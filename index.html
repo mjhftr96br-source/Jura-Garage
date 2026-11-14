@@ -333,6 +333,7 @@ const S = {
   log:{days:{}},
   sb:null, user:null, ai:false, needLogin:false,
 };
+let taHist = false;
 let session = null;          // laufende Abfrage
 const chats = new Map();     // Chat-Verlauf je Eintrag (nur in dieser Sitzung)
 const verdicts = new Map();  // KI-Auswertung im Schreibmodus
@@ -667,6 +668,12 @@ function vHeute(){
   const example = all.some(i=>i.example);
   if(!all.length) return `<h1>Deine Kartei ist leer</h1><p class="sub">Lege den ersten Eintrag an, lade unter „Daten“ die Sicherung aus deiner alten Kartei oder importiere deine Quizlet-Sets.</p>
     <div class="row"><a class="btn primary" href="#neu">Eintrag anlegen</a><a class="btn" href="#daten">Daten importieren</a></div>`;
+  const taDates = [...new Set(all.filter(i=>i.tagesabfrage).map(i=>i.tagesabfrage))].sort().reverse();
+  const taCount = d => all.filter(i=>i.tagesabfrage===d).length;
+  const taNew = d => all.filter(i=>i.tagesabfrage===d && isNew(i)).length;
+  const taRow = d => `<div class="row" style="justify-content:space-between;padding:8px 0;border-top:1px solid var(--line,#ddd)"><span><b>${toDate(d).toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long"})}</b><br><span class="small muted">${taCount(d)} Karten${taNew(d)?", "+taNew(d)+" noch nie gelernt":""}</span></span><button class="btn ${d===taDates[0]?"primary":""}" data-act="tagesabfrage" data-d="${esc(d)}">Abfragen</button></div>`;
+  const taShown = taHist ? taDates : taDates.slice(0,2);
+  const taBox = `<section class="panel" style="margin-top:18px"><h3 style="margin-top:0">Lerninhalte von heute abfragen</h3><p class="small muted" style="margin:0 0 6px">Claude liest, welche Dokumente in deinem Ordner neu oder geändert sind, und macht daraus Karten.</p>${taDates.length ? taShown.map(taRow).join("") : `<p class="small muted">Noch keine Abfrage geladen.</p>`}${taDates.length>2 ? `<div class="row" style="margin-top:8px"><button class="btn ghost" data-act="tahist">${taHist?"Verlauf ausblenden":"Verlauf anzeigen ("+(taDates.length-2)+" ältere)"}</button></div>`:""}<p class="small muted" style="margin:12px 0 4px">Neue Abfrage aus dem iCloud-Ordner „Tagesabfragen“ laden:</p><input type="file" id="tafile" accept=".json,application/json" multiple></section>`;
   return `<h1>Heute</h1>
   <p class="sub">${new Date().toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long"})}. Ausgewählt wird nach Fälligkeit, Klausurrelevanz und deinem Lernstand.</p>
   ${S.mode==="lokal"?'<div class="notice info small">Noch nicht mit Supabase verbunden. Deine Einträge liegen nur in diesem Browser.</div>':""}
@@ -692,7 +699,8 @@ function vHeute(){
       ${leech?`<div class="notice fix" style="margin-top:14px"><h4>${leech} Problemkarte${leech>1?"n":""}</h4>Karten, die du immer wieder vergisst. <a href="#problemkarten" class="linkbtn">Ansehen</a></div>`:""}
       ${fixes?`<div class="notice info" style="margin-top:14px"><b>${fixes} Korrekturvorschl${fixes>1?"äge":"ag"}</b> von Claude warten. Sie erscheinen, wenn du die Karte zum ersten Mal lernst. <a class="linkbtn" href="#bibliothek" data-act="fixfilter">Alle zeigen</a></div>`:""}
     </aside>
-  </div>`;
+  </div>
+  ${taBox}`;
 }
 function streak(){
   let d = today(), n = 0;
@@ -1156,7 +1164,7 @@ async function doExport(){
   }catch(e){}
   $("#exportbox").innerHTML = `<p class="small muted">Das Herunterladen ist hier nicht möglich. Kopiere den Text und speichere ihn als „${name}“.</p><textarea style="width:100%;min-height:120px;font-size:12px" readonly>${esc(data)}</textarea>`;
 }
-async function doImport(file){
+async function doImport(file, noStart){
   let d;
   try{ d = JSON.parse(await file.text()); if(!Array.isArray(d.items)) throw 0; }
   catch(e){ toast("Die Datei ist keine Sicherung der Examenskartei."); return; }
@@ -1166,6 +1174,13 @@ async function doImport(file){
     await putProgressMany(Object.entries(d.progress||{}));
     if(d.settings){ Object.assign(S.settings, d.settings); await saveSettings(); }
     if(d.log && d.log.days){ Object.entries(d.log.days).forEach(([k,v])=>S.log.days[k]=Math.max(S.log.days[k]||0,v)); await putMeta("log", S.log); }
+    if(d.tagesabfrage && d.tagesabfrage.datum){
+      const ids = d.items.filter(it=>it && it.id && it.type).map(it=>it.id);
+      toast(ids.length+" Karten der Tagesabfrage übernommen");
+      if(noStart){ render(); return; }
+      startSession(ids, {label:"Tagesabfrage "+toDate(d.tagesabfrage.datum).toLocaleDateString("de-DE",{day:"numeric",month:"long"})});
+      return;
+    }
     toast(d.items.length+" Einträge geladen"); render();
   }catch(e){ render(); }
 }
@@ -1189,6 +1204,8 @@ document.addEventListener("click", async e=>{
   if(a==="cat"){ const t=b.dataset.t, c=S.settings.cats; S.settings.cats = c.includes(t) ? c.filter(x=>x!==t) : [...c,t]; saveSettings(); render(); }
   else if(a==="start"){ const n = Math.max(0, todayTarget()-doneToday()); startSession(buildQueue(S.settings.cats, n), {label:"Heutige Abfrage"}); }
   else if(a==="more"){ startSession(buildQueue(S.settings.cats, 10), {label:"Zusätzliche Runde"}); }
+  else if(a==="tahist"){ taHist = !taHist; render(); }
+  else if(a==="tagesabfrage"){ const d = b.dataset.d; startSession([...S.items.values()].filter(i=>i.tagesabfrage===d).sort((x,y)=>priority(y)-priority(x)).map(i=>i.id), {label:"Tagesabfrage "+toDate(d).toLocaleDateString("de-DE",{day:"numeric",month:"long"})}); }
   else if(a==="reveal"){ if(session){ session.revealed = true; render(); } }
   else if(a==="grade"){ grade(Number(b.dataset.g)); }
   else if(a==="endsession"){ session = null; if(b.tagName!=="A") go("heute"); }
@@ -1238,12 +1255,12 @@ document.addEventListener("input", e=>{
     d.innerHTML = hits.length ? hits.map(i=>`<button data-act="addlink" data-id="${esc(i.id)}">${esc(TYPES[i.type])}: ${esc(titleOf(i))}</button>`).join("") : '<div class="small muted" style="padding:8px 12px">Kein Treffer</div>'; d.hidden = false; }
   else if(t.id==="chatin"){ t.style.height="auto"; t.style.height=Math.min(140,t.scrollHeight)+"px"; }
 });
-document.addEventListener("change", e=>{
+document.addEventListener("change", async e=>{
   const t = e.target;
   if(t.dataset.bib){ if(t.dataset.bib==="fix") bib.fix = t.checked; else if(t.dataset.bib!=="q") bib[t.dataset.bib] = t.value; render(); }
   else if(t.dataset.ex==="area"){ exam.area = t.value; render(); }
   else if(t.dataset.ex==="minRel"){ exam.minRel = Number(t.value); render(); }
-  else if(t.id==="importfile" && t.files[0]){ doImport(t.files[0]); }
+  else if((t.id==="importfile" || t.id==="tafile") && t.files[0]){ for(const f of t.files){ await doImport(f, t.id==="tafile"); } }
 });
 document.addEventListener("keydown", e=>{
   const ae = document.activeElement; const typing = ae && /INPUT|TEXTAREA|SELECT/.test(ae.tagName);
