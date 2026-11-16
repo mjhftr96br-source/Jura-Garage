@@ -333,7 +333,31 @@ const S = {
   log:{days:{}},
   sb:null, user:null, ai:false, needLogin:false,
 };
-let taHist = false;
+let taHist = false, taBusy = false;
+function taDb(){ return new Promise((res,rej)=>{ const r = indexedDB.open("jg-ta",1); r.onupgradeneeded = ()=>r.result.createObjectStore("h"); r.onsuccess = ()=>res(r.result); r.onerror = ()=>rej(r.error); }); }
+async function taGetHandle(){ try{ const db = await taDb(); return await new Promise(res=>{ const q = db.transaction("h").objectStore("h").get("dir"); q.onsuccess = ()=>res(q.result||null); q.onerror = ()=>res(null); }); }catch(e){ return null; } }
+async function taSetHandle(h){ const db = await taDb(); await new Promise((res,rej)=>{ const t = db.transaction("h","readwrite"); t.objectStore("h").put(h,"dir"); t.oncomplete = res; t.onerror = ()=>rej(t.error); }); }
+async function taSync(manual){
+  if(taBusy) return;
+  if(!window.showDirectoryPicker){ if(manual){ const f = $("#tafile"); if(f) f.click(); } return; }
+  taBusy = true;
+  try{
+    let h = await taGetHandle();
+    if(h){ let p = await h.queryPermission({mode:"read"}); if(p!=="granted"){ if(!manual) return; p = await h.requestPermission({mode:"read"}); if(p!=="granted") return; } }
+    else { if(!manual) return; h = await window.showDirectoryPicker({id:"tagesabfragen", mode:"read"}); await taSetHandle(h); }
+    let seen = {}; try{ seen = JSON.parse(localStorage.getItem("jg-ta-seen")||"{}"); }catch(e){}
+    let n = 0;
+    for await (const [name, e] of h.entries()){
+      if(e.kind!=="file" || !/^\d{4}-\d{2}-\d{2}\.json$/.test(name)) continue;
+      const f = await e.getFile();
+      if(seen[name]===f.lastModified) continue;
+      await doImport(f, true); seen[name] = f.lastModified; n++;
+    }
+    try{ localStorage.setItem("jg-ta-seen", JSON.stringify(seen)); }catch(e){}
+    if(manual) toast(n ? "Neue Tagesabfrage geladen" : "Nichts Neues im Ordner");
+  }catch(e){ if(manual && !(e && e.name==="AbortError")) toast("Der Ordner konnte nicht gelesen werden."); }
+  finally{ taBusy = false; }
+}
 let session = null;          // laufende Abfrage
 const chats = new Map();     // Chat-Verlauf je Eintrag (nur in dieser Sitzung)
 const verdicts = new Map();  // KI-Auswertung im Schreibmodus
@@ -671,15 +695,15 @@ function vHeute(){
   const taDates = [...new Set(all.filter(i=>i.tagesabfrage).map(i=>i.tagesabfrage))].sort().reverse();
   const taCount = d => all.filter(i=>i.tagesabfrage===d).length;
   const taNew = d => all.filter(i=>i.tagesabfrage===d && isNew(i)).length;
-  const taRow = d => `<div class="row" style="justify-content:space-between;padding:8px 0;border-top:1px solid var(--line,#ddd)"><span><b>${toDate(d).toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long"})}</b><br><span class="small muted">${taCount(d)} Karten${taNew(d)?", "+taNew(d)+" noch nie gelernt":""}</span></span><button class="btn ${d===taDates[0]?"primary":""}" data-act="tagesabfrage" data-d="${esc(d)}">Abfragen</button></div>`;
+  const taRow = d => `<div class="row" style="padding:11px 0;border-top:1px solid var(--line)"><div><b>${toDate(d).toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long"})}</b><div class="small muted">${taCount(d)} Karten${taNew(d)?", "+taNew(d)+" noch nie gelernt":""}</div></div><span class="spacer"></span><button class="btn ${d===taDates[0]?"primary":""}" data-act="tagesabfrage" data-d="${esc(d)}">Abfragen</button></div>`;
   const taShown = taHist ? taDates : taDates.slice(0,2);
-  const taBox = `<section class="panel" style="margin-top:18px"><h3 style="margin-top:0">Lerninhalte von heute abfragen</h3><p class="small muted" style="margin:0 0 6px">Claude liest, welche Dokumente in deinem Ordner neu oder geändert sind, und macht daraus Karten.</p>${taDates.length ? taShown.map(taRow).join("") : `<p class="small muted">Noch keine Abfrage geladen.</p>`}${taDates.length>2 ? `<div class="row" style="margin-top:8px"><button class="btn ghost" data-act="tahist">${taHist?"Verlauf ausblenden":"Verlauf anzeigen ("+(taDates.length-2)+" ältere)"}</button></div>`:""}<p class="small muted" style="margin:12px 0 4px">Neue Abfrage aus dem iCloud-Ordner „Tagesabfragen“ laden:</p><input type="file" id="tafile" accept=".json,application/json" multiple></section>`;
+  const taBox = `<section class="panel" style="margin-top:18px"><div class="row" style="margin-bottom:4px"><h3 style="margin:0">Lerninhalte von heute abfragen</h3><span class="spacer"></span><button class="btn" data-act="taload" title="Liest neue Tagesabfragen aus deinem iCloud-Ordner">Neu laden</button></div><p class="small muted" style="margin:0 0 10px">Claude wertet aus, welche Dokumente du geändert hast, und macht daraus Karten.</p>${taDates.length ? taShown.map(taRow).join("") : `<div class="small muted" style="border-top:1px solid var(--line);padding-top:11px">Noch keine Abfrage geladen. Mit „Neu laden“ holst du sie aus dem Ordner „Tagesabfragen“.</div>`}${taDates.length>2 ? `<div style="border-top:1px solid var(--line);padding-top:10px"><button class="linkbtn" data-act="tahist">${taHist?"Verlauf ausblenden":"Verlauf anzeigen ("+(taDates.length-2)+" ältere)"}</button></div>`:""}<input type="file" id="tafile" accept=".json,application/json" multiple hidden></section>`;
   return `<h1>Heute</h1>
   <p class="sub">${new Date().toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long"})}. Ausgewählt wird nach Fälligkeit, Klausurrelevanz und deinem Lernstand.</p>
   ${S.mode==="lokal"?'<div class="notice info small">Noch nicht mit Supabase verbunden. Deine Einträge liegen nur in diesem Browser.</div>':""}
   ${example?'<div class="notice info small">Die Kartei enthält noch Beispielinhalte zum Ausprobieren. Du kannst sie unter „Daten“ löschen, bevor du deine eigenen Karten importierst.</div>':""}
   <div class="today">
-    <section class="panel">
+    <div><section class="panel">
       <h3 style="margin-top:0">Was möchtest du abfragen?</h3>
       <div class="cats">${TKEYS.map(t=>`<button class="chip t-${t}" data-act="cat" data-t="${t}" aria-pressed="${cats.includes(t)}"><i class="dot"></i>${TYPES_PL[t]} <span class="n">${dueBy(t)}</span></button>`).join("")}</div>
       <h3>Wie viele heute?</h3>
@@ -689,6 +713,7 @@ function vHeute(){
       ${!n && avail ? `<button class="btn" data-act="more">10 weitere</button>`:""}</div>
       <p class="small muted" style="margin:14px 0 0"><kbd>Leertaste</kbd> Antwort zeigen, <kbd>1</kbd>–<kbd>4</kbd> bewerten, <kbd>?</kbd> alle Tastenkürzel</p>
     </section>
+    ${taBox}</div>
     <aside>
       <div class="facts">
         <div><b>${streak()}</b><span>${streak()===1?"Tag":"Tage"} Lernserie</span></div>
@@ -699,8 +724,7 @@ function vHeute(){
       ${leech?`<div class="notice fix" style="margin-top:14px"><h4>${leech} Problemkarte${leech>1?"n":""}</h4>Karten, die du immer wieder vergisst. <a href="#problemkarten" class="linkbtn">Ansehen</a></div>`:""}
       ${fixes?`<div class="notice info" style="margin-top:14px"><b>${fixes} Korrekturvorschl${fixes>1?"äge":"ag"}</b> von Claude warten. Sie erscheinen, wenn du die Karte zum ersten Mal lernst. <a class="linkbtn" href="#bibliothek" data-act="fixfilter">Alle zeigen</a></div>`:""}
     </aside>
-  </div>
-  ${taBox}`;
+  </div>`;
 }
 function streak(){
   let d = today(), n = 0;
@@ -1204,6 +1228,7 @@ document.addEventListener("click", async e=>{
   if(a==="cat"){ const t=b.dataset.t, c=S.settings.cats; S.settings.cats = c.includes(t) ? c.filter(x=>x!==t) : [...c,t]; saveSettings(); render(); }
   else if(a==="start"){ const n = Math.max(0, todayTarget()-doneToday()); startSession(buildQueue(S.settings.cats, n), {label:"Heutige Abfrage"}); }
   else if(a==="more"){ startSession(buildQueue(S.settings.cats, 10), {label:"Zusätzliche Runde"}); }
+  else if(a==="taload"){ taSync(true); }
   else if(a==="tahist"){ taHist = !taHist; render(); }
   else if(a==="tagesabfrage"){ const d = b.dataset.d; startSession([...S.items.values()].filter(i=>i.tagesabfrage===d).sort((x,y)=>priority(y)-priority(x)).map(i=>i.id), {label:"Tagesabfrage "+toDate(d).toLocaleDateString("de-DE",{day:"numeric",month:"long"})}); }
   else if(a==="reveal"){ if(session){ session.revealed = true; render(); } }
@@ -1302,7 +1327,7 @@ async function startData(sess){
   S.user = sess.user; S.needLogin = false; S.ready = false; render();
   try{ await loadAll(); }
   catch(e){ S.stale = true; toast(isAuthErr(e) ? "Deine Anmeldung ist abgelaufen. Bitte melde dich neu an." : "Die Kartei konnte nicht geladen werden. Prüfe die Internetverbindung."); }
-  S.ai = true; S.ready = true; render(); subscribe();
+  S.ai = true; S.ready = true; render(); subscribe(); taSync(false);
 }
 async function boot(){
   render();
