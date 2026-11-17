@@ -27,7 +27,7 @@
   --c-def:#5F84A6; --c-card:#6E8D57; --c-case:#B86A4E; --c-schema:#8A6E96;
   --chat:#E9EDE2; --chat-ink:#2D382C; --chat-line:#CED7C3; --bubble:#FFFDF8;
   --ok:#5E7F50; --ok-soft:#E3EBD6; --warn:#8A621D; --warn-soft:#F4E6C8;
-  --g1:#B86A4E; --g2:#B0832F; --g3:#5E7F50; --g4:#5F84A6;
+  --g1:#B86A4E; --g2:#B0832F; --g3:#5E7F50; --g4:#5F84A6; --g5:#7A6BA8;
   --blob-a:#EBD3A6; --blob-b:#D6E0C6; --blob-c:#EBCFC0; --blob-d:#D3E0EA;
   --shadow:0 1px 0 rgba(90,70,30,.06), 0 14px 34px -22px rgba(80,58,20,.45);
   --r1:28px 22px 30px 24px / 24px 30px 22px 28px;
@@ -48,7 +48,7 @@
     --c-def:#93B1CB; --c-card:#9DB886; --c-case:#D99479; --c-schema:#B9A0C3;
     --chat:#1F241D; --chat-ink:#D8DFD0; --chat-line:#343C31; --bubble:#2A3127;
     --ok:#9DB886; --ok-soft:#27301F; --warn:#E4C07E; --warn-soft:#352C1C;
-    --g1:#D99479; --g2:#E4C07E; --g3:#9DB886; --g4:#93B1CB;
+    --g1:#D99479; --g2:#E4C07E; --g3:#9DB886; --g4:#93B1CB; --g5:#B9A0C3;
     --blob-a:#3A3020; --blob-b:#25301F; --blob-c:#3A261F; --blob-d:#1F2A33;
     --shadow:0 1px 0 rgba(0,0,0,.25), 0 16px 36px -22px rgba(0,0,0,.8);
     color-scheme: dark;
@@ -61,7 +61,7 @@
   --c-def:#93B1CB; --c-card:#9DB886; --c-case:#D99479; --c-schema:#B9A0C3;
   --chat:#1F241D; --chat-ink:#D8DFD0; --chat-line:#343C31; --bubble:#2A3127;
   --ok:#9DB886; --ok-soft:#27301F; --warn:#E4C07E; --warn-soft:#352C1C;
-  --g1:#D99479; --g2:#E4C07E; --g3:#9DB886; --g4:#93B1CB;
+  --g1:#D99479; --g2:#E4C07E; --g3:#9DB886; --g4:#93B1CB; --g5:#B9A0C3;
   --blob-a:#3A3020; --blob-b:#25301F; --blob-c:#3A261F; --blob-d:#1F2A33;
   --shadow:0 1px 0 rgba(0,0,0,.25), 0 16px 36px -22px rgba(0,0,0,.8);
   color-scheme: dark;
@@ -69,14 +69,8 @@
 *,*::before,*::after{box-sizing:border-box}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--ink);font:16.5px/1.55 var(--sans);-webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden}
-/* weiche Farbflecken im Hintergrund */
-body::after{content:"";position:fixed;inset:-10vmax;z-index:-1;pointer-events:none;
-  background:
-    radial-gradient(38vmax 30vmax at 8% 12%, var(--blob-a) 0, transparent 62%),
-    radial-gradient(34vmax 28vmax at 96% 20%, var(--blob-b) 0, transparent 60%),
-    radial-gradient(40vmax 30vmax at 85% 96%, var(--blob-c) 0, transparent 62%),
-    radial-gradient(30vmax 26vmax at 10% 88%, var(--blob-d) 0, transparent 60%);
-  opacity:.75}
+/* ruhiger, flacher Grund */
+
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
 button,input,textarea,select{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--acc-ink);outline-offset:3px;border-radius:8px}
@@ -93,7 +87,7 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;padding:10
 @media (max-width:980px){.brand b{display:none}}
 nav.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;flex:1}
 nav.tabs::-webkit-scrollbar{display:none}
-nav.tabs a{padding:8px 13px;border-radius:999px;text-decoration:none;color:var(--ink);opacity:.68;font-weight:500;white-space:nowrap;transition:background .15s,opacity .15s}
+nav.tabs a{padding:8px 10px;border-radius:999px;text-decoration:none;color:var(--ink);opacity:.68;font-weight:500;white-space:nowrap;transition:background .15s,opacity .15s}
 nav.tabs a:hover{opacity:1;background:var(--soft)}
 nav.tabs a[aria-current="page"]{opacity:1;font-weight:600;background:var(--acc-soft);color:var(--acc-ink)}
 .qs{position:relative;width:210px;flex:none}
@@ -112,7 +106,7 @@ h3{font:600 15.5px/1.3 var(--sans);margin:18px 0 8px}
 .sub{color:var(--muted);margin:0 0 20px;max-width:68ch}
 .muted{color:var(--muted)}
 .small{font-size:13.5px}
-kbd{font:500 11px/1 var(--sans);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:2px 5px;color:var(--muted);background:var(--paper)}
+kbd{font:600 10px/1 var(--sans);letter-spacing:.02em;border:0;border-radius:4px;padding:3px 5px;color:var(--muted);background:color-mix(in srgb,var(--muted) 16%,transparent);vertical-align:1px}
 .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 .spacer{flex:1}
 
@@ -149,9 +143,9 @@ kbd{font:500 11px/1 var(--sans);border:1px solid var(--line);border-bottom-width
 @media (max-width:700px){.zones{grid-template-columns:1fr}}
 .zone{position:relative;background:var(--paper);border:1px solid var(--line);border-radius:var(--r1);padding:20px 20px 22px;box-shadow:var(--shadow);overflow:hidden}
 .zone:nth-child(2){border-radius:var(--r2)} .zone:nth-child(3){border-radius:var(--r3)}
-.zone::before{content:"";position:absolute;width:220px;height:180px;right:-60px;top:-70px;border-radius:46% 54% 60% 40% / 52% 40% 60% 48%;background:var(--zc,var(--acc-soft));opacity:.9;z-index:0}
+.zone{border-top:3px solid var(--zc,var(--acc))}
 .zone > *{position:relative;z-index:1}
-.zone.z-pensum{--zc:var(--acc-soft)} .zone.z-tages{--zc:var(--moss-soft)} .zone.z-fall{--zc:var(--clay-soft)}
+.zone.z-pensum{--zc:var(--acc)} .zone.z-tages{--zc:var(--moss)} .zone.z-fall{--zc:var(--clay)}
 .zone header{display:flex;gap:12px;align-items:flex-start;margin-bottom:6px}
 .zone header .ill{width:64px;height:64px;flex:none;margin:-4px 0 0 -4px}
 .zone header h2{margin:2px 0 2px;font-size:21px}
@@ -184,10 +178,10 @@ kbd{font:500 11px/1 var(--sans);border:1px solid var(--line);border-bottom-width
 .bar{height:8px;background:var(--line);border-radius:8px;overflow:hidden;margin:8px 0 18px}
 .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--moss),var(--acc));border-radius:8px;transition:width .25s}
 .sheet{position:relative;background:var(--paper);border:1px solid var(--line);border-radius:var(--r1);box-shadow:var(--shadow);padding:28px 30px 28px 30px;min-height:300px;overflow:hidden}
-.sheet::before{content:"";position:absolute;right:-50px;top:-60px;width:170px;height:150px;border-radius:46% 54% 60% 40% / 52% 40% 60% 48%;background:var(--tc,var(--acc));opacity:.13}
+.sheet{box-shadow:var(--shadow), inset 0 3px 0 var(--tc,var(--acc))}
 .sheet > *{position:relative}
 .t-def{--tc:var(--c-def)} .t-card{--tc:var(--c-card)} .t-case{--tc:var(--c-case)} .t-schema{--tc:var(--c-schema)}
-.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--tc)}
+.dot{display:inline-block;width:4px;height:14px;border-radius:2px;background:var(--tc)}
 .sheet .meta{display:flex;gap:10px;flex-wrap:wrap;align-items:center;color:var(--muted);font-size:13px;margin-bottom:16px}
 .typetag{font-weight:600;color:var(--tc);background:color-mix(in srgb,var(--tc) 14%,transparent);padding:3px 10px;border-radius:999px}
 .fallchip{font-weight:600;color:var(--clay);background:var(--clay-soft);padding:3px 10px;border-radius:999px;text-decoration:none}
@@ -209,17 +203,18 @@ ol.schema li.l0{font-weight:600;margin-top:10px}
 ol.probs li{margin:0 0 12px}
 ol.probs b{font-weight:600}
 ul.kern{margin:8px 0;padding-left:1.2em}
-.grades{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:20px}
+.grades{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:20px}
 .grades button{border:1px solid var(--line);background:var(--paper);border-radius:var(--r3);padding:11px 6px;cursor:pointer;text-align:center;transition:transform .12s}
 .grades button:nth-child(2){border-radius:var(--r2)} .grades button:nth-child(3){border-radius:var(--r1)}
 .grades button:hover{transform:translateY(-2px);border-color:var(--muted)}
-.grades button b{display:block;font-weight:600}
+.grades button b{display:block;font-weight:600;white-space:nowrap;font-size:15px}
 .grades button span{font-size:12.5px;color:var(--muted)}
-.grades button kbd{margin-left:4px}
+.grades button kbd{margin-left:5px;font-size:9px;padding:2px 4px}
+.grades button[data-g="5"] b{color:var(--g5)}
 .grades button[data-g="1"] b{color:var(--g1)} .grades button[data-g="2"] b{color:var(--g2)}
 .grades button[data-g="3"] b{color:var(--g3)} .grades button[data-g="4"] b{color:var(--g4)}
 .grades button.rec{outline:2px solid var(--ok);outline-offset:2px}
-@media (max-width:520px){.grades{grid-template-columns:repeat(2,1fr)} .sheet{padding:22px 18px}}
+@media (max-width:520px){.grades{grid-template-columns:repeat(3,1fr)} .sheet{padding:22px 18px}}
 .reveal{margin-top:22px}
 
 .notice{border-radius:var(--r3);padding:14px 16px;margin:0 0 16px;border:1px solid}
@@ -274,7 +269,7 @@ ul.kern{margin:8px 0;padding-left:1.2em}
 .item .t{font:500 16.5px/1.4 var(--serif);font-variation-settings:"SOFT" 100}
 .item .s{color:var(--muted);font-size:13px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .item .k{font-size:12px;font-weight:600;color:var(--tc);display:inline-flex;align-items:center;gap:6px}
-.item .k::before{content:"";width:9px;height:9px;border-radius:50% 40% 55% 45%;background:var(--tc)}
+.item .k::before{content:"";width:4px;height:12px;border-radius:2px;background:var(--tc)}
 .item .r{text-align:right;font-size:12.5px;color:var(--muted);white-space:nowrap}
 @media (max-width:600px){.item{grid-template-columns:1fr}.item .r{text-align:left}}
 mark{background:color-mix(in srgb,var(--acc) 45%,transparent);color:inherit;border-radius:3px;padding:0 1px}
@@ -332,6 +327,34 @@ mark{background:color-mix(in srgb,var(--acc) 45%,transparent);color:inherit;bord
 .done b{font:600 46px/1 var(--serif);display:block;margin-bottom:8px}
 body.locked nav.tabs, body.locked .qs{display:none}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* Tier, eigene Antwort, Eselsbrücke, Statistik */
+.tier{display:inline-block;font:700 11px/1 var(--sans);letter-spacing:.03em;padding:3px 7px;border-radius:5px;color:var(--ink);background:var(--soft);border:1px solid var(--line)}
+.tier.t1{background:var(--acc);border-color:var(--acc);color:var(--on-acc)} .tier.t2{background:var(--acc-soft);border-color:var(--acc);color:var(--acc-ink)}
+.tier.t3{color:var(--muted)} .tier.t4{color:var(--muted);border-style:dashed}
+.own{margin-top:16px} .own label{display:block;font:600 13px/1.3 var(--sans);color:var(--muted);margin-bottom:6px}
+.own textarea{width:100%;min-height:84px;padding:11px 13px;border:1px solid var(--line);border-radius:var(--r3);background:var(--soft);color:var(--ink);font:16px/1.5 var(--sans);resize:vertical}
+.own textarea:focus{outline:2px solid var(--acc);outline-offset:1px;background:var(--paper)}
+.ownshow{margin:16px 0 0;padding:12px 14px;border-left:3px solid var(--tc,var(--acc));background:var(--soft);border-radius:0 var(--r3) var(--r3) 0}
+.ownshow h4,.mnemo h4{margin:0 0 4px;font:700 11px/1.2 var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.ownshow div{font-size:15.5px;white-space:pre-wrap}
+.mnemo{margin:18px 0 0;padding:13px 16px 14px;background:var(--acc-soft);border:1px dashed var(--acc);border-radius:var(--r2);position:relative}
+.mnemo h4{color:var(--acc-ink)}
+.mnemo .txt{font:italic 500 17px/1.45 var(--serif);font-variation-settings:"SOFT" 100;white-space:pre-wrap}
+.mnemo textarea{width:100%;min-height:64px;padding:9px 11px;border:1px solid var(--acc);border-radius:var(--r3);background:var(--paper);color:var(--ink);font:16px/1.45 var(--sans)}
+.mnemo .act{margin-top:8px;display:flex;gap:10px;align-items:center}
+.addmnemo{margin-top:14px}
+.norm .ext{opacity:.55;margin-left:3px;font-size:.9em}
+.goalbar{position:relative;height:14px;background:var(--line);border-radius:7px;overflow:hidden}
+.goalbar i{position:absolute;left:0;top:0;bottom:0;border-radius:7px}
+.goalmark{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink);opacity:.7}
+.tiers4{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-top:6px}
+.tcard{background:var(--paper);border:1px solid var(--line);border-radius:var(--r3);padding:14px 16px}
+.tcard b.big{display:block;font:600 30px/1.1 var(--serif);font-variant-numeric:tabular-nums;margin:6px 0 8px}
+.bigstat{display:flex;gap:26px;flex-wrap:wrap;align-items:flex-end;margin:6px 0 14px}
+.bigstat b{display:block;font:600 40px/1 var(--serif);font-variant-numeric:tabular-nums}
+.bigstat span{color:var(--muted);font-size:13.5px}
+.proj svg{width:100%;height:auto;max-height:230px;display:block}
 </style>
 </head>
 <body>
@@ -388,12 +411,27 @@ const toDate = s => { const [y,m,d]=s.split("-").map(Number); return new Date(y,
 const diffDays = (a,b) => { const p=s=>{const [y,m,d]=s.split("-").map(Number);return Date.UTC(y,m-1,d)}; return Math.round((p(b)-p(a))/864e5); };
 const fold = s => String(s ?? "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ß/g,"ss");
 const uid = p => p+"-"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const FED_LAWS = new Set("BGB StGB GG VwGO VwVfG StPO ZPO BauGB BauNVO HGB StVG StVO KrWG ProdHaftG BVerfGG GVG InsO AO FGO SGG UWG GWB UrhG MarkenG PatG HGrG ZVG GBO ArbGG KSchG BetrVG TVG AGG BDSG VwZG VwKostG WHG BNatSchG BImSchG UVPG StGB OWiG JGG BRAO RVG GKG FamFG AktG GmbHG WEG BeurkG UKlaG AsylG AufenthG PolG ROG BBodSchG EStG KStG UStG SGB GwG KWG VVG InsVV BtMG StVollzG GVG BGBEG EGBGB ZwVwV UmwRG WpHG BauGB".split(" "));
+const BAY_LAWS = {PAG:"BayPAG", LStVG:"BayLStVG", GO:"BayGO", LKrO:"BayLKrO", BezO:"BayBezO", BayBO:"BayBO", BayVwVfG:"BayVwVfG", VwZVG:"BayVwZVG", BayVwZVG:"BayVwZVG", BayStrWG:"BayStrWG", BayDSG:"BayDSG", KAG:"BayKAG", BayNatSchG:"BayNatSchG", BayWaldG:"BayWaldG", BayVerf:"BayVerf", BV:"BayVerf", BayEUG:"BayEUG", BayHSchG:"BayHSchG", BayBG:"BayBG", BayKJHG:"BayKJHG", BayVwGO:"BayVwVfG", POG:"BayPOG", BayVSG:"BayVSG", BayStVollzG:"BayStVollzG", BayVGG:"BayVGG", VerfGHG:"BayVfGHG", BayVfGHG:"BayVfGHG"};
+const SLUG_EXC = {EGBGB:"bgbeg", BGBEG:"bgbeg", GwG:"gwg", OWiG:"owig"};
+function normUrl(n){
+  const t = String(n).trim();
+  const m = t.match(/(§§?|Art\.?|Artikel)\s*(\d+[a-z]?)/i); if(!m) return null;
+  const abbr = (t.match(/([A-ZÄÖÜ][A-Za-zÄÖÜäöüß]*)\s*$/)||[])[1]; if(!abbr) return null;
+  const isArt = /^art/i.test(m[1]), num = m[2].toLowerCase();
+  if(BAY_LAWS[abbr]) return "https://www.gesetze-bayern.de/Content/Document/"+BAY_LAWS[abbr];
+  if(FED_LAWS.has(abbr)){ const slug = SLUG_EXC[abbr] || abbr.toLowerCase(); return "https://www.gesetze-im-internet.de/"+slug+"/"+(isArt ? "art_"+num+".html" : "__"+num+".html"); }
+  return null;
+}
+const normChip = n => { const u = normUrl(n); return u ? `<a class="norm" href="${u}" target="_blank" rel="noopener noreferrer" title="Im amtlichen Gesetzestext öffnen">${esc(n)}<span class="ext">↗</span></a>` : `<a class="norm" href="#${normSlug(n)}">${esc(n)}</a>`; };
 const normSlug = n => "n-"+fold(n).replace(/§+/g,"p").replace(/art\./g,"art").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 const TYPES = {def:"Definition", card:"Karteikarte", schema:"Schema", case:"Fall"};
 const TYPES_PL = {def:"Definitionen", card:"Karteikarten", schema:"Schemata", case:"Fälle"};
 const TKEYS = ["def","card","schema","case"];
-const REL_TXT = {5:"sehr hoch",4:"hoch",3:"mittel",2:"gering",1:"sehr gering"};
-const GRADE_TXT = {1:"Nochmal",2:"Schwer",3:"Gut",4:"Leicht"};
+const TIER_TXT = {1:"Tier 1 · Fundament",2:"Tier 2 · Klassiker",3:"Tier 3 · Vertiefung",4:"Tier 4 · Randwissen"};
+const tierOf = it => it.tier || ({5:1,4:2,3:3,2:4,1:4}[it.relevance]||3);
+const tierTag = it => { const t = tierOf(it); return `<span class="tier t${t}" title="${TIER_TXT[t]}">T${t}</span>`; };
+const GRADE_TXT = {1:"Nochmal",2:"Schwer",3:"Gut",4:"Leicht",5:"Sehr leicht"};
 
 /* ---------- Zustand ---------- */
 const S = {
@@ -406,6 +444,8 @@ const S = {
 let taHist = false;
 let session = null;          // laufende Abfrage
 const chats = new Map();     // Chat-Verlauf je Eintrag (nur in dieser Sitzung)
+const own = new Map();  // Antworten „in eigenen Worten“ der laufenden Abfrage
+let mnemoEdit = null;
 const verdicts = new Map();  // KI-Auswertung im Schreibmodus
 const checks = new Map();    // Fallabfrage: Skizze des Kernproblems und Claudes Prüfung
 
@@ -560,7 +600,7 @@ function cachePut(k, v){
     localStorage.setItem(AI_CACHE_KEY, JSON.stringify(m)); }catch(e){}
 }
 const CHAT_RULES = "Du bist Repetitor für das bayerische Erste Juristische Staatsexamen und hilfst beim Lernen mit einer Kartei. Antworte auf Deutsch, knapp (höchstens 6 Sätze, außer es wird ausdrücklich mehr verlangt) und examensnah. Nenne die einschlägigen Normen und bei Streitständen die herrschende Meinung. Ist die Karte fehlerhaft oder unvollständig, weise sachlich darauf hin.";
-const GRADE_RULES = 'Du korrigierst Definitionen für das bayerische Erste Juristische Staatsexamen. Prüfe, ob jedes Kernmerkmal der Musterdefinition sinngemäß in der Antwort enthalten ist; der Wortlaut muss nicht übereinstimmen. Antworte ausschließlich mit JSON ohne weiteren Text: {"merkmale":[{"merkmal":"…","erfuellt":true,"hinweis":"nur wenn nicht erfüllt, höchstens 10 Wörter"}],"gesamt":"vollständig|teilweise|unzureichend","empfehlung":"Nochmal|Schwer|Gut|Leicht","kommentar":"ein Satz"}';
+const GRADE_RULES = 'Du korrigierst Antworten auf Karteikarten (Definitionen, Fragen, Schemata) für das bayerische Erste Juristische Staatsexamen. Prüfe, ob jedes Kernmerkmal der Musterdefinition sinngemäß in der Antwort enthalten ist; der Wortlaut muss nicht übereinstimmen. Antworte ausschließlich mit JSON ohne weiteren Text: {"merkmale":[{"merkmal":"…","erfuellt":true,"hinweis":"nur wenn nicht erfüllt, höchstens 10 Wörter"}],"gesamt":"vollständig|teilweise|unzureichend","empfehlung":"Nochmal|Schwer|Gut|Leicht","kommentar":"ein Satz"}';
 const CHECK_RULES = `Du bist Korrektor für das bayerische Erste Juristische Staatsexamen. Der Lernende skizziert in eigenen Worten das Kernproblem eines Übungsfalls. Prüfe die Skizze an der beigefügten Lösung; deren Rechtsauffassung gilt. Antworte auf Deutsch, knapp und konkret, in genau diesem Format (Abschnitte ohne Inhalt weglassen):
 Richtig erkannt: Stichpunkte, jeweils mit „– “ beginnend
 Fehlt oder ungenau: Stichpunkte mit „– “; nenne das fehlende Problem und die einschlägige Norm
@@ -600,26 +640,34 @@ async function aiJson(prompt){
 }
 
 /* ---------- Wiederholungssystem ---------- */
-// Klausurrelevanz streckt oder verkürzt jeden Abstand. Wenig relevante Karten kommen auch bei „Nochmal“ erst später wieder.
-const REL_FACTOR = {5:0.8, 4:1, 3:1.3, 2:1.8, 1:2.5};
-const AGAIN_DAYS = {5:1, 4:1, 3:3, 2:5, 1:8};
-function schedule(prev, grade, rel){
+// Das Tier streckt oder verkürzt die Abstände: Tier 1 und 2 kommen öfter, Randwissen seltener.
+// Mindestabstände: Schwer 2 Tage, Gut 4 Tage, Leicht 1 Woche, Sehr leicht 1 Monat (nie nach dem Examen).
+const TIER_FACTOR = {1:0.8, 2:1, 3:1.3, 4:1.7};
+const AGAIN_DAYS = {1:1, 2:1, 3:2, 4:4};
+const EXAM_DEFAULT = "2027-03-01";
+const examDate = () => S.settings.examDate || EXAM_DEFAULT;
+const daysToExam = () => Math.max(0, diffDays(today(), examDate()));
+function schedule(prev, grade, tier){
   const p = Object.assign({ivl:0, ease:2.5, reps:0, lapses:0}, prev||{});
-  rel = rel||3; const f = REL_FACTOR[rel]||1; let ivl;
-  if(grade===1){ ivl = AGAIN_DAYS[rel]||3; p.ease = Math.max(1.3, p.ease-0.2); p.lapses++; }
-  else if(grade===2){ ivl = (p.ivl ? Math.max(p.ivl*1.2, p.ivl+1) : 1.5) * f; p.ease = Math.max(1.3, p.ease-0.15); }
-  else if(grade===3){ ivl = (p.ivl ? p.ivl*p.ease : 3) * f; }
-  else { ivl = (p.ivl ? p.ivl*p.ease*1.3 : 6) * f; p.ease = Math.min(3.2, p.ease+0.15); }
-  ivl = Math.min(365, Math.max(1, Math.round(ivl)));
+  tier = tier||3; const f = TIER_FACTOR[tier]||1; let ivl;
+  if(grade===1){ ivl = AGAIN_DAYS[tier]||2; p.ease = Math.max(1.3, p.ease-0.2); p.lapses++; }
+  else if(grade===2){ ivl = Math.max(2, (p.ivl ? Math.max(p.ivl*1.2, p.ivl+1) : 2) * f); p.ease = Math.max(1.3, p.ease-0.15); }
+  else if(grade===3){ ivl = Math.max(4, (p.ivl ? p.ivl*p.ease : 4) * f); }
+  else if(grade===4){ ivl = Math.max(7, (p.ivl ? p.ivl*p.ease*1.3 : 7) * f); p.ease = Math.min(3.2, p.ease+0.1); }
+  else { ivl = Math.max(30, (p.ivl ? p.ivl*p.ease*1.6 : 30)); p.ease = Math.min(3.2, p.ease+0.15); }
+  const cap = Math.max(1, daysToExam()-2); // nicht über das Examen hinaus planen
+  ivl = Math.min(365, cap, Math.max(1, Math.round(ivl)));
+  if(grade>=3 && !p.sure) p.sure = today();
   p.ivl = ivl; p.reps++; p.due = addDays(today(), ivl); p.last = today(); p.lastGrade = grade;
   p.leech = p.lapses >= 3;
   return p;
 }
+const TIER_W = {1:8, 2:6, 3:3, 4:1};
 function priority(it){
-  const p = S.progress.get(it.id), r = it.relevance||3;
-  if(!p) return r*2 + 0.5;
+  const p = S.progress.get(it.id), w = TIER_W[tierOf(it)];
+  if(!p) return w + 0.5;
   const over = Math.max(0, diffDays(p.due, today()));
-  return r*2 + Math.min(p.lapses,5) + Math.min(over,30)*0.2 + (p.ease<2 ? 1.5 : 0);
+  return w + Math.min(p.lapses,5) + Math.min(over,30)*0.2 + (p.ease<2 ? 1.5 : 0);
 }
 const isDue = it => { const p = S.progress.get(it.id); return !p || p.due <= today(); };
 const isNew = it => !S.progress.get(it.id);
@@ -648,7 +696,7 @@ function normIndex(){
   return m;
 }
 const areas = () => [...new Set([...S.items.values()].map(i=>i.area).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"de"));
-function relDots(r){ r=r||3; let h='<span class="rel" title="Klausurrelevanz: '+REL_TXT[r]+'">'; for(let i=1;i<=5;i++) h+='<i class="'+(i<=r?"on":"")+'"></i>'; return h+"</span>"; }
+
 function paras(t){ return String(t||"").split(/\n{2,}|\n/).filter(x=>x.trim()).map(x=>"<p>"+esc(x)+"</p>").join(""); }
 function hl(text, toks){
   let h = esc(text); if(!toks.length) return h;
@@ -669,7 +717,7 @@ function itemRow(it, toks=[]){
   const sub = snippet(bodyText(it).replace(/\s+/g," "), toks);
   return `<a class="item t-${it.type}" href="#e-${esc(it.id)}"><span class="k">${TYPES[it.type]}</span>
     <span><div class="t">${hl(titleOf(it)||"(ohne Titel)", toks)}</div><div class="s">${hl(sub,toks)}</div></span>
-    <span class="r">${esc(it.area||"")}<br>${relDots(it.relevance)} ${p&&p.leech?'<b style="color:var(--g1)">Problemkarte</b>':esc(due)}</span></a>`;
+    <span class="r">${esc(it.area||"")}<br>${tierTag(it)} ${p&&p.leech?'<b style="color:var(--g1)">Problemkarte</b>':esc(due)}</span></a>`;
 }
 
 /* ---------- Routing ---------- */
@@ -828,7 +876,7 @@ function vAktuell(){
 
   // 1) Tägliches Pensum
   const pensum = `<section class="zone z-pensum">
-    <header>${ILL.pensum()}<div><h2>Tägliches Pensum</h2><p>Ausgewählt nach Fälligkeit, Klausurrelevanz und deinem Lernstand.</p></div></header>
+    <header>${ILL.pensum()}<div><h2>Tägliches Pensum</h2><p>Ausgewählt nach Fälligkeit, Tier (1 bis 4) und deinem Lernstand.</p></div></header>
     <h3>Was möchtest du abfragen?</h3>
     <div class="cats">${TKEYS.map(t=>`<button class="chip t-${t}" data-act="cat" data-t="${t}" aria-pressed="${cats.includes(t)}"><i class="dot"></i>${TYPES_PL[t]} <span class="n">${dueBy(t)}</span></button>`).join("")}</div>
     <h3>Wie viele heute?</h3>
@@ -836,7 +884,7 @@ function vAktuell(){
     <p class="small muted" style="margin:0 0 16px">Grundpensum ${S.settings.base} pro Tag, der Regler gilt nur für heute. Erledigt: ${done}.</p>
     <div class="row"><button class="btn primary big" data-act="start" ${n?"":"disabled"}>${n ? n+" Karten abfragen" : done>=target && avail ? "Tagespensum geschafft" : "Nichts fällig"}</button>
     ${!n && avail ? `<button class="btn" data-act="more">10 weitere</button>`:""}</div>
-    <p class="small muted" style="margin:14px 0 0"><kbd>Leertaste</kbd> Antwort zeigen, <kbd>1</kbd>–<kbd>4</kbd> bewerten, <kbd>?</kbd> alle Tastenkürzel</p>
+    <p class="small muted" style="margin:14px 0 0"><kbd>Leertaste</kbd> Antwort zeigen, <kbd>1</kbd>–<kbd>5</kbd> bewerten, <kbd>?</kbd> alle Tastenkürzel</p>
   </section>`;
 
   // 2) Tagesabfrage
@@ -895,7 +943,7 @@ function buildQueue(cats, n){
 }
 function startSession(ids, opts={}){
   if(!ids.length){ toast("Keine passenden Karten gefunden."); return; }
-  session = {ids, idx:0, revealed:false, exam:!!opts.exam, label:opts.label||"Abfrage", results:{1:0,2:0,3:0,4:0}, counted:new Set(), total:ids.length};
+  session = {ids, idx:0, revealed:false, exam:!!opts.exam, label:opts.label||"Abfrage", results:{1:0,2:0,3:0,4:0,5:0}, counted:new Set(), total:ids.length};
   go("lernen");
 }
 
@@ -903,9 +951,9 @@ function startSession(ids, opts={}){
 function vLernen(){
   if(!session) return `<h1>Keine laufende Abfrage</h1><p class="sub">Starte eine Abfrage unter „Aktuell“.</p><a class="btn primary" href="#aktuell">Zu „Aktuell“</a>`;
   if(session.idx >= session.ids.length){
-    const r = session.results, tot = r[1]+r[2]+r[3]+r[4];
+    const r = session.results, tot = r[1]+r[2]+r[3]+r[4]+r[5];
     return `<div class="panel done">${ILL.done()}<b>${tot}</b><p>${session.exam?"Prüfungsfragen beantwortet":"Karten wiederholt"}</p>
-      <p class="muted">Nochmal ${r[1]}, schwer ${r[2]}, gut ${r[3]}, leicht ${r[4]}${session.exam&&tot?". Quote: "+Math.round((r[3]+r[4])/tot*100)+" % sicher":""}</p>
+      <p class="muted">Nochmal ${r[1]}, schwer ${r[2]}, gut ${r[3]}, leicht ${r[4]}, sehr leicht ${r[5]}${session.exam&&tot?". Quote: "+Math.round((r[3]+r[4]+r[5])/tot*100)+" % sicher":""}</p>
       <div class="row" style="justify-content:center;margin-top:16px"><a class="btn primary" href="#aktuell" data-act="endsession">Fertig</a><a class="btn" href="#statistik" data-act="endsession">Statistik ansehen</a></div></div>`;
   }
   const id = session.ids[session.idx], it = S.items.get(id);
@@ -929,7 +977,7 @@ const fieldName = k => ({steps:"Prüfungspunkte",hinweis:"Hinweise",front:"Vorde
 
 function sheet(it, revealed, study){
   const p = S.progress.get(it.id);
-  const meta = `<div class="meta"><span class="typetag">${it.fallsumme?"Fallzusammenfassung":TYPES[it.type]}</span>${it.fall?`<span class="fallchip">${esc([it.fall.reihe,it.fall.name].filter(Boolean).join(" "))}</span>`:""}<span>${esc(it.area||"")}</span>${relDots(it.relevance)}<span>${esc(it.source||"")}</span>
+  const meta = `<div class="meta"><span class="typetag">${it.fallsumme?"Fallzusammenfassung":TYPES[it.type]}</span>${it.fall?`<span class="fallchip">${esc([it.fall.reihe,it.fall.name].filter(Boolean).join(" "))}</span>`:""}<span>${esc(it.area||"")}</span>${tierTag(it)}<span>${esc(it.source||"")}</span>
     ${study?`<span class="spacer"></span><a href="#e-${esc(it.id)}" class="small muted" data-act="peek">Eintrag öffnen</a>`:""}</div>`;
   let q="", a="";
   if(it.type==="card"){
@@ -948,32 +996,38 @@ function sheet(it, revealed, study){
       ${(it.problems||[]).length?`<h3>Problemschwerpunkte</h3><ol class="probs prose" style="font-size:16px">${it.problems.map(pr=>`<li><b>${esc(pr.frage)}</b><br>${esc(pr.antwort)}</li>`).join("")}</ol>`:""}
       ${(it.gliederung||[]).length?`<h3>Lösungsaufbau</h3>${schemaList(it.gliederung)}`:""}`;
   }
-  const norms = (it.norms||[]).length ? `<div class="margin-norms">${it.norms.map(n=>`<a class="norm" href="#${normSlug(n)}">${esc(n)}</a>`).join("")}</div>` : "";
-  if(!study) return `<article class="sheet t-${it.type}">${meta}${q}<div class="answer">${a}</div>${norms}</article>`;
+  const norms = (it.norms||[]).length ? `<div class="margin-norms">${it.norms.map(normChip).join("")}</div>` : "";
+  if(!study) return `<article class="sheet t-${it.type}">${meta}${q}<div class="answer">${a}</div>${it.mnemonic?`<div class="mnemo"><h4>Eselsbrücke</h4><div class="txt">${esc(it.mnemonic)}</div></div>`:""}${norms}</article>`;
   // Lernansicht
   let write = "";
-  if(it.type==="def" && !session.exam || it.type==="def" && session.exam){
-    write = `<div class="row" style="margin-top:16px"><label class="switch"><input type="checkbox" data-act="writemode" ${S.settings.write?"checked":""}> Schreibmodus: Definition eintippen und von Claude auswerten lassen</label></div>`;
-    if(S.settings.write && !revealed){
-      const v = verdicts.get(it.id);
-      write += `<div class="write" style="margin-top:10px"><textarea id="wtext" placeholder="Deine Definition …">${esc(v&&v.input||"")}</textarea>
-        <div class="row" style="margin-top:8px"><button class="btn" data-act="judge" data-id="${esc(it.id)}" ${v&&v.busy?"disabled":""}>${v&&v.busy?"Claude wertet aus …":"Auswerten lassen"}</button>
-        ${S.ai?"":'<span class="small muted">Die Auswertung braucht die Verbindung zu Supabase.</span>'}</div></div>`;
-    }
+  const hasOwn = it.type!=="case";
+  const myText = own.get(it.id)||"";
+  if(hasOwn && !revealed){
+    const v = verdicts.get(it.id);
+    write = `<div class="own"><label for="wtext">In eigenen Worten antworten</label><textarea id="wtext" placeholder="Schreib auf, wie du antworten würdest …">${esc(myText)}</textarea>
+      ${S.ai?`<div class="row" style="margin-top:8px"><button class="btn" data-act="judge" data-id="${esc(it.id)}" ${v&&v.busy?"disabled":""}>${v&&v.busy?"Claude wertet aus …":"Von Claude auswerten lassen"}</button></div>`:""}</div>`;
+  } else if(hasOwn && myText.trim()){
+    write = `<div class="ownshow"><h4>Deine Antwort</h4><div>${esc(myText)}</div></div>`;
   }
   const v = verdicts.get(it.id);
   const verdictHtml = v && v.result ? verdictBox(v.result) : v && v.error ? `<div class="verdict small">${esc(v.error)}</div>` : "";
   const ck = it.type==="case" ? checks.get(it.id) : null;
-  const rec = v && v.result ? ({"Nochmal":1,"Schwer":2,"Gut":3,"Leicht":4}[v.result.empfehlung]||0) : ck && ck.rec ? ck.rec : 0;
-  const gradeBtns = [1,2,3,4].map(g=>{
-    const ivl = session.exam ? null : schedule(p, g, it.relevance).ivl;
-    return `<button data-act="grade" data-g="${g}" class="${rec===g?"rec":""}"><b>${GRADE_TXT[g]}<kbd>${g}</kbd></b><span>${session.exam ? "" : g===1 && (it.relevance||3)>=4 ? "gleich nochmal" : fmtIvl(ivl)}</span></button>`;
+  const rec = v && v.result ? ({"Nochmal":1,"Schwer":2,"Gut":3,"Leicht":4,"Sehr leicht":5}[v.result.empfehlung]||0) : ck && ck.rec ? ck.rec : 0;
+  const gradeBtns = [1,2,3,4,5].map(g=>{
+    const ivl = session.exam ? null : schedule(p, g, tierOf(it)).ivl;
+    return `<button data-act="grade" data-g="${g}" class="${rec===g?"rec":""}"><b>${GRADE_TXT[g]}<kbd>${g}</kbd></b><span>${session.exam ? "" : g===1 && tierOf(it)<=2 ? "gleich nochmal" : fmtIvl(ivl)}</span></button>`;
   }).join("");
   const sketch = it.type==="case" ? sketchBox(it, revealed) : "";
   return `<article class="sheet t-${it.type}">${meta}${q}${write}${verdictHtml}${sketch}
-    ${revealed ? `<div class="answer">${it.type==="case"?'<h3 style="margin-top:0">Lösung</h3>':""}${a}</div>${norms}<div class="grades">${gradeBtns}</div>${linkedLine(it)}`
+    ${revealed ? `<div class="answer">${it.type==="case"?'<h3 style="margin-top:0">Lösung</h3>':""}${a}</div>${mnemoBox(it)}${norms}<div class="grades">${gradeBtns}</div>${linkedLine(it)}`
       : it.type==="case" ? "" : `<div class="reveal"><button class="btn primary big" data-act="reveal">Antwort zeigen <kbd style="margin-left:6px">Leertaste</kbd></button></div>`}
   </article>`;
+}
+function mnemoBox(it){
+  if(mnemoEdit===it.id) return `<div class="mnemo"><h4>Eselsbrücke</h4><textarea id="mtext" placeholder="Dein Merkhinweis …">${esc(it.mnemonic||"")}</textarea>
+    <div class="act"><button class="btn primary" data-act="mnemosave" data-id="${esc(it.id)}">Speichern</button><button class="btn ghost" data-act="mnemocancel">Abbrechen</button></div></div>`;
+  if(it.mnemonic) return `<div class="mnemo"><h4>Deine Eselsbrücke</h4><div class="txt">${esc(it.mnemonic)}</div><div class="act"><button class="linkbtn small" data-act="mnemoedit" data-id="${esc(it.id)}">Ändern</button></div></div>`;
+  return `<div class="addmnemo"><button class="linkbtn small" data-act="mnemoedit" data-id="${esc(it.id)}">+ Eselsbrücke notieren</button></div>`;
 }
 function schemaList(steps){
   return `<ol class="schema prose" style="font-size:16px">${(steps||[]).map(l=>{ const lv = Math.min(4, Math.floor((l.match(/^\s*/)[0].replace(/\t/g,"  ").length)/2)); return `<li class="l${lv}" style="--lv:${lv}">${esc(l.trim())}</li>`; }).join("")}</ol>`;
@@ -1025,12 +1079,12 @@ async function grade(g){
   const id = session.ids[session.idx], it = S.items.get(id);
   session.results[g]++;
   if(!session.exam){
-    const p = schedule(S.progress.get(id), g, it.relevance);
+    const p = schedule(S.progress.get(id), g, tierOf(it));
     putProgress(id, p);
     if(!session.counted.has(id)){ session.counted.add(id); bumpLog(); }
-    if(g===1 && (it.relevance||3)>=4){ const at = Math.min(session.ids.length, session.idx+4); session.ids.splice(at,0,id); }
+    if(g===1 && tierOf(it)<=2){ const at = Math.min(session.ids.length, session.idx+4); session.ids.splice(at,0,id); }
   }
-  verdicts.delete(id); checks.delete(id);
+  verdicts.delete(id); checks.delete(id); own.delete(id); mnemoEdit = null;
   session.idx++; session.revealed = false;
   render();
 }
@@ -1045,16 +1099,20 @@ function itemContext(it){
   if(it.fall) L.push("Aus der Klausur: "+[it.fall.reihe, it.fall.name, it.fall.titel].filter(Boolean).join(" "));
   return L.join("\n");
 }
+const jTerm = it => it.type==="def" ? it.term : it.type==="schema" ? it.title : it.front;
+const jDef = it => it.type==="def" ? it.definition : it.type==="schema" ? (it.steps||[]).join("\n") : it.back;
 async function judge(id){
   const it = S.items.get(id); const ta = $("#wtext"); const input = (ta && ta.value || "").trim();
-  if(!input){ toast("Schreib zuerst deine Definition."); return; }
+  if(!input){ toast("Schreib zuerst deine Antwort."); return; }
   if(!S.ai){ toast("Die Auswertung braucht die Verbindung zu Supabase."); return; }
+  own.set(id, input);
   verdicts.set(id, {input, busy:true}); render();
-  const prompt = `Begriff: ${it.term}
-Musterdefinition: ${it.definition}
-Kernmerkmale: ${(it.merkmale||[]).join("; ")||"(aus der Musterdefinition ableiten)"}
+  const merk = (it.merkmale||[]).join("; ") || "(aus der Musterantwort ableiten, 2 bis 5 Kernpunkte)";
+  const prompt = `Frage/Begriff: ${jTerm(it)}
+Musterantwort: ${jDef(it)}
+Kernmerkmale: ${merk}
 Antwort: ${input}`;
-  const key = "g:"+hashStr(it.term+"|"+it.definition+"|"+(it.merkmale||[]).join("|"))+":"+hashStr(normQ(input));
+  const key = "g:"+hashStr(jTerm(it)+"|"+jDef(it)+"|"+merk)+":"+hashStr(normQ(input));
   const hit = cacheGet(key);
   if(hit){ verdicts.set(id, {input, result:hit}); }
   else try{
@@ -1143,7 +1201,7 @@ function runSearch(){
   const toks = fold(searchQ).split(/\s+/).filter(Boolean);
   if(!toks.length){ box.innerHTML = `<p class="muted">Tipp ein Wort ein. Mehrere Wörter müssen alle vorkommen.</p>${tagCloud()}`; return; }
   const hits = [...S.items.values()].filter(it=>{ const h = hay(it); return toks.every(t=>h.includes(t)); })
-    .sort((a,b)=>{ const ta=fold(titleOf(a)), tb=fold(titleOf(b)); const sa=toks.some(t=>ta.includes(t))?1:0, sb=toks.some(t=>tb.includes(t))?1:0; return sb-sa || (b.relevance||3)-(a.relevance||3); });
+    .sort((a,b)=>{ const ta=fold(titleOf(a)), tb=fold(titleOf(b)); const sa=toks.some(t=>ta.includes(t))?1:0, sb=toks.some(t=>tb.includes(t))?1:0; return sb-sa || tierOf(a)-tierOf(b); });
   if(!hits.length){ box.innerHTML = `<div class="panel empty">Kein Treffer für „${esc(searchQ)}“. Prüf die Schreibweise oder such nach einer Norm.</div>`; return; }
   box.innerHTML = TKEYS.map(t=>{ const h = hits.filter(i=>i.type===t); if(!h.length) return "";
     return `<h3>${TYPES_PL[t]} <span class="muted">${h.length}</span></h3><div class="list">${h.slice(0,80).map(i=>itemRow(i,toks)).join("")}</div>`; }).join("");
@@ -1161,13 +1219,13 @@ function vBib(){
   let list = [...S.items.values()].filter(i=>(!bib.type||i.type===bib.type)&&(!bib.area||i.area===bib.area)&&(!bib.fix||(i.suggestion&&i.suggestion.status==="offen")));
   const toks = fold(bib.q).split(/\s+/).filter(Boolean);
   if(toks.length) list = list.filter(i=>{ const h=hay(i); return toks.every(t=>h.includes(t)); });
-  list.sort(bib.sort==="rel" ? (a,b)=>(b.relevance||3)-(a.relevance||3)||titleOf(a).localeCompare(titleOf(b),"de") : bib.sort==="due" ? (a,b)=>((S.progress.get(a.id)||{}).due||"0").localeCompare((S.progress.get(b.id)||{}).due||"0") : (a,b)=>titleOf(a).localeCompare(titleOf(b),"de"));
+  list.sort(bib.sort==="rel" ? (a,b)=>tierOf(a)-tierOf(b)||titleOf(a).localeCompare(titleOf(b),"de") : bib.sort==="due" ? (a,b)=>((S.progress.get(a.id)||{}).due||"0").localeCompare((S.progress.get(b.id)||{}).due||"0") : (a,b)=>titleOf(a).localeCompare(titleOf(b),"de"));
   return `<div class="row"><h1>Bibliothek</h1><span class="spacer"></span><a class="btn primary" href="#neu">Eintrag anlegen</a></div>
   <p class="sub">${S.items.size} Einträge: ${TKEYS.map(t=>[...S.items.values()].filter(i=>i.type===t).length+" "+TYPES_PL[t]).join(", ")}.</p>
   <div class="filters">
     <select data-bib="type" aria-label="Art"><option value="">Alle Arten</option>${TKEYS.map(t=>`<option value="${t}" ${bib.type===t?"selected":""}>${TYPES_PL[t]}</option>`).join("")}</select>
     <select data-bib="area" aria-label="Rechtsgebiet"><option value="">Alle Rechtsgebiete</option>${ar.map(a=>`<option ${bib.area===a?"selected":""}>${esc(a)}</option>`).join("")}</select>
-    <select data-bib="sort" aria-label="Sortierung"><option value="rel" ${bib.sort==="rel"?"selected":""}>Nach Klausurrelevanz</option><option value="due" ${bib.sort==="due"?"selected":""}>Nach Fälligkeit</option><option value="abc" ${bib.sort==="abc"?"selected":""}>Alphabetisch</option></select>
+    <select data-bib="sort" aria-label="Sortierung"><option value="rel" ${bib.sort==="rel"?"selected":""}>Nach Tier</option><option value="due" ${bib.sort==="due"?"selected":""}>Nach Fälligkeit</option><option value="abc" ${bib.sort==="abc"?"selected":""}>Alphabetisch</option></select>
     <input data-bib="q" type="search" placeholder="Filtern" value="${esc(bib.q)}" aria-label="Filtern">
     <label class="switch"><input type="checkbox" data-bib="fix" ${bib.fix?"checked":""}> nur mit Korrekturvorschlag</label>
   </div>
@@ -1193,7 +1251,7 @@ function vDetail(id){
       ${sameNorm.length?`<h2>Über dieselben Normen</h2><div class="list">${sameNorm.map(o=>itemRow(o)).join("")}</div>`:""}
       <h2>Lernstand</h2>
       <dl class="kv">
-        <dt>Klausurrelevanz</dt><dd>${relDots(it.relevance)} ${REL_TXT[it.relevance||3]}</dd>
+        <dt>Tier</dt><dd>${tierTag(it)} ${TIER_TXT[tierOf(it)]}</dd>
         <dt>Nächste Abfrage</dt><dd>${!p?"noch nie gelernt":p.due<=today()?"heute fällig":toDate(p.due).toLocaleDateString("de-DE")+" ("+fmtIvl(diffDays(today(),p.due))+")"}</dd>
         ${p?`<dt>Wiederholungen</dt><dd>${p.reps}, davon ${p.lapses}× vergessen${p.leech?" (Problemkarte)":""}</dd><dt>Letzte Bewertung</dt><dd>${GRADE_TXT[p.lastGrade]||"-"} am ${toDate(p.last).toLocaleDateString("de-DE")}</dd>`:""}
       </dl>
@@ -1238,8 +1296,9 @@ function vEdit(it){
     </div>
     <div class="two">
       <div class="field"><label for="f-norms">Normen</label><input id="f-norms" value="${esc((it&&it.norms||[]).join(", "))}" placeholder="§ 35 BauGB, Art. 3 GG"><small>Mit Komma trennen. Ohne Absatz angeben, damit sie gebündelt werden.</small></div>
-      <div class="field"><label for="f-rel">Klausurrelevanz</label><select id="f-rel">${[5,4,3,2,1].map(r=>`<option value="${r}" ${(it?it.relevance||3:3)===r?"selected":""}>${r}: ${REL_TXT[r]}</option>`).join("")}</select></div>
+      <div class="field"><label for="f-rel">Tier</label><select id="f-rel">${[1,2,3,4].map(r=>`<option value="${r}" ${(it?tierOf(it):3)===r?"selected":""}>${TIER_TXT[r]}</option>`).join("")}</select></div>
     </div>
+    <div class="field"><label for="f-mnemo">Eselsbrücke</label><textarea id="f-mnemo" placeholder="Dein eigener Merkhinweis zu dieser Karte">${esc(it&&it.mnemonic||"")}</textarea><small>Erscheint bei jeder Abfrage unter der Antwort.</small></div>
     <div class="field"><label for="f-tags">Schlagwörter</label><input id="f-tags" value="${esc((it&&it.tags||[]).join(", "))}" placeholder="Außenbereich, Privilegierung"></div>
     <div class="field picker"><label for="f-link">Verknüpfen mit</label><input id="f-link" placeholder="Eintrag suchen und hinzufügen" autocomplete="off"><div class="drop" id="linkdrop" hidden></div>
       <div class="chips" id="linkchips">${linkChips()}</div></div>
@@ -1261,7 +1320,7 @@ async function saveEdit(){
     it.problems = lines("f-problems").map(l=>{ const i=l.indexOf("=>"); return i<0?{frage:l,antwort:""}:{frage:l.slice(0,i).trim(),antwort:l.slice(i+2).trim()}; });
     if(!it.title){ toast("Der Titel fehlt."); return; } }
   it.area = $("#f-area").value.trim(); it.source = $("#f-source").value.trim(); it.norms = csv("f-norms"); it.tags = csv("f-tags");
-  it.relevance = Number($("#f-rel").value)||3; it.links = [...new Set(draftLinks)].filter(x=>x!==it.id);
+  it.tier = Number($("#f-rel").value)||3; delete it.relevance; it.mnemonic = ($("#f-mnemo").value||"").trim(); it.links = [...new Set(draftLinks)].filter(x=>x!==it.id);
   await putItem(it);
   // Verweise beidseitig halten
   const prevLinks = old ? (old.links||[]) : [];
@@ -1284,7 +1343,7 @@ function vNorm(slug){
   for(const [n,l] of idx) if(normSlug(n)===slug){ name = n; list = l; break; }
   if(!name) return `<h1>Norm nicht gefunden</h1><a class="btn" href="#normen">Alle Normen</a>`;
   const by = t => list.filter(i=>i.type===t);
-  return `<div class="crumbs"><a href="#normen">Normen</a></div><div class="row"><h1>${esc(name)}</h1><span class="spacer"></span><button class="btn primary" data-act="learnnorm" data-n="${esc(slug)}">Alles zu dieser Norm abfragen</button></div>
+  return `<div class="crumbs"><a href="#normen">Normen</a></div><div class="row"><h1>${esc(name)}</h1><span class="spacer"></span>${normUrl(name)?`<a class="btn" href="${normUrl(name)}" target="_blank" rel="noopener noreferrer">Gesetzestext ↗</a>`:""}<button class="btn primary" data-act="learnnorm" data-n="${esc(slug)}">Alles zu dieser Norm abfragen</button></div>
   <p class="sub">${list.length} Einträge</p>
   ${TKEYS.map(t=>by(t).length?`<h3>${TYPES_PL[t]}</h3><div class="list">${by(t).map(i=>itemRow(i)).join("")}</div>`:"").join("")}`;
 }
@@ -1298,7 +1357,7 @@ function vProblem(){
 }
 
 /* ---------- Ansicht: Prüfungsmodus ---------- */
-const exam = {cats:[...TKEYS], area:"", n:30, minRel:3};
+const exam = {cats:[...TKEYS], area:"", n:30, maxTier:3};
 function vPruefung(){
   const pool = examPool();
   return `<h1>Prüfungsmodus</h1><p class="sub">Gemischte Abfrage unabhängig von der Fälligkeit, wie in einer Prüfungssituation. Dein Wiederholungsplan bleibt dabei unverändert; am Ende siehst du deine Quote.</p>
@@ -1307,16 +1366,77 @@ function vPruefung(){
     <div class="cats">${TKEYS.map(t=>`<button class="chip t-${t}" data-act="excat" data-t="${t}" aria-pressed="${exam.cats.includes(t)}"><i class="dot"></i>${TYPES_PL[t]}</button>`).join("")}</div>
     <div class="two">
       <div class="field"><label for="ex-area">Rechtsgebiet</label><select id="ex-area" data-ex="area"><option value="">Alle</option>${areas().map(a=>`<option ${exam.area===a?"selected":""}>${esc(a)}</option>`).join("")}</select></div>
-      <div class="field"><label for="ex-rel">Mindestens Klausurrelevanz</label><select id="ex-rel" data-ex="minRel">${[1,2,3,4,5].map(r=>`<option value="${r}" ${exam.minRel===r?"selected":""}>${r}: ${REL_TXT[r]}</option>`).join("")}</select></div>
+      <div class="field"><label for="ex-rel">Tiers einbeziehen</label><select id="ex-rel" data-ex="maxTier">${[1,2,3,4].map(r=>`<option value="${r}" ${exam.maxTier===r?"selected":""}>${r===1?"Nur Tier 1":"Tier 1 bis "+r}</option>`).join("")}</select></div>
     </div>
     <h3>Anzahl</h3>
     <div class="slider"><input type="range" min="5" max="100" step="5" value="${exam.n}" data-ex="n" aria-label="Anzahl Fragen"><output id="exOut">${exam.n}</output></div>
     <div class="row" style="margin-top:12px"><button class="btn primary big" data-act="startexam" ${pool.length?"":"disabled"}>Prüfung starten</button><span class="muted small">${pool.length} passende Einträge</span></div>
   </section>`;
 }
-function examPool(){ return [...S.items.values()].filter(i=>exam.cats.includes(i.type) && (!exam.area||i.area===exam.area) && (i.relevance||3)>=exam.minRel); }
+function examPool(){ return [...S.items.values()].filter(i=>exam.cats.includes(i.type) && (!exam.area||i.area===exam.area) && tierOf(i)<=exam.maxTier); }
 
 /* ---------- Ansicht: Statistik ---------- */
+function sureOf(it){ const p = S.progress.get(it.id); return !!(p && p.lastGrade>=3 && !p.leech); }
+function tierStats(){
+  const all = [...S.items.values()].filter(i=>!i.fallsumme || true);
+  const out = {};
+  for(const t of [1,2,3,4]){ const l = all.filter(i=>tierOf(i)===t); out[t] = {n:l.length, sure:l.filter(sureOf).length, seen:l.filter(i=>S.progress.has(i.id)).length}; }
+  return out;
+}
+function projection(){
+  const all = [...S.items.values()].filter(i=>tierOf(i)<=2);
+  const n = all.length, sure = all.filter(sureOf).length, left = daysToExam();
+  const t = today(), d14 = addDays(t,-14);
+  const recent = all.filter(i=>{ const p=S.progress.get(i.id); return p && p.sure && p.sure>=d14; }).length;
+  const first = all.map(i=>(S.progress.get(i.id)||{}).sure).filter(Boolean).sort()[0];
+  const span = first ? Math.min(14, Math.max(3, diffDays(first, t)+1)) : 0;
+  let rate = span && recent ? recent/span : 0, basis = "gemessen";
+  if(!rate){
+    const rev = Object.entries(S.log.days).filter(([d])=>d>=d14).reduce((a,[,v])=>a+v,0);
+    rate = (rev/14)*0.35*(n? (n-sure)/n : 0); basis = "geschätzt aus deinem Tagespensum";
+  }
+  const proj = n ? Math.min(100, (sure + rate*left)/n*100) : 0;
+  const need = left>0 ? Math.max(0, (0.9*n - sure)/left) : 0;
+  return {n, sure, left, rate, basis, pct: n?sure/n*100:0, proj, need};
+}
+function projChart(P){
+  const W=640,H=210,L=40,R=14,T=14,B=26;
+  const x = f => L+(W-L-R)*f, y = v => T+(H-T-B)*(1-v/100);
+  const line = `M${x(0)},${y(P.pct)} L${x(1)},${y(P.proj)}`;
+  const tick = [0,25,50,75,100].map(v=>`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="var(--muted)">${v}</text>`).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Hochrechnung Wissensstand Tier 1 und 2 bis zum Examen">${tick}
+    <line x1="${L}" x2="${W-R}" y1="${y(90)}" y2="${y(90)}" stroke="var(--g3)" stroke-width="2" stroke-dasharray="6 5"/>
+    <text x="${L+8}" y="${y(90)-6}" font-size="12" font-weight="600" fill="var(--g3)">Ziel 90 %</text>
+    <path d="${line}" stroke="var(--acc-ink)" stroke-width="3" fill="none" stroke-linecap="round" stroke-dasharray="1 7"/>
+    <circle cx="${x(0)}" cy="${y(P.pct)}" r="5" fill="var(--acc-ink)"/><circle cx="${x(1)}" cy="${y(P.proj)}" r="5" fill="none" stroke="var(--acc-ink)" stroke-width="2.5"/>
+    <text x="${x(0)+8}" y="${y(P.pct)-8}" font-size="12" fill="var(--ink)" font-weight="600" stroke="var(--paper)" stroke-width="4" paint-order="stroke">heute ${Math.round(P.pct)} %</text>
+    <text x="${x(1)-10}" y="${P.proj>80?y(P.proj)+22:y(P.proj)-10}" text-anchor="end" font-size="12" fill="var(--ink)" font-weight="600" stroke="var(--paper)" stroke-width="4" paint-order="stroke">Examen ${Math.round(P.proj)} %</text>
+    <text x="${L}" y="${H-6}" font-size="11" fill="var(--muted)">heute</text><text x="${W-R}" y="${H-6}" text-anchor="end" font-size="11" fill="var(--muted)">${toDate(examDate()).toLocaleDateString("de-DE",{day:"numeric",month:"long",year:"numeric"})}</text></svg>`;
+}
+function vWissen(){
+  const T = tierStats(), P = projection();
+  const goalOk = P.pct>=90;
+  const tc = t => { const x=T[t], pc = x.n? x.sure/x.n*100 : 0, goal = t<=2;
+    return `<div class="tcard"><span class="tier t${t}">T${t}</span> <span class="small muted">${TIER_TXT[t].split(" · ")[1]}</span>
+      <b class="big">${Math.round(pc)} %</b>
+      <div class="goalbar"><i style="width:${pc}%;background:${goal?(pc>=90?"var(--g3)":"var(--acc)"):"var(--g4)"}"></i>${goal?`<span class="goalmark" style="left:90%" title="Ziel 90 %"></span>`:""}</div>
+      <p class="small muted" style="margin:8px 0 0">${x.sure} von ${x.n} sicher, ${x.seen} schon gelernt${goal?". Ziel: 90 %":""}</p></div>`; };
+  const ar = areas().map(a=>{ const l=[...S.items.values()].filter(i=>i.area===a && tierOf(i)<=2); return {a, n:l.length, s:l.filter(sureOf).length}; }).filter(x=>x.n).sort((p,q)=>p.s/p.n - q.s/q.n);
+  const exp = toDate(examDate()).toLocaleDateString("de-DE",{day:"numeric",month:"long",year:"numeric"});
+  return `<h2>Wissensstand und Hochrechnung</h2>
+  <section class="panel proj">
+    <div class="bigstat"><div><b>${Math.round(P.pct)} %</b><span>Tier 1 und 2 sicher (Ziel 90 %)</span></div>
+      <div><b style="color:${P.proj>=90?"var(--g3)":"var(--g1)"}">${Math.round(P.proj)} %</b><span>Hochrechnung zum Examen</span></div>
+      <div><b>${P.left}</b><span>Tage bis ${esc(exp)}</span></div>
+      <div><b>${P.need>0?P.need.toFixed(1):"0"}</b><span>neue sichere Karten pro Tag nötig</span></div></div>
+    ${projChart(P)}
+    <p class="small muted" style="margin:10px 0 0">${goalOk?"Das Ziel von 90 % ist erreicht, jetzt gilt es, es zu halten. ":""}Dein Tempo: ${P.rate.toFixed(1)} neue sichere Karten aus Tier 1 und 2 pro Tag (${P.basis}). „Sicher“ heißt: zuletzt mit Gut, Leicht oder Sehr leicht bewertet und keine Problemkarte. Die Linie rechnet bei gleichbleibendem Tempo und ohne Vergessen, ist also eine Orientierung und keine Garantie.</p>
+    <div class="row" style="margin-top:10px"><label class="small muted" for="examdate">Examenstermin</label><input type="date" id="examdate" value="${esc(examDate())}" style="padding:6px 10px;border:1px solid var(--line);border-radius:10px;background:var(--soft);color:var(--ink)"></div>
+  </section>
+  <h3 style="margin-top:22px">Wissensstand nach Tier</h3>
+  <div class="tiers4">${[1,2,3,4].map(tc).join("")}</div>
+  ${ar.length?`<h3 style="margin-top:22px">Tier 1 und 2 nach Rechtsgebiet (schwächste zuerst)</h3><section class="panel"><div class="areas">${ar.map(x=>{ const pc=x.s/x.n*100; return `<div class="area"><div class="row"><b>${esc(x.a)}</b><span class="small muted">${x.s} von ${x.n}, ${Math.round(pc)} %</span></div><div class="goalbar"><i style="width:${pc}%;background:${pc>=90?"var(--g3)":"var(--acc)"}"></i><span class="goalmark" style="left:90%"></span></div></div>`; }).join("")}</div></section>`:""}`;
+}
 function vStats(){
   const all = [...S.items.values()];
   const ar = areas(); if(all.some(i=>!i.area)) ar.push("");
@@ -1327,6 +1447,8 @@ function vStats(){
   const last30 = []; for(let d=29; d>=0; d--) last30.push(S.log.days[addDays(t,-d)]||0);
   const max30 = Math.max(1,...last30);
   return `<h1>Statistik</h1><p class="sub">${reviews} Wiederholungen insgesamt. Lernserie: ${streak()} ${streak()===1?"Tag":"Tage"}.</p>
+  ${vWissen()}
+  <h2>Aktivität</h2>
   <div class="grid2">
     <section class="panel"><h3 style="margin-top:0">Fällig in den nächsten 14 Tagen</h3>
       <div class="forecast">${fc.map((n,d)=>`<div><em>${n}</em><i style="height:${(n/max*100).toFixed(0)}%"></i><span>${d===0?"heute":toDate(addDays(t,d)).toLocaleDateString("de-DE",{weekday:"short"}).replace(".","")}</span></div>`).join("")}</div>
@@ -1367,7 +1489,7 @@ function vDaten(){
       <div class="field"><label for="qz-type">Anlegen als</label><select id="qz-type"><option value="card">Karteikarten</option><option value="def">Definitionen</option></select></div>
       <div class="field"><label for="qz-area">Rechtsgebiet</label><input id="qz-area" list="arealist2"><datalist id="arealist2">${areas().map(a=>`<option value="${esc(a)}">`).join("")}</datalist></div>
     </div>
-    <div class="row" style="margin-top:12px"><button class="btn primary" data-act="quizlet">Importieren</button><span class="small muted">Klausurrelevanz, Normen und Verknüpfungen ergänzt Claude später beim Import im Chat.</span></div>
+    <div class="row" style="margin-top:12px"><button class="btn primary" data-act="quizlet">Importieren</button><span class="small muted">Tier, Normen und Verknüpfungen ergänzt Claude später beim Import im Chat.</span></div>
   </section>`;
 }
 async function doExport(){
@@ -1412,7 +1534,7 @@ async function doQuizlet(){
   const list = rows.map(([a,...b])=>{
     const back = b.join(" ").trim();
     const it = type==="def" ? {id:uid("d"), type, term:a.trim(), definition:back, merkmale:[]} : {id:uid("k"), type, front:a.trim(), back};
-    return Object.assign(it, {area, source:"Quizlet", relevance:3, norms:[], tags:[], links:[], created:now()});
+    return Object.assign(it, {area, source:"Quizlet", tier:3, norms:[], tags:[], links:[], created:now()});
   });
   try{ await putItems(list); $("#qz").value = ""; toast(rows.length+" Karten importiert"); }catch(e){}
   render();
@@ -1436,6 +1558,10 @@ document.addEventListener("click", async e=>{
   else if(a==="endsession"){ session = null; if(b.tagName!=="A") go("aktuell"); }
   else if(a==="writemode"){ S.settings.write = b.checked; saveSettings(); render(); }
   else if(a==="judge"){ judge(id); }
+  else if(a==="mnemoedit"){ mnemoEdit = id; render(); setTimeout(()=>{ const m=$("#mtext"); if(m){ m.focus(); m.setSelectionRange(m.value.length,m.value.length); } },30); }
+  else if(a==="mnemocancel"){ mnemoEdit = null; render(); }
+  else if(a==="mnemosave"){ const it = S.items.get(id); const v = ($("#mtext").value||"").trim(); const n = Object.assign({}, it); if(v) n.mnemonic = v; else delete n.mnemonic; mnemoEdit = null; await putItem(n); toast(v?"Eselsbrücke gespeichert":"Eselsbrücke entfernt"); render(); }
+  else if(a==="examdate"){ }
   else if(a==="fixok"||a==="fixno"){ const it = S.items.get(id); if(!it||!it.suggestion) return;
     const c = clean(it); if(a==="fixok" && c.suggestion.patch) Object.assign(c, c.suggestion.patch);
     c.suggestion.status = a==="fixok" ? "übernommen" : "verworfen"; c.suggestion.decided = today(); await putItem(c); toast(a==="fixok"?"Vorschlag übernommen":"Vorschlag verworfen"); render(); }
@@ -1468,6 +1594,7 @@ document.addEventListener("click", async e=>{
 });
 document.addEventListener("input", e=>{
   const t = e.target;
+  if(t.id==="wtext" && session){ own.set(session.ids[session.idx], t.value); return; }
   if(t.id==="daily"){ $("#dailyOut").textContent = t.value; clearTimeout(t._tm); t._tm = setTimeout(()=>{ S.settings.todayDate = today(); S.settings.todayN = Number(t.value); saveSettings(); render(); }, 350); }
   else if(t.dataset.act==="base"){ $("#baseOut").textContent = t.value; clearTimeout(t._tm); t._tm = setTimeout(()=>{ S.settings.base = Number(t.value); saveSettings(); }, 350); }
   else if(t.id==="bigq"){ searchQ = t.value; runSearch(); }
@@ -1481,10 +1608,11 @@ document.addEventListener("input", e=>{
   else if(t.id==="chatin"){ t.style.height="auto"; t.style.height=Math.min(140,t.scrollHeight)+"px"; }
 });
 document.addEventListener("change", async e=>{
+  if(e.target.id==="examdate"){ if(e.target.value){ S.settings.examDate = e.target.value; await saveSettings(); render(); } return; }
   const t = e.target;
   if(t.dataset.bib){ if(t.dataset.bib==="fix") bib.fix = t.checked; else if(t.dataset.bib!=="q") bib[t.dataset.bib] = t.value; render(); }
   else if(t.dataset.ex==="area"){ exam.area = t.value; render(); }
-  else if(t.dataset.ex==="minRel"){ exam.minRel = Number(t.value); render(); }
+  else if(t.dataset.ex==="maxTier"){ exam.maxTier = Number(t.value); render(); }
   else if((t.id==="importfile") && t.files[0]){ for(const f of t.files){ await doImport(f); } }
 });
 document.addEventListener("keydown", e=>{
@@ -1497,7 +1625,7 @@ document.addEventListener("keydown", e=>{
   const r = route();
   if(r==="lernen" && session && session.idx<session.ids.length){
     if((e.key===" "||e.key==="Enter") && !session.revealed){ e.preventDefault(); const cur = S.items.get(session.ids[session.idx]); const sk = $("#sktext"); if(cur && cur.type==="case" && sk){ sk.focus(); return; } session.revealed=true; render(); return; }
-    if(session.revealed && /^[1-4]$/.test(e.key)){ e.preventDefault(); grade(Number(e.key)); return; }
+    if(session.revealed && /^[1-5]$/.test(e.key)){ e.preventDefault(); grade(Number(e.key)); return; }
     if(e.key==="w" && !session.revealed){ const ta=$("#wtext"); if(ta){ e.preventDefault(); ta.focus(); } return; }
   }
   if(e.key==="k"){ const c=$("#chatin"); if(c && !c.disabled){ e.preventDefault(); c.focus(); } return; }
@@ -1511,8 +1639,8 @@ function help(){
   $("#layer").innerHTML = `<div class="overlay" data-act="closehelp"><div class="panel" onclick="event.stopPropagation()"><div class="row"><h2 style="margin:0">Tastenkürzel</h2><span class="spacer"></span><button class="btn ghost" data-act="closehelp">Schließen</button></div>
   <div class="keys" style="margin-top:14px">
     <span><kbd>Leertaste</kbd> <kbd>Enter</kbd></span><span>Antwort zeigen</span>
-    <span><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd></span><span>Nochmal, Schwer, Gut, Leicht</span>
-    <span><kbd>W</kbd></span><span>ins Schreibfeld (Definitionen)</span>
+    <span><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> <kbd>5</kbd></span><span>Nochmal, Schwer, Gut, Leicht, Sehr leicht</span>
+    <span><kbd>W</kbd></span><span>ins Feld „In eigenen Worten“</span>
     <span><kbd>Strg</kbd> <kbd>Enter</kbd></span><span>Fallskizze von Claude prüfen lassen</span>
     <span><kbd>K</kbd></span><span>Frage an Claude schreiben</span>
     <span><kbd>Strg F</kbd> <kbd>/</kbd></span><span>Suche</span>
