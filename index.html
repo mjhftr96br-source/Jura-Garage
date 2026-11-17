@@ -609,7 +609,7 @@ Tipp für die Klausur: ein Satz
 Empfehlung: Nochmal|Schwer|Gut|Leicht
 Bewerte großzügig, wenn der Kern in eigenen Worten richtig erfasst ist, und streng bei falscher Anspruchsgrundlage oder einem verkannten Hauptproblem. Keine Einleitung, keine Wiederholung der Skizze.`;
 async function aiStream(system, turns, opts={}){
-  const r = await aiCall({kind:opts.kind||"chat", system, messages:normTurns(turns).slice(-8), stream:true, max_tokens:opts.max_tokens||1200}, opts.signal);
+  const r = await aiCall({kind:opts.kind||"chat", system, messages:normTurns(turns).slice(-8), stream:true, max_tokens:opts.max_tokens||2000}, opts.signal);
   const reader = r.body.getReader(), dec = new TextDecoder(); let buf = "", text = "";
   try{
     for(;;){
@@ -632,7 +632,7 @@ async function aiStream(system, turns, opts={}){
   return text;
 }
 async function aiJson(prompt){
-  const r = await aiCall({kind:"grade", system:[GRADE_RULES], messages:[{role:"user", content:prompt}], stream:false, max_tokens:400});
+  const r = await aiCall({kind:"grade", system:[GRADE_RULES], messages:[{role:"user", content:prompt}], stream:false, max_tokens:1000});
   const d = await r.json(); const t = String(d.text||"");
   const a = t.indexOf("{"), b = t.lastIndexOf("}");
   if(a<0 || b<a) throw {code:"invalid_json"};
@@ -1064,7 +1064,7 @@ async function checkCase(id){
   const c = {input, busy:true, text:"", error:null, ctl:new AbortController()}; checks.set(id, c); render();
   try{
     c.text = await aiStream([CHECK_RULES, "Der Fall und seine Lösung:\n"+itemContext(it)], [{role:"user", content:"Meine Skizze des Kernproblems:\n"+input}],
-      {kind:"check", max_tokens:1500, signal:c.ctl.signal, onText:t=>{ c.text = t; const el = $("#fbstream"); if(el){ el.innerHTML = fbHtml(t); el.classList.remove("busy"); } }});
+      {kind:"check", max_tokens:2500, signal:c.ctl.signal, onText:t=>{ c.text = t; const el = $("#fbstream"); if(el){ el.innerHTML = fbHtml(t); el.classList.remove("busy"); } }});
   }catch(e){ if(e && e.text) c.text = e.text; if(!(e && e.code==="cancelled")) c.error = errText(e); }
   c.busy = false; c.rec = recFrom(c.text);
   if(c.text && session && session.ids[session.idx]===id) session.revealed = true;
