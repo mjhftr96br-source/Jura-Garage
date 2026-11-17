@@ -1213,10 +1213,12 @@ function tagCloud(){
 }
 
 /* ---------- Ansicht: Bibliothek ---------- */
-const bib = {type:"", area:"", q:"", fix:false, sort:"rel"};
+const bib = {type:"", area:"", cat:"", q:"", fix:false, sort:"rel"};
+const isHemmer = i => /hemmer/i.test(i.source||"") || (i.tags||[]).some(t=>/^hemmer$/i.test(t));
+const CATS = {"hemmer-faelle":["Hemmer-Fälle", i=>i.type==="case"&&isHemmer(i)], "hemmer-karten":["Hemmer-Karteikarten", i=>i.type==="card"&&isHemmer(i)], "hemmer-alle":["Alles von Hemmer", isHemmer]};
 function vBib(){
   const ar = areas();
-  let list = [...S.items.values()].filter(i=>(!bib.type||i.type===bib.type)&&(!bib.area||i.area===bib.area)&&(!bib.fix||(i.suggestion&&i.suggestion.status==="offen")));
+  let list = [...S.items.values()].filter(i=>(!bib.type||i.type===bib.type)&&(!bib.cat||CATS[bib.cat][1](i))&&(!bib.area||i.area===bib.area)&&(!bib.fix||(i.suggestion&&i.suggestion.status==="offen")));
   const toks = fold(bib.q).split(/\s+/).filter(Boolean);
   if(toks.length) list = list.filter(i=>{ const h=hay(i); return toks.every(t=>h.includes(t)); });
   list.sort(bib.sort==="rel" ? (a,b)=>tierOf(a)-tierOf(b)||titleOf(a).localeCompare(titleOf(b),"de") : bib.sort==="due" ? (a,b)=>((S.progress.get(a.id)||{}).due||"0").localeCompare((S.progress.get(b.id)||{}).due||"0") : (a,b)=>titleOf(a).localeCompare(titleOf(b),"de"));
@@ -1224,6 +1226,7 @@ function vBib(){
   <p class="sub">${S.items.size} Einträge: ${TKEYS.map(t=>[...S.items.values()].filter(i=>i.type===t).length+" "+TYPES_PL[t]).join(", ")}.</p>
   <div class="filters">
     <select data-bib="type" aria-label="Art"><option value="">Alle Arten</option>${TKEYS.map(t=>`<option value="${t}" ${bib.type===t?"selected":""}>${TYPES_PL[t]}</option>`).join("")}</select>
+    <select data-bib="cat" aria-label="Kategorie"><option value="">Alle Kategorien</option>${Object.entries(CATS).map(([k,v])=>`<option value="${k}" ${bib.cat===k?"selected":""}>${v[0]} (${[...S.items.values()].filter(v[1]).length})</option>`).join("")}</select>
     <select data-bib="area" aria-label="Rechtsgebiet"><option value="">Alle Rechtsgebiete</option>${ar.map(a=>`<option ${bib.area===a?"selected":""}>${esc(a)}</option>`).join("")}</select>
     <select data-bib="sort" aria-label="Sortierung"><option value="rel" ${bib.sort==="rel"?"selected":""}>Nach Tier</option><option value="due" ${bib.sort==="due"?"selected":""}>Nach Fälligkeit</option><option value="abc" ${bib.sort==="abc"?"selected":""}>Alphabetisch</option></select>
     <input data-bib="q" type="search" placeholder="Filtern" value="${esc(bib.q)}" aria-label="Filtern">
