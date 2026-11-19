@@ -183,6 +183,8 @@ kbd{font:600 10px/1 var(--sans);letter-spacing:.02em;border:0;border-radius:4px;
 .t-def{--tc:var(--c-def)} .t-card{--tc:var(--c-card)} .t-case{--tc:var(--c-case)} .t-schema{--tc:var(--c-schema)}
 .dot{display:inline-block;width:4px;height:14px;border-radius:2px;background:var(--tc)}
 .sheet .meta{display:flex;gap:10px;flex-wrap:wrap;align-items:center;color:var(--muted);font-size:13px;margin-bottom:16px}
+.starbtn{border:0;background:transparent;font-size:22px;line-height:1;cursor:pointer;color:var(--muted);padding:0 4px}.starbtn.on{color:#e6a700}.starbtn:hover{color:#e6a700}.starmark{color:#e6a700;margin-left:4px}
+.norm-inline{font-size:inherit;white-space:nowrap}
 .typetag{font-weight:600;color:var(--tc);background:color-mix(in srgb,var(--tc) 14%,transparent);padding:3px 10px;border-radius:999px}
 .fallchip{font-weight:600;color:var(--clay);background:var(--clay-soft);padding:3px 10px;border-radius:999px;text-decoration:none}
 .q{font:500 23px/1.35 var(--serif);margin:0 0 6px;max-width:62ch;font-variation-settings:"SOFT" 100}
@@ -424,6 +426,9 @@ function normUrl(n){
   return null;
 }
 const normChip = n => { const u = normUrl(n); return u ? `<a class="norm" href="${u}" target="_blank" rel="noopener noreferrer" title="Im amtlichen Gesetzestext öffnen">${esc(n)}<span class="ext">↗</span></a>` : `<a class="norm" href="#${normSlug(n)}">${esc(n)}</a>`; };
+const NORM_RE = /(§§?|Art\.)\s*\d+[a-z]?(?:\s*(?:,|und|\/)\s*(?:§\s*)?\d+[a-z]?)*(?:\s*(?:Abs\.\s*)?(?:[IVX]+|\d+)(?![\dA-Za-z]))?(?:\s+(?:S\.|Satz)\s*\d+)?(?:\s+Nr\.\s*\d+[a-z]?)?(?:\s+(?:Alt\.|Var\.)\s*\d+)?(?:\s+(?:[a-z]\)|lit\.\s*[a-z]))?\s+([A-ZÄÖÜ][A-Za-zÄÖÜäöüß]{1,9})(?![A-Za-zÄÖÜäöüß])/g;
+const linkNorms = h => String(h).replace(NORM_RE, m => { const u = normUrl(m); return u ? `<a class="norm norm-inline" href="${u}" target="_blank" rel="noopener noreferrer" title="Im amtlichen Gesetzestext öffnen">${m}</a>` : m; });
+const nl = t => linkNorms(esc(t));
 const normSlug = n => "n-"+fold(n).replace(/§+/g,"p").replace(/art\./g,"art").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 const TYPES = {def:"Definition", card:"Karteikarte", schema:"Schema", case:"Fall"};
 const TYPES_PL = {def:"Definitionen", card:"Karteikarten", schema:"Schemata", case:"Fälle"};
@@ -697,7 +702,7 @@ function normIndex(){
 }
 const areas = () => [...new Set([...S.items.values()].map(i=>i.area).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"de"));
 
-function paras(t){ return String(t||"").split(/\n{2,}|\n/).filter(x=>x.trim()).map(x=>"<p>"+esc(x)+"</p>").join(""); }
+function paras(t){ return String(t||"").split(/\n{2,}|\n/).filter(x=>x.trim()).map(x=>"<p>"+nl(x)+"</p>").join(""); }
 function hl(text, toks){
   let h = esc(text); if(!toks.length) return h;
   const f = fold(text); const marks = [];
@@ -716,7 +721,7 @@ function itemRow(it, toks=[]){
   const due = !p ? "neu" : p.due<=today() ? "fällig" : "fällig "+fmtIvl(diffDays(today(),p.due)).replace("in ","in ");
   const sub = snippet(bodyText(it).replace(/\s+/g," "), toks);
   return `<a class="item t-${it.type}" href="#e-${esc(it.id)}"><span class="k">${TYPES[it.type]}</span>
-    <span><div class="t">${hl(titleOf(it)||"(ohne Titel)", toks)}</div><div class="s">${hl(sub,toks)}</div></span>
+    <span><div class="t">${it.star?'<span class="starmark">★</span> ':""}${hl(titleOf(it)||"(ohne Titel)", toks)}</div><div class="s">${hl(sub,toks)}</div></span>
     <span class="r">${esc(it.area||"")}<br>${tierTag(it)} ${p&&p.leech?'<b style="color:var(--g1)">Problemkarte</b>':esc(due)}</span></a>`;
 }
 
@@ -943,7 +948,7 @@ function buildQueue(cats, n){
 }
 function startSession(ids, opts={}){
   if(!ids.length){ toast("Keine passenden Karten gefunden."); return; }
-  session = {ids, idx:0, revealed:false, exam:!!opts.exam, label:opts.label||"Abfrage", results:{1:0,2:0,3:0,4:0,5:0}, counted:new Set(), total:ids.length};
+  session = {ids, idx:0, revealed:false, exam:!!opts.exam, label:opts.label||"Abfrage", results:{1:0,2:0,3:0,4:0,5:0}, counted:new Set(), total:ids.length, history:[]};
   go("lernen");
 }
 
@@ -954,13 +959,13 @@ function vLernen(){
     const r = session.results, tot = r[1]+r[2]+r[3]+r[4]+r[5];
     return `<div class="panel done">${ILL.done()}<b>${tot}</b><p>${session.exam?"Prüfungsfragen beantwortet":"Karten wiederholt"}</p>
       <p class="muted">Nochmal ${r[1]}, schwer ${r[2]}, gut ${r[3]}, leicht ${r[4]}, sehr leicht ${r[5]}${session.exam&&tot?". Quote: "+Math.round((r[3]+r[4]+r[5])/tot*100)+" % sicher":""}</p>
-      <div class="row" style="justify-content:center;margin-top:16px"><a class="btn primary" href="#aktuell" data-act="endsession">Fertig</a><a class="btn" href="#statistik" data-act="endsession">Statistik ansehen</a></div></div>`;
+      <div class="row" style="justify-content:center;margin-top:16px">${session.history&&session.history.length?`<button class="btn" data-act="backcard">← Zurück</button>`:""}<a class="btn primary" href="#aktuell" data-act="endsession">Fertig</a><a class="btn" href="#statistik" data-act="endsession">Statistik ansehen</a></div></div>`;
   }
   const id = session.ids[session.idx], it = S.items.get(id);
   if(!it){ session.idx++; return vLernen(); }
   const pos = session.idx+1, tot = session.ids.length;
   return `<div class="row"><b>${esc(session.label)}</b><span class="muted">${pos} von ${tot}</span><span class="spacer"></span>
-    <button class="btn ghost" data-act="endsession">Beenden</button></div>
+    ${session.history&&session.history.length?`<button class="btn ghost" data-act="backcard" title="Zur vorherigen Karte (Taste B oder ←)">← Zurück</button>`:""}<button class="btn ghost" data-act="endsession">Beenden</button></div>
   <div class="bar"><i style="width:${(session.idx/tot*100).toFixed(1)}%"></i></div>
   <div class="study">
     <div>${fixNotice(it)}${sheet(it, session.revealed, true)}</div>
@@ -977,23 +982,23 @@ const fieldName = k => ({steps:"Prüfungspunkte",hinweis:"Hinweise",front:"Vorde
 
 function sheet(it, revealed, study){
   const p = S.progress.get(it.id);
-  const meta = `<div class="meta"><span class="typetag">${it.fallsumme?"Fallzusammenfassung":TYPES[it.type]}</span>${it.fall?`<span class="fallchip">${esc([it.fall.reihe,it.fall.name].filter(Boolean).join(" "))}</span>`:""}<span>${esc(it.area||"")}</span>${tierTag(it)}<span>${esc(it.source||"")}</span>
+  const meta = `<div class="meta"><button class="starbtn ${it.star?"on":""}" data-act="star" data-id="${esc(it.id)}" title="${it.star?"Stern entfernen":"Mit Stern markieren"}" aria-label="Stern" aria-pressed="${it.star?"true":"false"}">${it.star?"★":"☆"}</button><span class="typetag">${it.fallsumme?"Fallzusammenfassung":TYPES[it.type]}</span>${it.fall?`<span class="fallchip">${esc([it.fall.reihe,it.fall.name].filter(Boolean).join(" "))}</span>`:""}<span>${esc(it.area||"")}</span>${tierTag(it)}<span>${esc(it.source||"")}</span>
     ${study?`<span class="spacer"></span><a href="#e-${esc(it.id)}" class="small muted" data-act="peek">Eintrag öffnen</a>`:""}</div>`;
   let q="", a="";
   if(it.type==="card"){
-    q = `<p class="q">${esc(it.front)}</p>`;
+    q = `<p class="q">${nl(it.front)}</p>`;
     a = `<div class="prose">${paras(it.back)}</div>`;
   } else if(it.type==="def"){
     q = `<p class="small muted" style="margin:0 0 4px">Definiere</p><p class="q">${esc(it.term)}</p>`;
-    a = `<div class="prose">${paras(it.definition)}</div>${(it.merkmale||[]).length?`<h3>Kernmerkmale</h3><ul class="kern">${it.merkmale.map(m=>"<li>"+esc(m)+"</li>").join("")}</ul>`:""}`;
+    a = `<div class="prose">${paras(it.definition)}</div>${(it.merkmale||[]).length?`<h3>Kernmerkmale</h3><ul class="kern">${it.merkmale.map(m=>"<li>"+nl(m)+"</li>").join("")}</ul>`:""}`;
   } else if(it.type==="schema"){
     q = `<p class="small muted" style="margin:0 0 4px">Gib das Prüfungsschema wieder</p><p class="q">${esc(it.title)}</p>`;
     a = schemaList(it.steps)+(it.hinweis?`<div class="prose small" style="margin-top:10px;color:var(--muted)">${paras(it.hinweis)}</div>`:"");
   } else {
     q = `<p class="q">${esc(it.title)}</p>${it.sachverhalt?`<div class="prose" style="color:var(--muted);font-size:15.5px">${paras(it.sachverhalt)}</div>`:""}
       ${study && !it.fall?`<p style="margin:14px 0 0;font-weight:600">Was sind die wesentlichen Bestandteile und die Probleme dieses Falls?</p>`:""}`;
-    a = `${(it.kern||[]).length?`<h3 style="margin-top:0">Wesentliche Bestandteile</h3><ul class="kern prose" style="font-size:16px">${it.kern.map(k=>"<li>"+esc(k)+"</li>").join("")}</ul>`:""}
-      ${(it.problems||[]).length?`<h3>Problemschwerpunkte</h3><ol class="probs prose" style="font-size:16px">${it.problems.map(pr=>`<li><b>${esc(pr.frage)}</b><br>${esc(pr.antwort)}</li>`).join("")}</ol>`:""}
+    a = `${(it.kern||[]).length?`<h3 style="margin-top:0">Wesentliche Bestandteile</h3><ul class="kern prose" style="font-size:16px">${it.kern.map(k=>"<li>"+nl(k)+"</li>").join("")}</ul>`:""}
+      ${(it.problems||[]).length?`<h3>Problemschwerpunkte</h3><ol class="probs prose" style="font-size:16px">${it.problems.map(pr=>`<li><b>${nl(pr.frage)}</b><br>${nl(pr.antwort)}</li>`).join("")}</ol>`:""}
       ${(it.gliederung||[]).length?`<h3>Lösungsaufbau</h3>${schemaList(it.gliederung)}`:""}`;
   }
   const norms = (it.norms||[]).length ? `<div class="margin-norms">${it.norms.map(normChip).join("")}</div>` : "";
@@ -1018,7 +1023,7 @@ function sheet(it, revealed, study){
     return `<button data-act="grade" data-g="${g}" class="${rec===g?"rec":""}"><b>${GRADE_TXT[g]}<kbd>${g}</kbd></b><span>${session.exam ? "" : g===1 && tierOf(it)<=2 ? "gleich nochmal" : fmtIvl(ivl)}</span></button>`;
   }).join("");
   const sketch = it.type==="case" ? sketchBox(it, revealed) : "";
-  return `<article class="sheet t-${it.type}">${meta}${q}${write}${verdictHtml}${sketch}
+  return `<article class="sheet t-${it.type}">${meta}${q}${!revealed?norms:""}${write}${verdictHtml}${sketch}
     ${revealed ? `<div class="answer">${it.type==="case"?'<h3 style="margin-top:0">Lösung</h3>':""}${a}</div>${mnemoBox(it)}${norms}<div class="grades">${gradeBtns}</div>${linkedLine(it)}`
       : it.type==="case" ? "" : `<div class="reveal"><button class="btn primary big" data-act="reveal">Antwort zeigen <kbd style="margin-left:6px">Leertaste</kbd></button></div>`}
   </article>`;
@@ -1078,15 +1083,30 @@ async function grade(g){
   if(!session || !session.revealed) return;
   const id = session.ids[session.idx], it = S.items.get(id);
   session.results[g]++;
+  const hist = {id, g, prev: S.progress.has(id) ? clean(S.progress.get(id)) : null, inserted: null};
+  if(!session.history) session.history = [];
+  session.history.push(hist);
   if(!session.exam){
     const p = schedule(S.progress.get(id), g, tierOf(it));
     putProgress(id, p);
     if(!session.counted.has(id)){ session.counted.add(id); bumpLog(); }
-    if(g===1 && tierOf(it)<=2){ const at = Math.min(session.ids.length, session.idx+4); session.ids.splice(at,0,id); }
+    if(g===1 && tierOf(it)<=2){ const at = Math.min(session.ids.length, session.idx+4); session.ids.splice(at,0,id); hist.inserted = at; }
   }
   verdicts.delete(id); checks.delete(id); own.delete(id); mnemoEdit = null;
   session.idx++; session.revealed = false;
   render();
+}
+
+async function backCard(){
+  if(!session || !session.history || !session.history.length) return;
+  const h = session.history.pop();
+  if(h.inserted!=null && session.ids[h.inserted]===h.id) session.ids.splice(h.inserted,1);
+  session.results[h.g] = Math.max(0, session.results[h.g]-1);
+  session.idx = Math.max(0, session.idx-1);
+  session.revealed = true;
+  verdicts.delete(h.id); checks.delete(h.id); own.delete(h.id); mnemoEdit = null;
+  render();
+  if(!session.exam){ if(h.prev) await putProgress(h.id, h.prev); else await deleteProgress(h.id); }
 }
 
 /* ---------- KI: Auswertung & Chat ---------- */
@@ -1213,16 +1233,16 @@ function tagCloud(){
 }
 
 /* ---------- Ansicht: Bibliothek ---------- */
-const bib = {type:"", area:"", cat:"", q:"", fix:false, sort:"rel"};
+const bib = {type:"", area:"", cat:"", q:"", fix:false, star:false, sort:"rel"};
 const isHemmer = i => /hemmer/i.test(i.source||"") || (i.tags||[]).some(t=>/^hemmer$/i.test(t));
 const CATS = {"hemmer-faelle":["Hemmer-Fälle", i=>i.type==="case"&&isHemmer(i)], "hemmer-karten":["Hemmer-Karteikarten", i=>i.type==="card"&&isHemmer(i)], "hemmer-alle":["Alles von Hemmer", isHemmer]};
 function vBib(){
   const ar = areas();
-  let list = [...S.items.values()].filter(i=>(!bib.type||i.type===bib.type)&&(!bib.cat||CATS[bib.cat][1](i))&&(!bib.area||i.area===bib.area)&&(!bib.fix||(i.suggestion&&i.suggestion.status==="offen")));
+  let list = [...S.items.values()].filter(i=>(!bib.type||i.type===bib.type)&&(!bib.cat||CATS[bib.cat][1](i))&&(!bib.area||i.area===bib.area)&&(!bib.fix||(i.suggestion&&i.suggestion.status==="offen"))&&(!bib.star||i.star));
   const toks = fold(bib.q).split(/\s+/).filter(Boolean);
   if(toks.length) list = list.filter(i=>{ const h=hay(i); return toks.every(t=>h.includes(t)); });
   list.sort(bib.sort==="rel" ? (a,b)=>tierOf(a)-tierOf(b)||titleOf(a).localeCompare(titleOf(b),"de") : bib.sort==="due" ? (a,b)=>((S.progress.get(a.id)||{}).due||"0").localeCompare((S.progress.get(b.id)||{}).due||"0") : (a,b)=>titleOf(a).localeCompare(titleOf(b),"de"));
-  return `<div class="row"><h1>Bibliothek</h1><span class="spacer"></span><a class="btn primary" href="#neu">Eintrag anlegen</a></div>
+  return `<div class="row"><h1>Bibliothek</h1><span class="spacer"></span>${list.some(i=>i.star)?`<button class="btn" data-act="learnstar">★ ${list.filter(i=>i.star).length} Sternkarten abfragen</button>`:""}<a class="btn primary" href="#neu">Eintrag anlegen</a></div>
   <p class="sub">${S.items.size} Einträge: ${TKEYS.map(t=>[...S.items.values()].filter(i=>i.type===t).length+" "+TYPES_PL[t]).join(", ")}.</p>
   <div class="filters">
     <select data-bib="type" aria-label="Art"><option value="">Alle Arten</option>${TKEYS.map(t=>`<option value="${t}" ${bib.type===t?"selected":""}>${TYPES_PL[t]}</option>`).join("")}</select>
@@ -1230,6 +1250,7 @@ function vBib(){
     <select data-bib="area" aria-label="Rechtsgebiet"><option value="">Alle Rechtsgebiete</option>${ar.map(a=>`<option ${bib.area===a?"selected":""}>${esc(a)}</option>`).join("")}</select>
     <select data-bib="sort" aria-label="Sortierung"><option value="rel" ${bib.sort==="rel"?"selected":""}>Nach Tier</option><option value="due" ${bib.sort==="due"?"selected":""}>Nach Fälligkeit</option><option value="abc" ${bib.sort==="abc"?"selected":""}>Alphabetisch</option></select>
     <input data-bib="q" type="search" placeholder="Filtern" value="${esc(bib.q)}" aria-label="Filtern">
+    <label class="switch"><input type="checkbox" data-bib="star" ${bib.star?"checked":""}> nur ★ Sterne (${[...S.items.values()].filter(i=>i.star).length})</label>
     <label class="switch"><input type="checkbox" data-bib="fix" ${bib.fix?"checked":""}> nur mit Korrekturvorschlag</label>
   </div>
   ${list.length ? `<div class="list">${list.slice(0,400).map(i=>itemRow(i,toks)).join("")}</div>${list.length>400?`<p class="small muted">Die ersten 400 von ${list.length} angezeigt. Grenze die Auswahl mit den Filtern ein.</p>`:""}` : `<div class="panel empty">Keine Einträge für diese Auswahl.</div>`}`;
@@ -1558,6 +1579,7 @@ document.addEventListener("click", async e=>{
   else if(a==="tagesabfrage"){ const d = b.dataset.d; startSession([...S.items.values()].filter(i=>i.tagesabfrage===d).sort((x,y)=>priority(y)-priority(x)).map(i=>i.id), {label:"Tagesabfrage "+toDate(d).toLocaleDateString("de-DE",{day:"numeric",month:"long"})}); }
   else if(a==="reveal"){ if(session){ session.revealed = true; render(); } }
   else if(a==="grade"){ grade(Number(b.dataset.g)); }
+  else if(a==="backcard"){ await backCard(); }
   else if(a==="endsession"){ session = null; if(b.tagName!=="A") go("aktuell"); }
   else if(a==="writemode"){ S.settings.write = b.checked; saveSettings(); render(); }
   else if(a==="judge"){ judge(id); }
@@ -1574,6 +1596,8 @@ document.addEventListener("click", async e=>{
   else if(a==="tag"){ searchQ = b.dataset.t; go("suche"); }
   else if(a==="fixfilter"){ bib.fix = true; }
   else if(a==="learnone"){ const it = S.items.get(id); startSession([id], {label:TYPES[it.type]+" abfragen"}); }
+  else if(a==="star"){ const it = S.items.get(id); if(!it) return; const c = clean(it); if(c.star) delete c.star; else c.star = true; await putItem(c); toast(c.star?"Mit Stern markiert":"Stern entfernt"); render(); }
+  else if(a==="learnstar"){ startSession([...S.items.values()].filter(i=>i.star).sort((x,y)=>priority(y)-priority(x)).map(i=>i.id), {label:"Sternkarten"}); }
   else if(a==="learnleech"){ startSession([...S.items.values()].filter(i=>(S.progress.get(i.id)||{}).leech).map(i=>i.id), {label:"Problemkarten"}); }
   else if(a==="learnnorm"){ const slug = b.dataset.n; let list=[]; for(const [n,l] of normIndex()) if(normSlug(n)===slug) list=l; startSession(list.sort((x,y)=>priority(y)-priority(x)).map(i=>i.id), {label:"Norm abfragen"}); }
   else if(a==="edit"){ editing = id; draftLinksInit = false; render(); }
@@ -1613,7 +1637,7 @@ document.addEventListener("input", e=>{
 document.addEventListener("change", async e=>{
   if(e.target.id==="examdate"){ if(e.target.value){ S.settings.examDate = e.target.value; await saveSettings(); render(); } return; }
   const t = e.target;
-  if(t.dataset.bib){ if(t.dataset.bib==="fix") bib.fix = t.checked; else if(t.dataset.bib!=="q") bib[t.dataset.bib] = t.value; render(); }
+  if(t.dataset.bib){ if(t.dataset.bib==="fix") bib.fix = t.checked; else if(t.dataset.bib==="star") bib.star = t.checked; else if(t.dataset.bib!=="q") bib[t.dataset.bib] = t.value; render(); }
   else if(t.dataset.ex==="area"){ exam.area = t.value; render(); }
   else if(t.dataset.ex==="maxTier"){ exam.maxTier = Number(t.value); render(); }
   else if((t.id==="importfile") && t.files[0]){ for(const f of t.files){ await doImport(f); } }
@@ -1629,6 +1653,7 @@ document.addEventListener("keydown", e=>{
   if(r==="lernen" && session && session.idx<session.ids.length){
     if((e.key===" "||e.key==="Enter") && !session.revealed){ e.preventDefault(); const cur = S.items.get(session.ids[session.idx]); const sk = $("#sktext"); if(cur && cur.type==="case" && sk){ sk.focus(); return; } session.revealed=true; render(); return; }
     if(session.revealed && /^[1-5]$/.test(e.key)){ e.preventDefault(); grade(Number(e.key)); return; }
+    if((e.key==="b"||e.key==="ArrowLeft") && session.history && session.history.length){ e.preventDefault(); backCard(); return; }
     if(e.key==="w" && !session.revealed){ const ta=$("#wtext"); if(ta){ e.preventDefault(); ta.focus(); } return; }
   }
   if(e.key==="k"){ const c=$("#chatin"); if(c && !c.disabled){ e.preventDefault(); c.focus(); } return; }
