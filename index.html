@@ -189,6 +189,11 @@ kbd{font:600 10px/1 var(--sans);letter-spacing:.02em;border:0;border-radius:4px;
 .fallchip{font-weight:600;color:var(--clay);background:var(--clay-soft);padding:3px 10px;border-radius:999px;text-decoration:none}
 .q{font:500 23px/1.35 var(--serif);margin:0 0 6px;max-width:62ch;font-variation-settings:"SOFT" 100}
 .prose{font:400 17px/1.62 var(--sans);max-width:68ch}
+.cardimg{margin:18px 0 0;padding:8px;background:#fff;border:1px solid rgba(0,0,0,.12);border-radius:var(--r2);overflow-x:auto;cursor:zoom-in}
+.cardimg img{display:block;width:100%;height:auto}
+.cardimg.zoom{cursor:zoom-out}
+.cardimg.zoom img{width:auto;max-width:none}
+.cardimg figcaption{margin-top:6px;font:400 13px/1.4 var(--sans);color:#6b6b6b}
 .prose p{margin:0 0 .7em}
 .answer{margin-top:22px;padding-top:20px;position:relative}
 .answer::before{content:"";position:absolute;left:0;right:0;top:0;height:8px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='8' viewBox='0 0 40 8'%3E%3Cpath d='M0 4 Q10 0 20 4 T40 4' fill='none' stroke='%23C9B996' stroke-width='1.4'/%3E%3C/svg%3E") repeat-x;opacity:.9}
@@ -702,6 +707,12 @@ function normIndex(){
 }
 const areas = () => [...new Set([...S.items.values()].map(i=>i.area).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"de"));
 
+// Optionale Grafik auf Karteikarten: Feld "image" (Datei im Ordner bilder/, z. B. "bilder/x.png", oder data:image/…;base64,…), "imageAlt" als Beschriftung. Antippen vergrößert.
+function cardImg(it){
+  const src = typeof it.image==="string" ? it.image : "";
+  if(!/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(src) && !/^bilder\/[A-Za-z0-9._-]+\.(png|jpe?g|webp|svg)$/.test(src)) return "";
+  return `<figure class="cardimg" onclick="this.classList.toggle('zoom')" title="Antippen zum Vergrößern"><img src="${src}" alt="${esc(it.imageAlt||"Grafik")}" loading="lazy">${it.imageAlt?`<figcaption>${esc(it.imageAlt)}</figcaption>`:""}</figure>`;
+}
 function paras(t){ return String(t||"").split(/\n{2,}|\n/).filter(x=>x.trim()).map(x=>"<p>"+nl(x)+"</p>").join(""); }
 function hl(text, toks){
   let h = esc(text); if(!toks.length) return h;
@@ -987,7 +998,7 @@ function sheet(it, revealed, study){
   let q="", a="";
   if(it.type==="card"){
     q = `<p class="q">${nl(it.front)}</p>`;
-    a = `<div class="prose">${paras(it.back)}</div>`;
+    a = `<div class="prose">${paras(it.back)}</div>${cardImg(it)}`;
   } else if(it.type==="def"){
     q = `<p class="small muted" style="margin:0 0 4px">Definiere</p><p class="q">${esc(it.term)}</p>`;
     a = `<div class="prose">${paras(it.definition)}</div>${(it.merkmale||[]).length?`<h3>Kernmerkmale</h3><ul class="kern">${it.merkmale.map(m=>"<li>"+nl(m)+"</li>").join("")}</ul>`:""}`;
