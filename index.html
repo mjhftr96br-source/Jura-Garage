@@ -184,16 +184,13 @@ kbd{font:600 10px/1 var(--sans);letter-spacing:.02em;border:0;border-radius:4px;
 .dot{display:inline-block;width:4px;height:14px;border-radius:2px;background:var(--tc)}
 .sheet .meta{display:flex;gap:10px;flex-wrap:wrap;align-items:center;color:var(--muted);font-size:13px;margin-bottom:16px}
 .starbtn{border:0;background:transparent;font-size:22px;line-height:1;cursor:pointer;color:var(--muted);padding:0 4px}.starbtn.on{color:#e6a700}.starbtn:hover{color:#e6a700}.starmark{color:#e6a700;margin-left:4px}
-.norm-inline{font-size:inherit;white-space:nowrap}
+.norm.norm-inline{display:inline;background:none;padding:0;border-radius:0;font:inherit;font-weight:inherit;color:inherit;text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px;white-space:normal}.norm.norm-inline:hover{color:var(--acc-ink)}
+ol.schema .sh{font-weight:inherit}ol.schema ul.sub{list-style:none;margin:3px 0 0;padding:0 0 0 4px;font-size:15px}ol.schema ul.sub li{margin:0 0 3px;padding:0 0 0 16px;position:relative;line-height:1.45}ol.schema ul.sub li::before{content:"–";position:absolute;left:2px;color:var(--muted)}
+.tabs{display:flex;gap:6px;margin:6px 0 12px;border-bottom:1px solid var(--line,#ddd);flex-wrap:wrap}.tab{border:0;background:transparent;padding:8px 14px;border-radius:8px 8px 0 0;cursor:pointer;font:inherit;color:var(--muted)}.tab.on{color:var(--ink,inherit);font-weight:600;box-shadow:inset 0 -2px 0 var(--accent,#2b6cb0)}
 .typetag{font-weight:600;color:var(--tc);background:color-mix(in srgb,var(--tc) 14%,transparent);padding:3px 10px;border-radius:999px}
 .fallchip{font-weight:600;color:var(--clay);background:var(--clay-soft);padding:3px 10px;border-radius:999px;text-decoration:none}
 .q{font:500 23px/1.35 var(--serif);margin:0 0 6px;max-width:62ch;font-variation-settings:"SOFT" 100}
 .prose{font:400 17px/1.62 var(--sans);max-width:68ch}
-.cardimg{margin:18px 0 0;padding:8px;background:#fff;border:1px solid rgba(0,0,0,.12);border-radius:var(--r2);overflow-x:auto;cursor:zoom-in}
-.cardimg img{display:block;width:100%;height:auto}
-.cardimg.zoom{cursor:zoom-out}
-.cardimg.zoom img{width:auto;max-width:none}
-.cardimg figcaption{margin-top:6px;font:400 13px/1.4 var(--sans);color:#6b6b6b}
 .prose p{margin:0 0 .7em}
 .answer{margin-top:22px;padding-top:20px;position:relative}
 .answer::before{content:"";position:absolute;left:0;right:0;top:0;height:8px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='8' viewBox='0 0 40 8'%3E%3Cpath d='M0 4 Q10 0 20 4 T40 4' fill='none' stroke='%23C9B996' stroke-width='1.4'/%3E%3C/svg%3E") repeat-x;opacity:.9}
@@ -707,12 +704,6 @@ function normIndex(){
 }
 const areas = () => [...new Set([...S.items.values()].map(i=>i.area).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"de"));
 
-// Optionale Grafik auf Karteikarten: Feld "image" (Datei im Ordner bilder/, z. B. "bilder/x.png", oder data:image/…;base64,…), "imageAlt" als Beschriftung. Antippen vergrößert.
-function cardImg(it){
-  const src = typeof it.image==="string" ? it.image : "";
-  if(!/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(src) && !/^bilder\/[A-Za-z0-9._-]+\.(png|jpe?g|webp|svg)$/.test(src)) return "";
-  return `<figure class="cardimg" onclick="this.classList.toggle('zoom')" title="Antippen zum Vergrößern"><img src="${src}" alt="${esc(it.imageAlt||"Grafik")}" loading="lazy">${it.imageAlt?`<figcaption>${esc(it.imageAlt)}</figcaption>`:""}</figure>`;
-}
 function paras(t){ return String(t||"").split(/\n{2,}|\n/).filter(x=>x.trim()).map(x=>"<p>"+nl(x)+"</p>").join(""); }
 function hl(text, toks){
   let h = esc(text); if(!toks.length) return h;
@@ -998,7 +989,7 @@ function sheet(it, revealed, study){
   let q="", a="";
   if(it.type==="card"){
     q = `<p class="q">${nl(it.front)}</p>`;
-    a = `<div class="prose">${paras(it.back)}</div>${cardImg(it)}`;
+    a = `<div class="prose">${paras(it.back)}</div>`;
   } else if(it.type==="def"){
     q = `<p class="small muted" style="margin:0 0 4px">Definiere</p><p class="q">${esc(it.term)}</p>`;
     a = `<div class="prose">${paras(it.definition)}</div>${(it.merkmale||[]).length?`<h3>Kernmerkmale</h3><ul class="kern">${it.merkmale.map(m=>"<li>"+nl(m)+"</li>").join("")}</ul>`:""}`;
@@ -1045,8 +1036,36 @@ function mnemoBox(it){
   if(it.mnemonic) return `<div class="mnemo"><h4>Deine Eselsbrücke</h4><div class="txt">${esc(it.mnemonic)}</div><div class="act"><button class="linkbtn small" data-act="mnemoedit" data-id="${esc(it.id)}">Ändern</button></div></div>`;
   return `<div class="addmnemo"><button class="linkbtn small" data-act="mnemoedit" data-id="${esc(it.id)}">+ Eselsbrücke notieren</button></div>`;
 }
+function splitTop(str, sepRe){
+  const out=[]; let depth=0, cur="";
+  for(let k=0;k<str.length;k++){
+    const c=str[k];
+    if(c==="(") depth++; else if(c===")") depth=Math.max(0,depth-1);
+    if(depth===0){
+      if(c===";"){ out.push(cur.trim()); cur=""; continue; }
+      if(c==="," && sepRe.test(str.slice(k+1))){ out.push(cur.trim()); cur=""; continue; }
+    }
+    cur+=c;
+  }
+  if(cur.trim()) out.push(cur.trim());
+  return out.filter(Boolean);
+}
+function stepHtml(t){
+  const m = t.match(/^((?:[IVX]+|[A-Z]|\d+|[a-z])[.)]\s+)?([^:]{2,80}):\s+(.+)$/);
+  const ITEM = /^\s*(Nr\.|Alt\.|Var\.|Fall|Fallgruppe|Abs\.|S\.)\s*\d*/;
+  if(m && t.length>90){
+    let items = splitTop(m[3], ITEM);
+    if(items.length===1){ const c = splitTop(m[3].replace(/;/g,"\u0001"), /^/).map(x=>x.replace(/\u0001/g,";")); if(c.length>=3 && c.every(x=>x.length<=95)) items = c; }
+    return `<span class="sh">${nl((m[1]||"")+m[2])}:</span><ul class="sub">${items.map(x=>`<li>${nl(x)}</li>`).join("")}</ul>`;
+  }
+  if(t.length>110 && t.includes(";")){
+    const items = splitTop(t, /^$/);
+    if(items.length>1) return `<span class="sh">${nl(items[0])}</span><ul class="sub">${items.slice(1).map(x=>`<li>${nl(x)}</li>`).join("")}</ul>`;
+  }
+  return nl(t);
+}
 function schemaList(steps){
-  return `<ol class="schema prose" style="font-size:16px">${(steps||[]).map(l=>{ const lv = Math.min(4, Math.floor((l.match(/^\s*/)[0].replace(/\t/g,"  ").length)/2)); return `<li class="l${lv}" style="--lv:${lv}">${esc(l.trim())}</li>`; }).join("")}</ol>`;
+  return `<ol class="schema prose" style="font-size:16px">${(steps||[]).map(l=>{ const lv = Math.min(4, Math.floor((l.match(/^\s*/)[0].replace(/\t/g,"  ").length)/2)); return `<li class="l${lv}" style="--lv:${lv}">${stepHtml(l.trim())}</li>`; }).join("")}</ol>`;
 }
 function verdictBox(r){
   return `<div class="verdict"><b>${esc(r.gesamt==="vollständig"?"Vollständig erfasst":r.gesamt==="teilweise"?"Teilweise erfasst":"Wesentliches fehlt")}</b>${r.empfehlung?` <span class="small muted">Vorschlag: ${esc(r.empfehlung)}</span>`:""}
@@ -1246,7 +1265,8 @@ function tagCloud(){
 /* ---------- Ansicht: Bibliothek ---------- */
 const bib = {type:"", area:"", cat:"", q:"", fix:false, star:false, sort:"rel"};
 const isHemmer = i => /hemmer/i.test(i.source||"") || (i.tags||[]).some(t=>/^hemmer$/i.test(t));
-const CATS = {"hemmer-faelle":["Hemmer-Fälle", i=>i.type==="case"&&isHemmer(i)], "hemmer-karten":["Hemmer-Karteikarten", i=>i.type==="card"&&isHemmer(i)], "hemmer-alle":["Alles von Hemmer", isHemmer]};
+const isZusatz = i => (i.tags||[]).some(t=>/^(wiederholungsfrage|zusatzfrage|sonderheft)$/i.test(t)) || /wiederholungs|zusatzfrage|sonderheft/i.test(i.source||"");
+const CATS = {"hemmer-zusatz":["Hemmer-Zusatzfragen", i=>i.type==="card"&&isZusatz(i)], "hemmer-faelle":["Hemmer-Fälle", i=>i.type==="case"&&isHemmer(i)], "hemmer-karten":["Hemmer-Karteikarten", i=>i.type==="card"&&isHemmer(i)], "hemmer-alle":["Alles von Hemmer", isHemmer]};
 function vBib(){
   const ar = areas();
   let list = [...S.items.values()].filter(i=>(!bib.type||i.type===bib.type)&&(!bib.cat||CATS[bib.cat][1](i))&&(!bib.area||i.area===bib.area)&&(!bib.fix||(i.suggestion&&i.suggestion.status==="offen"))&&(!bib.star||i.star));
@@ -1255,6 +1275,7 @@ function vBib(){
   list.sort(bib.sort==="rel" ? (a,b)=>tierOf(a)-tierOf(b)||titleOf(a).localeCompare(titleOf(b),"de") : bib.sort==="due" ? (a,b)=>((S.progress.get(a.id)||{}).due||"0").localeCompare((S.progress.get(b.id)||{}).due||"0") : (a,b)=>titleOf(a).localeCompare(titleOf(b),"de"));
   return `<div class="row"><h1>Bibliothek</h1><span class="spacer"></span>${list.some(i=>i.star)?`<button class="btn" data-act="learnstar">★ ${list.filter(i=>i.star).length} Sternkarten abfragen</button>`:""}<a class="btn primary" href="#neu">Eintrag anlegen</a></div>
   <p class="sub">${S.items.size} Einträge: ${TKEYS.map(t=>[...S.items.values()].filter(i=>i.type===t).length+" "+TYPES_PL[t]).join(", ")}.</p>
+  <div class="tabs" role="tablist">${[["", "Alle Einträge", S.items.size], ["hemmer-zusatz", "Hemmer-Zusatzfragen", [...S.items.values()].filter(CATS["hemmer-zusatz"][1]).length]].map(([k,l,n])=>`<button role="tab" class="tab ${bib.cat===k?"on":""}" aria-selected="${bib.cat===k}" data-act="bibtab" data-t="${k}">${l} <span class="muted">${n}</span></button>`).join("")}</div>
   <div class="filters">
     <select data-bib="type" aria-label="Art"><option value="">Alle Arten</option>${TKEYS.map(t=>`<option value="${t}" ${bib.type===t?"selected":""}>${TYPES_PL[t]}</option>`).join("")}</select>
     <select data-bib="cat" aria-label="Kategorie"><option value="">Alle Kategorien</option>${Object.entries(CATS).map(([k,v])=>`<option value="${k}" ${bib.cat===k?"selected":""}>${v[0]} (${[...S.items.values()].filter(v[1]).length})</option>`).join("")}</select>
@@ -1590,6 +1611,7 @@ document.addEventListener("click", async e=>{
   else if(a==="tagesabfrage"){ const d = b.dataset.d; startSession([...S.items.values()].filter(i=>i.tagesabfrage===d).sort((x,y)=>priority(y)-priority(x)).map(i=>i.id), {label:"Tagesabfrage "+toDate(d).toLocaleDateString("de-DE",{day:"numeric",month:"long"})}); }
   else if(a==="reveal"){ if(session){ session.revealed = true; render(); } }
   else if(a==="grade"){ grade(Number(b.dataset.g)); }
+  else if(a==="bibtab"){ bib.cat = b.dataset.t; render(); }
   else if(a==="backcard"){ await backCard(); }
   else if(a==="endsession"){ session = null; if(b.tagName!=="A") go("aktuell"); }
   else if(a==="writemode"){ S.settings.write = b.checked; saveSettings(); render(); }
