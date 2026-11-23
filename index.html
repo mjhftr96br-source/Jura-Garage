@@ -80,24 +80,27 @@ svg.ill{display:block;overflow:visible}
 
 /* Kopfzeile */
 header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;padding:10px 0 6px;background:color-mix(in srgb,var(--bg) 82%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
-.topin{display:flex;align-items:center;gap:14px;min-height:56px;background:color-mix(in srgb,var(--paper) 88%,transparent);border:1px solid var(--line);border-radius:999px;padding:6px 8px 6px 10px;box-shadow:var(--shadow)}
+.topin{display:flex;align-items:center;gap:8px;min-height:56px;background:color-mix(in srgb,var(--paper) 88%,transparent);border:1px solid var(--line);border-radius:999px;padding:6px 8px 6px 10px;box-shadow:var(--shadow)}
 .brand{display:flex;align-items:center;gap:9px;text-decoration:none;white-space:nowrap;padding-right:4px}
 .brand svg{width:38px;height:38px;flex:none}
 .brand b{font:600 19px/1 var(--serif);letter-spacing:-.01em;font-variation-settings:"SOFT" 100,"WONK" 1}
-@media (max-width:980px){.brand b{display:none}}
+@media (max-width:1260px){.brand b{display:none}}
 nav.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;flex:1}
 nav.tabs::-webkit-scrollbar{display:none}
-nav.tabs a{padding:8px 10px;border-radius:999px;text-decoration:none;color:var(--ink);opacity:.68;font-weight:500;white-space:nowrap;transition:background .15s,opacity .15s}
+nav.tabs{justify-content:center}
+nav.tabs a{padding:7px 9px;font-size:15px;border-radius:999px;text-decoration:none;color:var(--ink);opacity:.68;font-weight:500;white-space:nowrap;transition:background .15s,opacity .15s}
 nav.tabs a:hover{opacity:1;background:var(--soft)}
 nav.tabs a[aria-current="page"]{opacity:1;font-weight:600;background:var(--acc-soft);color:var(--acc-ink)}
-.qs{position:relative;width:210px;flex:none}
-.themebtn{flex:none;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--soft);color:var(--ink);border-radius:999px;padding:7px 11px;cursor:pointer;font-weight:500;white-space:nowrap}
+.qs{position:relative;width:165px;flex:none}
+.themebtn{flex:none;display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;padding:0;border:1px solid var(--line);background:var(--soft);color:var(--ink);border-radius:50%;cursor:pointer}
+.themebtn svg{width:15px;height:15px}
 .themebtn:hover{border-color:var(--muted)}
-@media (max-width:1400px){.themebtn span{display:none}}
+.themebtn span{display:none}
 .qs input{width:100%;padding:8px 12px 8px 33px;border:1px solid var(--line);border-radius:999px;background:var(--soft);color:var(--ink)}
 .qs svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);z-index:1}
 .qs kbd{position:absolute;right:10px;top:50%;transform:translateY(-50%)}
-@media (max-width:820px){ .qs{display:none} .topin{gap:8px} }
+@media (max-width:1120px){ .qs{display:none} }
+@media (max-width:820px){ nav.tabs{justify-content:flex-start} nav.tabs a{padding:7px 8px;font-size:14.5px} }
 
 main{padding:22px 0 80px}
 h1{font:600 34px/1.12 var(--serif);letter-spacing:-.015em;margin:0 0 6px;font-variation-settings:"SOFT" 100,"WONK" 1}
@@ -186,7 +189,8 @@ kbd{font:600 10px/1 var(--sans);letter-spacing:.02em;border:0;border-radius:4px;
 .starbtn{border:0;background:transparent;font-size:22px;line-height:1;cursor:pointer;color:var(--muted);padding:0 4px}.starbtn.on{color:#e6a700}.starbtn:hover{color:#e6a700}.starmark{color:#e6a700;margin-left:4px}
 .norm.norm-inline{display:inline;background:none;padding:0;border-radius:0;font:inherit;font-weight:inherit;color:inherit;text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px;white-space:normal}.norm.norm-inline:hover{color:var(--acc-ink)}
 ol.schema .sh{font-weight:inherit}ol.schema ul.sub{list-style:none;margin:3px 0 0;padding:0 0 0 4px;font-size:15px}ol.schema ul.sub li{margin:0 0 3px;padding:0 0 0 16px;position:relative;line-height:1.45}ol.schema ul.sub li::before{content:"–";position:absolute;left:2px;color:var(--muted)}
-.tabs{display:flex;gap:6px;margin:6px 0 12px;border-bottom:1px solid var(--line,#ddd);flex-wrap:wrap}.tab{border:0;background:transparent;padding:8px 14px;border-radius:8px 8px 0 0;cursor:pointer;font:inherit;color:var(--muted)}.tab.on{color:var(--ink,inherit);font-weight:600;box-shadow:inset 0 -2px 0 var(--accent,#2b6cb0)}
+.subtabs{display:flex;gap:4px;margin:6px 0 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}.tab{border:0;background:transparent;padding:8px 14px;border-radius:10px 10px 0 0;cursor:pointer;font:inherit;color:var(--muted)}.tab:hover{color:var(--ink);background:var(--soft)}.tab.on{color:var(--ink);font-weight:600;box-shadow:inset 0 -2px 0 var(--acc-ink)}.tab .muted{font-weight:400}
+.zone .subtabs{margin:2px 0 10px}.zone .tab{padding:6px 11px;font-size:14.5px}
 .typetag{font-weight:600;color:var(--tc);background:color-mix(in srgb,var(--tc) 14%,transparent);padding:3px 10px;border-radius:999px}
 .fallchip{font-weight:600;color:var(--clay);background:var(--clay-soft);padding:3px 10px;border-radius:999px;text-decoration:none}
 .q{font:500 23px/1.35 var(--serif);margin:0 0 6px;max-width:62ch;font-variation-settings:"SOFT" 100}
@@ -359,6 +363,32 @@ body.locked nav.tabs, body.locked .qs{display:none}
 .bigstat b{display:block;font:600 40px/1 var(--serif);font-variant-numeric:tabular-nums}
 .bigstat span{color:var(--muted);font-size:13.5px}
 .proj svg{width:100%;height:auto;max-height:230px;display:block}
+
+/* Spracheingabe */
+.micwrap{position:relative;display:block;width:100%}
+.micwrap.in{display:block;width:100%}
+.filters .micwrap.in{width:auto;flex:1 1 180px;min-width:150px}
+.compose .micwrap{flex:1;min-width:0}.compose .micwrap textarea{width:100%}
+.micwrap.in:has(.bigsearch) .micbtn{top:calc(50% - 9px);width:32px;height:32px;right:12px}
+.micwrap.ta>textarea{padding-right:42px}
+.micwrap.in>input{padding-right:38px;width:100%}
+.micbtn{position:absolute;right:6px;bottom:6px;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--paper);color:var(--muted);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;opacity:.85;z-index:2}
+.micwrap.in .micbtn{top:50%;bottom:auto;transform:translateY(-50%);width:26px;height:26px}
+.micbtn:hover{color:var(--ink);border-color:var(--muted);opacity:1}
+.micbtn.on{background:var(--clay);border-color:var(--clay);color:#fff;opacity:1;animation:micpulse 1.2s ease-in-out infinite}
+@keyframes micpulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--clay) 55%,transparent)}50%{box-shadow:0 0 0 6px transparent}}
+
+/* Status: offen (grau) / teilweise (gelb) / erledigt (grün) */
+.btn.st-open{background:color-mix(in srgb,var(--muted) 14%,var(--paper));border-color:color-mix(in srgb,var(--muted) 45%,transparent);color:var(--ink);font-weight:600}
+.btn.st-open:hover{background:color-mix(in srgb,var(--muted) 22%,var(--paper))}
+.btn.st-done{background:var(--ok);border-color:color-mix(in srgb,var(--ok) 70%,var(--ink));color:#fff;font-weight:600}
+.btn.st-done:disabled{opacity:.9;cursor:default}
+.btn.st-part{background:var(--acc);border-color:color-mix(in srgb,var(--acc) 70%,var(--ink));color:var(--on-acc);font-weight:600}
+:root[data-theme="dark"] .btn.st-done{color:#1A1813}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.st-done{color:#1A1813}}
+.stn{display:inline-block;min-width:20px;padding:1px 7px;border-radius:999px;background:var(--muted);color:var(--paper);font-size:12.5px;line-height:1.4;text-align:center}
+.stpill{font-size:12.5px;font-weight:600;padding:3px 10px;border-radius:999px}.stpill.open{background:color-mix(in srgb,var(--muted) 16%,transparent);color:var(--muted)}
+.hint.resume{align-items:center;border-style:solid;border-color:var(--acc);background:color-mix(in srgb,var(--acc-soft) 70%,transparent)}
 </style>
 </head>
 <body>
@@ -370,8 +400,8 @@ body.locked nav.tabs, body.locked .qs{display:none}
       <a href="#suche">Suche</a>
       <a href="#bibliothek">Bibliothek</a>
       <a href="#normen">Normen</a>
-      <a href="#problemkarten">Problemkarten</a>
-      <a href="#pruefung">Prüfungsmodus</a>
+      <a href="#problemkarten" title="Problemkarten">Problemkarten</a>
+      <a href="#pruefung">Prüfung</a>
       <a href="#statistik">Statistik</a>
       <a href="#daten">Daten</a>
     </nav>
@@ -415,20 +445,22 @@ const toDate = s => { const [y,m,d]=s.split("-").map(Number); return new Date(y,
 const diffDays = (a,b) => { const p=s=>{const [y,m,d]=s.split("-").map(Number);return Date.UTC(y,m-1,d)}; return Math.round((p(b)-p(a))/864e5); };
 const fold = s => String(s ?? "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ß/g,"ss");
 const uid = p => p+"-"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
-const FED_LAWS = new Set("BGB StGB GG VwGO VwVfG StPO ZPO BauGB BauNVO HGB StVG StVO KrWG ProdHaftG BVerfGG GVG InsO AO FGO SGG UWG GWB UrhG MarkenG PatG HGrG ZVG GBO ArbGG KSchG BetrVG TVG AGG BDSG VwZG VwKostG WHG BNatSchG BImSchG UVPG StGB OWiG JGG BRAO RVG GKG FamFG AktG GmbHG WEG BeurkG UKlaG AsylG AufenthG PolG ROG BBodSchG EStG KStG UStG SGB GwG KWG VVG InsVV BtMG StVollzG GVG BGBEG EGBGB ZwVwV UmwRG WpHG BauGB".split(" "));
-const BAY_LAWS = {PAG:"BayPAG", LStVG:"BayLStVG", GO:"BayGO", LKrO:"BayLKrO", BezO:"BayBezO", BayBO:"BayBO", BayVwVfG:"BayVwVfG", VwZVG:"BayVwZVG", BayVwZVG:"BayVwZVG", BayStrWG:"BayStrWG", BayDSG:"BayDSG", KAG:"BayKAG", BayNatSchG:"BayNatSchG", BayWaldG:"BayWaldG", BayVerf:"BayVerf", BV:"BayVerf", BayEUG:"BayEUG", BayHSchG:"BayHSchG", BayBG:"BayBG", BayKJHG:"BayKJHG", BayVwGO:"BayVwVfG", POG:"BayPOG", BayVSG:"BayVSG", BayStVollzG:"BayStVollzG", BayVGG:"BayVGG", VerfGHG:"BayVfGHG", BayVfGHG:"BayVfGHG"};
-const SLUG_EXC = {EGBGB:"bgbeg", BGBEG:"bgbeg", GwG:"gwg", OWiG:"owig"};
+const FED_LAWS = new Set("BGB StGB GG VwGO VwVfG StPO ZPO BauGB BauNVO HGB StVG StVO KrWG ProdHaftG BVerfGG GVG InsO AO FGO SGG UWG GWB UrhG MarkenG PatG HGrG ZVG GBO ArbGG KSchG BetrVG TVG AGG BDSG VwZG WHG BNatSchG BImSchG UVPG OWiG JGG BRAO RVG GKG FamFG AktG GmbHG WEG BeurkG UKlaG AsylG AufenthG ROG BBodSchG EStG KStG UStG GwG KWG VVG InsVV BtMG StVollzG BGBEG EGBGB ZwVwV UmwRG WpHG EGStGB PartGG BeamtStG BVerfGG IfSG ZVG".split(" "));
+// Abweichende Kürzel auf gesetze-im-internet.de (geprüft: BauGB = bbaug)
+const SLUG_EXC = {BauGB:"bbaug", EGBGB:"bgbeg", BGBEG:"bgbeg", OWiG:"owig_1968", GwG:"gwg_2017", WEG:"woeigg", AO:"ao_1977", BDSG:"bdsg_2018", UStG:"ustg_1980", KStG:"kstg_1977", BNatSchG:"bnatschg_2009", WHG:"whg_2009", ROG:"rog_2008", VwZG:"vwzg_2005", AsylG:"asylvfg_1992", AufenthG:"aufenthg_2004", BtMG:"btmg_1981", GKG:"gkg_2004", KWG:"kredwg", VVG:"vvg_2008", StVO:"stvo_2013", UWG:"uwg_2004", EGStGB:"stgbeg", IfSG:"ifsg"};
+// Bayerische Gesetze: gesetze-bayern.de verlinkt jeden Artikel als <Kürzel>-<Nummer>, z. B. BayVwVfG-35
+const BAY_LAWS = {PAG:"BayPAG", BayPAG:"BayPAG", LStVG:"BayLStVG", BayLStVG:"BayLStVG", GO:"BayGO", BayGO:"BayGO", LKrO:"BayLKrO", BezO:"BayBezO", BayBO:"BayBO", BayVwVfG:"BayVwVfG", VwZVG:"BayVwZVG", BayVwZVG:"BayVwZVG", BayStrWG:"BayStrWG", BayDSG:"BayDSG", KAG:"BayKAG", BayKAG:"BayKAG", BayNatSchG:"BayNatSchG", BayWaldG:"BayWaldG", BayVerf:"BayVerf", BV:"BayVerf", BayEUG:"BayEUG", BayHSchG:"BayHSchG", BayBG:"BayBG", POG:"BayPOG", BayVSG:"BayVSG", BayStVollzG:"BayStVollzG", VerfGHG:"BayVfGHG", BayVfGHG:"BayVfGHG", AGVwGO:"BayAGVwGO", BayAGVwGO:"BayAGVwGO", KommZG:"BayKommZG", BayKommZG:"BayKommZG", BayVersG:"BayVersG", BayImSchG:"BayImSchG", BayWG:"BayWG", BayEG:"BayEG", BayAGBGB:"BayAGBGB", AGBGB:"BayAGBGB", BayKG:"BayKG", BayRDG:"BayRDG", FAG:"BayFAG"};
 function normUrl(n){
   const t = String(n).trim();
   const m = t.match(/(§§?|Art\.?|Artikel)\s*(\d+[a-z]?)/i); if(!m) return null;
   const abbr = (t.match(/([A-ZÄÖÜ][A-Za-zÄÖÜäöüß]*)\s*$/)||[])[1]; if(!abbr) return null;
   const isArt = /^art/i.test(m[1]), num = m[2].toLowerCase();
-  if(BAY_LAWS[abbr]) return "https://www.gesetze-bayern.de/Content/Document/"+BAY_LAWS[abbr];
+  if(BAY_LAWS[abbr]) return "https://www.gesetze-bayern.de/Content/Document/"+BAY_LAWS[abbr]+"-"+num;
   if(FED_LAWS.has(abbr)){ const slug = SLUG_EXC[abbr] || abbr.toLowerCase(); return "https://www.gesetze-im-internet.de/"+slug+"/"+(isArt ? "art_"+num+".html" : "__"+num+".html"); }
   return null;
 }
 const normChip = n => { const u = normUrl(n); return u ? `<a class="norm" href="${u}" target="_blank" rel="noopener noreferrer" title="Im amtlichen Gesetzestext öffnen">${esc(n)}<span class="ext">↗</span></a>` : `<a class="norm" href="#${normSlug(n)}">${esc(n)}</a>`; };
-const NORM_RE = /(§§?|Art\.)\s*\d+[a-z]?(?:\s*(?:,|und|\/)\s*(?:§\s*)?\d+[a-z]?)*(?:\s*(?:Abs\.\s*)?(?:[IVX]+|\d+)(?![\dA-Za-z]))?(?:\s+(?:S\.|Satz)\s*\d+)?(?:\s+Nr\.\s*\d+[a-z]?)?(?:\s+(?:Alt\.|Var\.)\s*\d+)?(?:\s+(?:[a-z]\)|lit\.\s*[a-z]))?\s+([A-ZÄÖÜ][A-Za-zÄÖÜäöüß]{1,9})(?![A-Za-zÄÖÜäöüß])/g;
+const NORM_RE = /(§§?|Art\.)\s*\d+[a-z]?(?:\s*(?:,|und|\/)\s*(?:§\s*)?\d+[a-z]?)*(?:\s*(?:Abs\.\s*)?(?:[IVX]+|\d+)(?![\dA-Za-z]))?(?:\s+(?:(?:S\.|Satz)\s*)?\d+(?![\d.]))?(?:\s+Nr\.\s*\d+[a-z]?)?(?:\s+(?:Alt\.|Var\.)\s*\d+)?(?:\s+(?:[a-z]\)|lit\.\s*[a-z]))?\s+([A-ZÄÖÜ][A-Za-zÄÖÜäöüß]{1,9})(?![A-Za-zÄÖÜäöüß])/g;
 const linkNorms = h => String(h).replace(NORM_RE, m => { const u = normUrl(m); return u ? `<a class="norm norm-inline" href="${u}" target="_blank" rel="noopener noreferrer" title="Im amtlichen Gesetzestext öffnen">${m}</a>` : m; });
 const nl = t => linkNorms(esc(t));
 const normSlug = n => "n-"+fold(n).replace(/§+/g,"p").replace(/art\./g,"art").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
@@ -439,6 +471,7 @@ const TIER_TXT = {1:"Tier 1 · Fundament",2:"Tier 2 · Klassiker",3:"Tier 3 · V
 const tierOf = it => it.tier || ({5:1,4:2,3:3,2:4,1:4}[it.relevance]||3);
 const tierTag = it => { const t = tierOf(it); return `<span class="tier t${t}" title="${TIER_TXT[t]}">T${t}</span>`; };
 const GRADE_TXT = {1:"Nochmal",2:"Schwer",3:"Gut",4:"Leicht",5:"Sehr leicht"};
+// Leicht = in 3 Tagen, Sehr leicht = in 1 Woche (siehe Wiederholungssystem)
 
 /* ---------- Zustand ---------- */
 const S = {
@@ -538,13 +571,16 @@ async function fetchAll(table){
 }
 let lastLoad = 0;
 async function loadAll(){
+  let sessMeta = null;
   const [items, prog, meta] = await Promise.all([fetchAll("items"), fetchAll("progress"), fetchAll("meta")]);
   S.items = new Map(items.map(r=>[r.id, Object.assign({}, r.data, {id:r.id})]));
   S.progress = new Map(prog.map(r=>[r.id, r.data]));
   meta.forEach(r=>{
     if(r.key==="settings") Object.assign(S.settings, r.data||{});
+    if(r.key==="session") sessMeta = r.data;
     if(r.key==="log"){ const days = Object.assign({}, (r.data||{}).days||{}); for(const [k,v] of Object.entries(S.log.days)) days[k] = Math.max(days[k]||0, v); S.log = {days}; }
   });
+  if(!session) loadSavedSess(sessMeta);
   lastLoad = Date.now(); S.stale = false;
 }
 let rtTimer;
@@ -560,6 +596,7 @@ function subscribe(){
         if(t==="items") S.items.set(n.id, Object.assign({}, n.data, {id:n.id}));
         else if(t==="progress") S.progress.set(n.id, n.data);
         else if(n.key==="settings") Object.assign(S.settings, n.data||{});
+        else if(n.key==="session"){ if(!session) loadSavedSess(n.data); }
         else if(n.key==="log"){ const days = Object.assign({}, (n.data||{}).days||{}); for(const [k,v] of Object.entries(S.log.days)) days[k] = Math.max(days[k]||0, v); S.log = {days}; }
         later();
       });
@@ -607,14 +644,14 @@ function cachePut(k, v){
     localStorage.setItem(AI_CACHE_KEY, JSON.stringify(m)); }catch(e){}
 }
 const CHAT_RULES = "Du bist Repetitor für das bayerische Erste Juristische Staatsexamen und hilfst beim Lernen mit einer Kartei. Antworte auf Deutsch, knapp (höchstens 6 Sätze, außer es wird ausdrücklich mehr verlangt) und examensnah. Nenne die einschlägigen Normen und bei Streitständen die herrschende Meinung. Ist die Karte fehlerhaft oder unvollständig, weise sachlich darauf hin.";
-const GRADE_RULES = 'Du korrigierst Antworten auf Karteikarten (Definitionen, Fragen, Schemata) für das bayerische Erste Juristische Staatsexamen. Prüfe, ob jedes Kernmerkmal der Musterdefinition sinngemäß in der Antwort enthalten ist; der Wortlaut muss nicht übereinstimmen. Antworte ausschließlich mit JSON ohne weiteren Text: {"merkmale":[{"merkmal":"…","erfuellt":true,"hinweis":"nur wenn nicht erfüllt, höchstens 10 Wörter"}],"gesamt":"vollständig|teilweise|unzureichend","empfehlung":"Nochmal|Schwer|Gut|Leicht","kommentar":"ein Satz"}';
+const GRADE_RULES = 'Du wertest Antworten auf Karteikarten (Definitionen, Fragen, Schemata) für das bayerische Erste Juristische Staatsexamen aus. Bewerte wohlwollend, wie ein freundlicher Repetitor: Der Lernende antwortet frei aus dem Kopf, oft in Stichworten oder per Spracheingabe. Ein Kernmerkmal ist erfüllt, wenn der Gedanke sinngemäß erkennbar ist; Wortlaut, Reihenfolge, Synonyme, Abkürzungen, Tippfehler und fehlende Normzitate sind egal. Nebenpunkte, Beispiele und Streitstände, die nicht zum Kern gehören, nicht als Merkmal werten. Werte höchstens 2 bis 5 echte Kernmerkmale. gesamt: „vollständig“, wenn der Kern stimmt und höchstens Nebensächliches fehlt; „teilweise“, wenn ein Kernmerkmal fehlt; „unzureichend“ nur, wenn der Kern fehlt oder rechtlich falsch ist. empfehlung: Gut bei „vollständig“, Schwer bei „teilweise“, Nochmal nur bei „unzureichend“; Leicht nur bei einer sehr präzisen Antwort. Antworte ausschließlich mit JSON ohne weiteren Text: {"merkmale":[{"merkmal":"…","erfuellt":true,"hinweis":"nur wenn nicht erfüllt, höchstens 10 Wörter"}],"gesamt":"vollständig|teilweise|unzureichend","empfehlung":"Nochmal|Schwer|Gut|Leicht","kommentar":"ein ermutigender Satz, ggf. mit dem einen wichtigsten fehlenden Punkt"}';
 const CHECK_RULES = `Du bist Korrektor für das bayerische Erste Juristische Staatsexamen. Der Lernende skizziert in eigenen Worten das Kernproblem eines Übungsfalls. Prüfe die Skizze an der beigefügten Lösung; deren Rechtsauffassung gilt. Antworte auf Deutsch, knapp und konkret, in genau diesem Format (Abschnitte ohne Inhalt weglassen):
 Richtig erkannt: Stichpunkte, jeweils mit „– “ beginnend
 Fehlt oder ungenau: Stichpunkte mit „– “; nenne das fehlende Problem und die einschlägige Norm
 Richtigstellung: nur wenn etwas rechtlich falsch ist
 Tipp für die Klausur: ein Satz
 Empfehlung: Nochmal|Schwer|Gut|Leicht
-Bewerte großzügig, wenn der Kern in eigenen Worten richtig erfasst ist, und streng bei falscher Anspruchsgrundlage oder einem verkannten Hauptproblem. Keine Einleitung, keine Wiederholung der Skizze.`;
+Bewerte wohlwollend: Eine Skizze in Stichworten oder per Spracheingabe genügt, Formulierung und Vollständigkeit der Details sind zweitrangig. Erkennt der Lernende das Hauptproblem und löst es im Ergebnis vertretbar, ist das mindestens „Gut“. Kritisiere nur, was für die Klausur wirklich zählt (verkanntes Hauptproblem, falsche Anspruchsgrundlage, rechtlich falsches Ergebnis), und nenne bei „Fehlt oder ungenau“ höchstens drei Punkte. Keine Einleitung, keine Wiederholung der Skizze.`;
 async function aiStream(system, turns, opts={}){
   const r = await aiCall({kind:opts.kind||"chat", system, messages:normTurns(turns).slice(-8), stream:true, max_tokens:opts.max_tokens||2000}, opts.signal);
   const reader = r.body.getReader(), dec = new TextDecoder(); let buf = "", text = "";
@@ -646,29 +683,38 @@ async function aiJson(prompt){
   try{ return JSON.parse(t.slice(a,b+1)); }catch(e){ throw {code:"invalid_json"}; }
 }
 
-/* ---------- Wiederholungssystem ---------- */
-// Das Tier streckt oder verkürzt die Abstände: Tier 1 und 2 kommen öfter, Randwissen seltener.
-// Mindestabstände: Schwer 2 Tage, Gut 4 Tage, Leicht 1 Woche, Sehr leicht 1 Monat (nie nach dem Examen).
-const TIER_FACTOR = {1:0.8, 2:1, 3:1.3, 4:1.7};
-const AGAIN_DAYS = {1:1, 2:1, 3:2, 4:4};
+/* ---------- Wiederholungssystem (Stufenleiter) ---------- */
+// Neue Karten (auch aus „heute“/Tagesabfrage): zwei Tage in Folge, dann nach 3 Tagen, nach 1 Woche, danach monatlich.
+// Stufe 0 = noch nie gekonnt. „Gut“ rückt eine Stufe weiter: morgen → 3 Tage → 1 Woche → monatlich.
+// „In 3 Tagen“ (4) und „In 1 Woche“ (5) springen direkt auf diese Stufe; wer sie dann kann, kommt wöchentlich bzw. monatlich dran.
+// „Schwer“: morgen, Stufe bleibt. „Nochmal“: morgen, zurück auf Anfang. Nie über das Examen hinaus.
+const STEPS = [1, 3, 7, 30];
 const EXAM_DEFAULT = "2027-03-01";
 const examDate = () => S.settings.examDate || EXAM_DEFAULT;
 const daysToExam = () => Math.max(0, diffDays(today(), examDate()));
+function stageOf(p){
+  if(!p) return 0;
+  if(p.stage!=null) return p.stage;
+  const i = p.ivl||0; return i>=30 ? 4 : i>=7 ? 3 : i>=3 ? 2 : p.reps ? 1 : 0; // ältere Lernstände übernehmen
+}
 function schedule(prev, grade, tier){
-  const p = Object.assign({ivl:0, ease:2.5, reps:0, lapses:0}, prev||{});
-  tier = tier||3; const f = TIER_FACTOR[tier]||1; let ivl;
-  if(grade===1){ ivl = AGAIN_DAYS[tier]||2; p.ease = Math.max(1.3, p.ease-0.2); p.lapses++; }
-  else if(grade===2){ ivl = Math.max(2, (p.ivl ? Math.max(p.ivl*1.2, p.ivl+1) : 2) * f); p.ease = Math.max(1.3, p.ease-0.15); }
-  else if(grade===3){ ivl = Math.max(4, (p.ivl ? p.ivl*p.ease : 4) * f); }
-  else if(grade===4){ ivl = Math.max(7, (p.ivl ? p.ivl*p.ease*1.3 : 7) * f); p.ease = Math.min(3.2, p.ease+0.1); }
-  else { ivl = Math.max(30, (p.ivl ? p.ivl*p.ease*1.6 : 30)); p.ease = Math.min(3.2, p.ease+0.15); }
-  const cap = Math.max(1, daysToExam()-2); // nicht über das Examen hinaus planen
-  ivl = Math.min(365, cap, Math.max(1, Math.round(ivl)));
+  const p = Object.assign({ivl:0, reps:0, lapses:0}, prev||{});
+  let st = stageOf(prev), ivl;
+  // Heute schon mit „Gut“ gelernt (z. B. Tagesabfrage zweimal gestartet): Plan nicht doppelt weiterschieben
+  if(grade===3 && prev && prev.last===today() && prev.lastGrade>=3 && prev.due>today()){ return Object.assign({}, prev, {reps:(prev.reps||0)+1}); }
+  if(grade===1){ ivl = 1; st = 0; p.lapses++; }
+  else if(grade===2){ ivl = 1; }
+  else if(grade===3){ ivl = STEPS[Math.min(st, STEPS.length-1)]; st = Math.min(st+1, STEPS.length); }
+  else if(grade===4){ ivl = 3; st = 2; }
+  else { ivl = 7; st = 3; }
+  const cap = Math.max(1, daysToExam()-2);
+  ivl = Math.min(cap, Math.max(1, ivl));
   if(grade>=3 && !p.sure) p.sure = today();
-  p.ivl = ivl; p.reps++; p.due = addDays(today(), ivl); p.last = today(); p.lastGrade = grade;
+  p.stage = st; p.ivl = ivl; p.reps++; p.due = addDays(today(), ivl); p.last = today(); p.lastGrade = grade;
   p.leech = p.lapses >= 3;
   return p;
 }
+const GRADE_HINT = (p, g) => g===1 ? "morgen, von vorn" : g===2 ? "morgen" : g===4 ? "in 3 Tagen" : g===5 ? "in 1 Woche" : fmtIvl(schedule(p, 3).ivl);
 const TIER_W = {1:8, 2:6, 3:3, 4:1};
 function priority(it){
   const p = S.progress.get(it.id), w = TIER_W[tierOf(it)];
@@ -680,7 +726,7 @@ const isDue = it => { const p = S.progress.get(it.id); return !p || p.due <= tod
 const isNew = it => !S.progress.get(it.id);
 function todayTarget(){ return S.settings.todayDate===today() && S.settings.todayN!=null ? S.settings.todayN : S.settings.base; }
 const doneToday = () => S.log.days[today()]||0;
-function fmtIvl(n){ return n===1 ? "morgen" : n<30 ? "in "+n+" Tagen" : n<365 ? "in "+Math.round(n/30)+" Mon." : "in 1 Jahr"; }
+function fmtIvl(n){ return n===1 ? "morgen" : n===7 ? "in 1 Woche" : n===30 ? "in 1 Monat" : n<30 ? "in "+n+" Tagen" : n<365 ? "in "+Math.round(n/30)+" Mon." : "in 1 Jahr"; }
 
 /* ---------- Hilfsfunktionen Einträge ---------- */
 const titleOf = it => it.type==="card" ? it.front : it.type==="def" ? it.term : it.title;
@@ -731,7 +777,8 @@ function itemRow(it, toks=[]){
 const ROUTES = ["aktuell","suche","bibliothek","normen","problemkarten","pruefung","statistik","daten","lernen","neu"];
 function route(){ const h = decodeURIComponent(location.hash.slice(1)); return !h || h==="heute" ? "aktuell" : h; }
 function go(h){ if(location.hash.slice(1)===h) render(); else location.hash = h; }
-window.addEventListener("hashchange", ()=>{ editing = null; draftLinksInit = false; render(); window.scrollTo(0,0); });
+window.addEventListener("hashchange", ()=>{ editing = editNext; editNext = null; draftLinksInit = false; render(); window.scrollTo(0,0); });
+let editNext = null, backToSession = false;
 function setNav(r){
   const base = r.startsWith("e-") ? "bibliothek" : r.startsWith("n-") ? "normen" : r==="lernen" ? (session&&session.exam?"pruefung":"aktuell") : r==="neu" ? "bibliothek" : r;
   document.querySelectorAll("#tabs a").forEach(a=>{ if(a.getAttribute("href")==="#"+base) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current"); });
@@ -869,10 +916,10 @@ function startFall(key){
 /* ---------- Ansicht: Aktuell ---------- */
 function vAktuell(){
   const all = [...S.items.values()];
-  const cats = S.settings.cats;
-  const dueBy = t => all.filter(i=>i.type===t && isDue(i)).length;
+  const cats = S.settings.cats, pool = S.settings.pool||"";
+  const dueBy = t => all.filter(i=>i.type===t && inPool(pool,i) && isDue(i)).length;
   const target = todayTarget(), done = doneToday();
-  const avail = all.filter(i=>cats.includes(i.type) && isDue(i)).length;
+  const avail = all.filter(i=>cats.includes(i.type) && inPool(pool,i) && isDue(i)).length;
   const n = Math.min(Math.max(0,target-done), avail);
   const leech = all.filter(i=>(S.progress.get(i.id)||{}).leech).length;
   const fixes = all.filter(i=>i.suggestion && i.suggestion.status==="offen").length;
@@ -884,12 +931,15 @@ function vAktuell(){
   // 1) Tägliches Pensum
   const pensum = `<section class="zone z-pensum">
     <header>${ILL.pensum()}<div><h2>Tägliches Pensum</h2><p>Ausgewählt nach Fälligkeit, Tier (1 bis 4) und deinem Lernstand.</p></div></header>
+    ${poolTabs(pool, "pool", k=>all.filter(i=>inPool(k,i) && cats.includes(i.type) && isDue(i)).length+" fällig")}
     <h3>Was möchtest du abfragen?</h3>
     <div class="cats">${TKEYS.map(t=>`<button class="chip t-${t}" data-act="cat" data-t="${t}" aria-pressed="${cats.includes(t)}"><i class="dot"></i>${TYPES_PL[t]} <span class="n">${dueBy(t)}</span></button>`).join("")}</div>
     <h3>Wie viele heute?</h3>
     <div class="slider"><input id="daily" type="range" min="0" max="200" step="5" value="${target}" aria-label="Karten heute"><output id="dailyOut">${target}</output></div>
     <p class="small muted" style="margin:0 0 16px">Grundpensum ${S.settings.base} pro Tag, der Regler gilt nur für heute. Erledigt: ${done}.</p>
-    <div class="row"><button class="btn primary big" data-act="start" ${n?"":"disabled"}>${n ? n+" Karten abfragen" : done>=target && avail ? "Tagespensum geschafft" : "Nichts fällig"}</button>
+    <div class="row">${n ? `<button class="btn big st-open" data-act="start">${n} Karten abfragen</button><span class="stpill open">offen</span>`
+      : done>=target && done>0 ? `<button class="btn big st-done" data-act="${avail?"more":"noop"}" title="${avail?"Noch 10 weitere abfragen":"Alles erledigt"}">✓ Tagespensum geschafft</button>`
+      : `<button class="btn big st-done" disabled>✓ Nichts fällig</button>`}
     ${!n && avail ? `<button class="btn" data-act="more">10 weitere</button>`:""}</div>
     <p class="small muted" style="margin:14px 0 0"><kbd>Leertaste</kbd> Antwort zeigen, <kbd>1</kbd>–<kbd>5</kbd> bewerten, <kbd>?</kbd> alle Tastenkürzel</p>
   </section>`;
@@ -898,7 +948,9 @@ function vAktuell(){
   const taDates = [...new Set(all.filter(i=>i.tagesabfrage).map(i=>i.tagesabfrage))].sort().reverse();
   const taCount = d => all.filter(i=>i.tagesabfrage===d).length;
   const taNew = d => all.filter(i=>i.tagesabfrage===d && isNew(i)).length;
-  const taRow = d => `<div class="zrow"><div><div class="t">${d===today()?"Heute":d===addDays(today(),-1)?"Gestern":toDate(d).toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long"})}</div><div class="s">${taCount(d)} ${taCount(d)===1?"Karte":"Karten"}${taNew(d)?", "+taNew(d)+" noch nie gelernt":""}</div></div><span class="spacer"></span><button class="btn ${d===taDates[0]?"moss":""}" data-act="tagesabfrage" data-d="${esc(d)}">Abfragen</button></div>`;
+  const taOpen = d => all.filter(i=>i.tagesabfrage===d && isDue(i)).length;
+  const taRow = d => { const o = taOpen(d), c = taCount(d);
+    return `<div class="zrow"><div><div class="t">${d===today()?"Heute":d===addDays(today(),-1)?"Gestern":toDate(d).toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long"})}</div><div class="s">${c} ${c===1?"Karte":"Karten"}${taNew(d)?", "+taNew(d)+" noch nie gelernt":""}</div></div><span class="spacer"></span>${o ? `<button class="btn st-open" data-act="tagesabfrage" data-d="${esc(d)}" title="${o} von ${c} heute fällig">Abfragen <span class="stn">${o}</span></button>` : `<button class="btn st-done" data-act="tagesabfrage" data-d="${esc(d)}" title="Für heute erledigt – zum Wiederholen tippen">✓ Erledigt</button>`}</div>`; };
   const taShown = taHist ? taDates : taDates.slice(0,3);
   const tages = `<section class="zone z-tages">
     <header>${ILL.tages()}<div><h2>Tagesabfrage</h2><p>Claude schaut dreimal täglich (16, 19 und 22 Uhr) in deinen Lernordner und fragt dich nur das ab, was neu oder geändert ist.</p></div></header>
@@ -915,7 +967,7 @@ function vAktuell(){
     return `<div class="zrow"><div style="min-width:0"><div class="row" style="gap:8px"><span class="tag-reihe">${esc(g.fall.reihe||"Fall")} ${esc(g.fall.name||"")}</span></div>
       <div class="t" style="margin-top:6px">${esc(fallTitle(g))}</div>
       <div class="s">${g.items.length} ${g.items.length===1?"Eintrag":"Einträge"} · ${esc(status)} · noch ${left} ${left===1?"Tag":"Tage"} hier</div></div>
-      <span class="spacer"></span><button class="btn ${i===0?"clay":""}" data-act="fall" data-k="${esc(g.key)}">Abfragen</button></div>`;
+      <span class="spacer"></span>${g.items.some(isDue) ? `<button class="btn st-open" data-act="fall" data-k="${esc(g.key)}">Abfragen <span class="stn">${g.items.filter(isDue).length}</span></button>` : `<button class="btn st-done" data-act="fall" data-k="${esc(g.key)}" title="Für heute erledigt – zum Wiederholen tippen">✓ Erledigt</button>`}</div>`;
   };
   const fall = `<section class="zone z-fall">
     <header>${ILL.fall()}<div><h2>Fallabfrage</h2><p>Neue Klausuren aus UKK, KLK und der Klausurenbesprechung. Du skizzierst das Kernproblem, Claude prüft es gegen die Lösung.</p></div></header>
@@ -933,6 +985,8 @@ function vAktuell(){
         <div class="pebble"><b>${all.filter(isNew).length}</b><span>noch nie gelernt</span></div>
       </div>
     </div>${ILL.hero()}</div>
+    ${(()=>{ const d = session && session.idx<session.ids.length ? {label:session.label, idx:session.idx, ids:session.ids, live:true} : S.savedSess; if(!d) return "";
+      return `<div class="hint resume">${ILL.idee()}<span><b>Angefangene Abfrage:</b> ${esc(d.label)}, ${d.idx} von ${d.ids.length} erledigt. Dein Stand ist gespeichert.</span><span class="spacer"></span><button class="btn st-part" data-act="${d.live?"tosession":"resume"}">Fortsetzen</button>${d.live?"":`<button class="btn ghost small" data-act="dropsess">Verwerfen</button>`}</div>`; })()}
     ${example?`<div class="hint">${ILL.idee()}<span>Die Kartei enthält noch Beispielinhalte zum Ausprobieren. Du kannst sie unter „Daten“ löschen.</span></div>`:""}
     ${leech?`<div class="hint">${ILL.idee()}<span><b>${leech} Problemkarte${leech>1?"n":""}:</b> Karten, die du immer wieder vergisst. <a href="#problemkarten" class="linkbtn">Ansehen</a></span></div>`:""}
     ${fixes?`<div class="hint">${ILL.idee()}<span><b>${fixes} Korrekturvorschl${fixes>1?"äge":"ag"}</b> von Claude warten. Sie erscheinen, wenn du die Karte lernst. <a class="linkbtn" href="#bibliothek" data-act="fixfilter">Alle zeigen</a></span></div>`:""}
@@ -946,17 +1000,42 @@ function streak(){
   return n;
 }
 function buildQueue(cats, n){
-  return [...S.items.values()].filter(i=>cats.includes(i.type) && isDue(i)).sort((a,b)=>priority(b)-priority(a)).slice(0,n).map(i=>i.id);
+  const pool = S.settings.pool||"";
+  return [...S.items.values()].filter(i=>cats.includes(i.type) && inPool(pool,i) && isDue(i)).sort((a,b)=>priority(b)-priority(a)).slice(0,n).map(i=>i.id);
 }
 function startSession(ids, opts={}){
   if(!ids.length){ toast("Keine passenden Karten gefunden."); return; }
-  session = {ids, idx:0, revealed:false, exam:!!opts.exam, label:opts.label||"Abfrage", results:{1:0,2:0,3:0,4:0,5:0}, counted:new Set(), total:ids.length, history:[]};
+  session = {ids, idx:0, revealed:false, exam:!!opts.exam, label:opts.label||"Abfrage", kind:opts.kind||"", key:opts.key||"", results:{1:0,2:0,3:0,4:0,5:0}, counted:new Set(), total:ids.length, history:[], started:today()};
+  saveSess(); go("lernen");
+}
+/* Zwischenspeicher: eine angefangene Abfrage wird nach jeder Karte gesichert (Gerät + Konto) und lässt sich später fortsetzen */
+const SESS_KEY = "juragarage-abfrage";
+let sessTimer = null;
+function sessPayload(){ return session && session.idx < session.ids.length ? {ids:session.ids, idx:session.idx, exam:session.exam, label:session.label, kind:session.kind, key:session.key, results:session.results, counted:[...session.counted], total:session.total, history:(session.history||[]).slice(-30), started:session.started, t:Date.now()} : null; }
+function saveSess(){
+  const d = sessPayload(); S.savedSess = d;
+  try{ if(d) localStorage.setItem(SESS_KEY, JSON.stringify(d)); else localStorage.removeItem(SESS_KEY); }catch(e){}
+  clearTimeout(sessTimer); sessTimer = setTimeout(()=>{ putMeta("session", d || {cleared:Date.now()}).catch(()=>{}); }, 1200);
+}
+function clearSess(){ session = null; saveSess(); }
+function loadSavedSess(metaVal){
+  let loc = null; try{ loc = JSON.parse(localStorage.getItem(SESS_KEY)||"null"); }catch(e){}
+  const m = metaVal && metaVal.ids ? metaVal : null;
+  const cleared = metaVal && metaVal.cleared || 0;
+  let best = [m, loc].filter(Boolean).sort((a,b)=>(b.t||0)-(a.t||0))[0] || null;
+  if(best && cleared > (best.t||0)) best = null;
+  S.savedSess = best;
+}
+function resumeSess(){
+  const d = S.savedSess; if(!d) return;
+  const ids = d.ids.filter(x=>S.items.has(x)); if(d.idx >= ids.length){ S.savedSess = null; saveSess(); toast("Diese Abfrage war schon fertig."); render(); return; }
+  session = {ids, idx:Math.min(d.idx, ids.length), revealed:false, exam:!!d.exam, label:d.label||"Abfrage", kind:d.kind||"", key:d.key||"", results:d.results||{1:0,2:0,3:0,4:0,5:0}, counted:new Set(d.counted||[]), total:d.total||ids.length, history:d.history||[], started:d.started||today()};
   go("lernen");
 }
 
 /* ---------- Ansicht: Lernen ---------- */
 function vLernen(){
-  if(!session) return `<h1>Keine laufende Abfrage</h1><p class="sub">Starte eine Abfrage unter „Aktuell“.</p><a class="btn primary" href="#aktuell">Zu „Aktuell“</a>`;
+  if(!session) return S.savedSess ? `<h1>Abfrage pausiert</h1><p class="sub">${esc(S.savedSess.label)}: ${S.savedSess.idx} von ${S.savedSess.ids.length} erledigt.</p><div class="row"><button class="btn primary" data-act="resume">Fortsetzen</button><a class="btn" href="#aktuell">Zu „Aktuell“</a></div>` : `<h1>Keine laufende Abfrage</h1><p class="sub">Starte eine Abfrage unter „Aktuell“.</p><a class="btn primary" href="#aktuell">Zu „Aktuell“</a>`;
   if(session.idx >= session.ids.length){
     const r = session.results, tot = r[1]+r[2]+r[3]+r[4]+r[5];
     return `<div class="panel done">${ILL.done()}<b>${tot}</b><p>${session.exam?"Prüfungsfragen beantwortet":"Karten wiederholt"}</p>
@@ -985,7 +1064,7 @@ const fieldName = k => ({steps:"Prüfungspunkte",hinweis:"Hinweise",front:"Vorde
 function sheet(it, revealed, study){
   const p = S.progress.get(it.id);
   const meta = `<div class="meta"><button class="starbtn ${it.star?"on":""}" data-act="star" data-id="${esc(it.id)}" title="${it.star?"Stern entfernen":"Mit Stern markieren"}" aria-label="Stern" aria-pressed="${it.star?"true":"false"}">${it.star?"★":"☆"}</button><span class="typetag">${it.fallsumme?"Fallzusammenfassung":TYPES[it.type]}</span>${it.fall?`<span class="fallchip">${esc([it.fall.reihe,it.fall.name].filter(Boolean).join(" "))}</span>`:""}<span>${esc(it.area||"")}</span>${tierTag(it)}<span>${esc(it.source||"")}</span>
-    ${study?`<span class="spacer"></span><a href="#e-${esc(it.id)}" class="small muted" data-act="peek">Eintrag öffnen</a>`:""}</div>`;
+    <span class="spacer"></span><button class="btn ghost small" style="padding:4px 10px" data-act="change" data-id="${esc(it.id)}" title="Karte selbst bearbeiten oder Claude eine Änderung vorschlagen lassen">✎ Ändern</button>${study?`<a href="#e-${esc(it.id)}" class="small muted" data-act="peek">Eintrag öffnen</a>`:""}</div>`;
   let q="", a="";
   if(it.type==="card"){
     q = `<p class="q">${nl(it.front)}</p>`;
@@ -1021,8 +1100,7 @@ function sheet(it, revealed, study){
   const ck = it.type==="case" ? checks.get(it.id) : null;
   const rec = v && v.result ? ({"Nochmal":1,"Schwer":2,"Gut":3,"Leicht":4,"Sehr leicht":5}[v.result.empfehlung]||0) : ck && ck.rec ? ck.rec : 0;
   const gradeBtns = [1,2,3,4,5].map(g=>{
-    const ivl = session.exam ? null : schedule(p, g, tierOf(it)).ivl;
-    return `<button data-act="grade" data-g="${g}" class="${rec===g?"rec":""}"><b>${GRADE_TXT[g]}<kbd>${g}</kbd></b><span>${session.exam ? "" : g===1 && tierOf(it)<=2 ? "gleich nochmal" : fmtIvl(ivl)}</span></button>`;
+    return `<button data-act="grade" data-g="${g}" class="${rec===g?"rec":""}"><b>${GRADE_TXT[g]}<kbd>${g}</kbd></b><span>${session.exam ? "" : g===1 && tierOf(it)<=2 ? "gleich nochmal, dann morgen" : GRADE_HINT(p, g)}</span></button>`;
   }).join("");
   const sketch = it.type==="case" ? sketchBox(it, revealed) : "";
   return `<article class="sheet t-${it.type}">${meta}${q}${!revealed?norms:""}${write}${verdictHtml}${sketch}
@@ -1124,6 +1202,8 @@ async function grade(g){
   }
   verdicts.delete(id); checks.delete(id); own.delete(id); mnemoEdit = null;
   session.idx++; session.revealed = false;
+  saveSess();
+  if(session.idx >= session.ids.length) toast("✓ "+session.label+" abgeschlossen");
   render();
 }
 
@@ -1135,7 +1215,7 @@ async function backCard(){
   session.idx = Math.max(0, session.idx-1);
   session.revealed = true;
   verdicts.delete(h.id); checks.delete(h.id); own.delete(h.id); mnemoEdit = null;
-  render();
+  saveSess(); render();
   if(!session.exam){ if(h.prev) await putProgress(h.id, h.prev); else await deleteProgress(h.id); }
 }
 
@@ -1162,7 +1242,7 @@ async function judge(id){
 Musterantwort: ${jDef(it)}
 Kernmerkmale: ${merk}
 Antwort: ${input}`;
-  const key = "g:"+hashStr(jTerm(it)+"|"+jDef(it)+"|"+merk)+":"+hashStr(normQ(input));
+  const key = "g2:"+hashStr(jTerm(it)+"|"+jDef(it)+"|"+merk)+":"+hashStr(normQ(input));
   const hit = cacheGet(key);
   if(hit){ verdicts.set(id, {input, result:hit}); }
   else try{
@@ -1266,6 +1346,9 @@ function tagCloud(){
 const bib = {type:"", area:"", cat:"", q:"", fix:false, star:false, sort:"rel"};
 const isHemmer = i => /hemmer/i.test(i.source||"") || (i.tags||[]).some(t=>/^hemmer$/i.test(t));
 const isZusatz = i => (i.tags||[]).some(t=>/^(wiederholungsfrage|zusatzfrage|sonderheft)$/i.test(t)) || /wiederholungs|zusatzfrage|sonderheft/i.test(i.source||"");
+const POOLS = {"":["Alle", ()=>true], "zusatz":["Hemmer-Zusatzfragen", i=>isZusatz(i)]};
+const inPool = (pool, i) => (POOLS[pool||""]||POOLS[""])[1](i);
+function poolTabs(cur, act, countFn){ return `<div class="subtabs" role="tablist">${Object.entries(POOLS).map(([k,[l]])=>`<button role="tab" class="tab ${(cur||"")===k?"on":""}" aria-selected="${(cur||"")===k}" data-act="${act}" data-t="${k}">${l}${countFn?` <span class="muted">${countFn(k)}</span>`:""}</button>`).join("")}</div>`; }
 const CATS = {"hemmer-zusatz":["Hemmer-Zusatzfragen", i=>i.type==="card"&&isZusatz(i)], "hemmer-faelle":["Hemmer-Fälle", i=>i.type==="case"&&isHemmer(i)], "hemmer-karten":["Hemmer-Karteikarten", i=>i.type==="card"&&isHemmer(i)], "hemmer-alle":["Alles von Hemmer", isHemmer]};
 function vBib(){
   const ar = areas();
@@ -1275,7 +1358,7 @@ function vBib(){
   list.sort(bib.sort==="rel" ? (a,b)=>tierOf(a)-tierOf(b)||titleOf(a).localeCompare(titleOf(b),"de") : bib.sort==="due" ? (a,b)=>((S.progress.get(a.id)||{}).due||"0").localeCompare((S.progress.get(b.id)||{}).due||"0") : (a,b)=>titleOf(a).localeCompare(titleOf(b),"de"));
   return `<div class="row"><h1>Bibliothek</h1><span class="spacer"></span>${list.some(i=>i.star)?`<button class="btn" data-act="learnstar">★ ${list.filter(i=>i.star).length} Sternkarten abfragen</button>`:""}<a class="btn primary" href="#neu">Eintrag anlegen</a></div>
   <p class="sub">${S.items.size} Einträge: ${TKEYS.map(t=>[...S.items.values()].filter(i=>i.type===t).length+" "+TYPES_PL[t]).join(", ")}.</p>
-  <div class="tabs" role="tablist">${[["", "Alle Einträge", S.items.size], ["hemmer-zusatz", "Hemmer-Zusatzfragen", [...S.items.values()].filter(CATS["hemmer-zusatz"][1]).length]].map(([k,l,n])=>`<button role="tab" class="tab ${bib.cat===k?"on":""}" aria-selected="${bib.cat===k}" data-act="bibtab" data-t="${k}">${l} <span class="muted">${n}</span></button>`).join("")}</div>
+  <div class="subtabs" role="tablist">${[["", "Alle Einträge", S.items.size], ["hemmer-zusatz", "Hemmer-Zusatzfragen", [...S.items.values()].filter(CATS["hemmer-zusatz"][1]).length]].map(([k,l,n])=>`<button role="tab" class="tab ${bib.cat===k?"on":""}" aria-selected="${bib.cat===k}" data-act="bibtab" data-t="${k}">${l} <span class="muted">${n}</span></button>`).join("")}</div>
   <div class="filters">
     <select data-bib="type" aria-label="Art"><option value="">Alle Arten</option>${TKEYS.map(t=>`<option value="${t}" ${bib.type===t?"selected":""}>${TYPES_PL[t]}</option>`).join("")}</select>
     <select data-bib="cat" aria-label="Kategorie"><option value="">Alle Kategorien</option>${Object.entries(CATS).map(([k,v])=>`<option value="${k}" ${bib.cat===k?"selected":""}>${v[0]} (${[...S.items.values()].filter(v[1]).length})</option>`).join("")}</select>
@@ -1296,7 +1379,7 @@ function vDetail(id){
   const p = S.progress.get(id);
   const linked = linksOf(id);
   const sameNorm = [...new Map((it.norms||[]).flatMap(n=>(normIndex().get(n.trim())||[])).filter(o=>o.id!==id && !linked.includes(o)).map(o=>[o.id,o])).values()];
-  return `<div class="crumbs"><a href="#bibliothek">Bibliothek</a> / ${TYPES[it.type]}</div>
+  return `<div class="crumbs"><a href="#bibliothek">Bibliothek</a> / ${TYPES[it.type]}${session && session.idx<session.ids.length?` <button class="btn small" style="margin-left:10px;padding:4px 12px" data-act="tosession">← Zurück zur Abfrage</button>`:""}</div>
   <div class="detail">
     <div>
       ${fixNotice(it)}
@@ -1309,7 +1392,7 @@ function vDetail(id){
       <dl class="kv">
         <dt>Tier</dt><dd>${tierTag(it)} ${TIER_TXT[tierOf(it)]}</dd>
         <dt>Nächste Abfrage</dt><dd>${!p?"noch nie gelernt":p.due<=today()?"heute fällig":toDate(p.due).toLocaleDateString("de-DE")+" ("+fmtIvl(diffDays(today(),p.due))+")"}</dd>
-        ${p?`<dt>Wiederholungen</dt><dd>${p.reps}, davon ${p.lapses}× vergessen${p.leech?" (Problemkarte)":""}</dd><dt>Letzte Bewertung</dt><dd>${GRADE_TXT[p.lastGrade]||"-"} am ${toDate(p.last).toLocaleDateString("de-DE")}</dd>`:""}
+        ${p?`<dt>Stufe</dt><dd>${["Anfang","Tag 2","3 Tage","1 Woche","monatlich"][Math.min(4,stageOf(p))]}</dd><dt>Wiederholungen</dt><dd>${p.reps}, davon ${p.lapses}× vergessen${p.leech?" (Problemkarte)":""}</dd><dt>Letzte Bewertung</dt><dd>${GRADE_TXT[p.lastGrade]||"-"} am ${toDate(p.last).toLocaleDateString("de-DE")}</dd>`:""}
       </dl>
       <div class="row" style="margin-top:22px">
         <button class="btn primary" data-act="learnone" data-id="${esc(id)}">Jetzt abfragen</button>
@@ -1382,7 +1465,7 @@ async function saveEdit(){
   const prevLinks = old ? (old.links||[]) : [];
   for(const lid of it.links){ const o = S.items.get(lid); if(o && !(o.links||[]).includes(it.id)){ o.links = [...(o.links||[]), it.id]; await putItem(o); } }
   for(const lid of prevLinks.filter(x=>!it.links.includes(x))){ const o = S.items.get(lid); if(o && (o.links||[]).includes(it.id)){ o.links = o.links.filter(x=>x!==it.id); await putItem(o); } }
-  editing = null; draftLinksInit = false; toast(old?"Gespeichert":"Angelegt"); go("e-"+it.id);
+  editing = null; draftLinksInit = false; toast(old?"Gespeichert":"Angelegt"); if(backToSession && session){ backToSession = false; go("lernen"); } else go("e-"+it.id);
 }
 
 /* ---------- Ansicht: Normen ---------- */
@@ -1405,18 +1488,22 @@ function vNorm(slug){
 }
 
 /* ---------- Ansicht: Problemkarten ---------- */
+let leechPool = "";
 function vProblem(){
-  const list = [...S.items.values()].filter(i=>(S.progress.get(i.id)||{}).leech).sort((a,b)=>(S.progress.get(b.id).lapses)-(S.progress.get(a.id).lapses));
+  const isLeech = i=>(S.progress.get(i.id)||{}).leech;
+  const list = [...S.items.values()].filter(i=>isLeech(i) && inPool(leechPool,i)).sort((a,b)=>(S.progress.get(b.id).lapses)-(S.progress.get(a.id).lapses));
   return `<div class="row"><h1>Problemkarten</h1><span class="spacer"></span>${list.length?`<button class="btn primary" data-act="learnleech">Alle ${list.length} abfragen</button>`:""}</div>
+  ${poolTabs(leechPool, "lpool", k=>[...S.items.values()].filter(i=>isLeech(i) && inPool(k,i)).length)}
   <p class="sub">Karten, die du dreimal oder öfter mit „Nochmal“ bewertet hast. Sie werden automatisch gesammelt. Oft hilft es, sie umzuformulieren oder Claude nach einer Eselsbrücke zu fragen.</p>
   ${list.length?`<div class="list">${list.map(i=>itemRow(i)).join("")}</div>`:`<div class="panel empty">Keine Problemkarten. Gut so.</div>`}`;
 }
 
 /* ---------- Ansicht: Prüfungsmodus ---------- */
-const exam = {cats:[...TKEYS], area:"", n:30, maxTier:3};
+const exam = {cats:[...TKEYS], area:"", n:30, maxTier:3, pool:""};
 function vPruefung(){
   const pool = examPool();
   return `<h1>Prüfungsmodus</h1><p class="sub">Gemischte Abfrage unabhängig von der Fälligkeit, wie in einer Prüfungssituation. Dein Wiederholungsplan bleibt dabei unverändert; am Ende siehst du deine Quote.</p>
+  ${poolTabs(exam.pool, "expool", k=>[...S.items.values()].filter(i=>inPool(k,i)).length)}
   <section class="panel" style="max-width:720px">
     <h3 style="margin-top:0">Kategorien</h3>
     <div class="cats">${TKEYS.map(t=>`<button class="chip t-${t}" data-act="excat" data-t="${t}" aria-pressed="${exam.cats.includes(t)}"><i class="dot"></i>${TYPES_PL[t]}</button>`).join("")}</div>
@@ -1429,7 +1516,7 @@ function vPruefung(){
     <div class="row" style="margin-top:12px"><button class="btn primary big" data-act="startexam" ${pool.length?"":"disabled"}>Prüfung starten</button><span class="muted small">${pool.length} passende Einträge</span></div>
   </section>`;
 }
-function examPool(){ return [...S.items.values()].filter(i=>exam.cats.includes(i.type) && (!exam.area||i.area===exam.area) && tierOf(i)<=exam.maxTier); }
+function examPool(){ return [...S.items.values()].filter(i=>inPool(exam.pool,i) && exam.cats.includes(i.type) && (!exam.area||i.area===exam.area) && tierOf(i)<=exam.maxTier); }
 
 /* ---------- Ansicht: Statistik ---------- */
 function sureOf(it){ const p = S.progress.get(it.id); return !!(p && p.lastGrade>=3 && !p.leech); }
@@ -1601,19 +1688,25 @@ document.addEventListener("click", async e=>{
   const b = e.target.closest("[data-act]"); if(!b) return;
   const a = b.dataset.act, id = b.dataset.id;
   if(a==="cat"){ const t=b.dataset.t, c=S.settings.cats; S.settings.cats = c.includes(t) ? c.filter(x=>x!==t) : [...c,t]; saveSettings(); render(); }
-  else if(a==="start"){ const n = Math.max(0, todayTarget()-doneToday()); startSession(buildQueue(S.settings.cats, n), {label:"Heutige Abfrage"}); }
-  else if(a==="more"){ startSession(buildQueue(S.settings.cats, 10), {label:"Zusätzliche Runde"}); }
+  else if(a==="start"){ const n = Math.max(0, todayTarget()-doneToday()); startSession(buildQueue(S.settings.cats, n), {label:S.settings.pool==="zusatz"?"Hemmer-Zusatzfragen":"Heutige Abfrage", kind:"pensum"}); }
+  else if(a==="more"){ startSession(buildQueue(S.settings.cats, 10), {label:"Zusätzliche Runde", kind:"pensum"}); }
+  else if(a==="pool"){ S.settings.pool = b.dataset.t; saveSettings(); render(); }
+  else if(a==="expool"){ exam.pool = b.dataset.t; render(); }
+  else if(a==="lpool"){ leechPool = b.dataset.t; render(); }
   else if(a==="tahist"){ taHist = !taHist; render(); }
   else if(a==="fall"){ startFall(b.dataset.k); }
   else if(a==="check"){ checkCase(id); }
   else if(a==="stopcheck"){ const c = checks.get(id); if(c&&c.ctl) c.ctl.abort(); }
   else if(a==="recheck"){ const c = checks.get(id); checks.set(id, {input:c?c.input:""}); if(session) session.revealed = false; render(); const t=$("#sktext"); if(t) t.focus(); }
-  else if(a==="tagesabfrage"){ const d = b.dataset.d; startSession([...S.items.values()].filter(i=>i.tagesabfrage===d).sort((x,y)=>priority(y)-priority(x)).map(i=>i.id), {label:"Tagesabfrage "+toDate(d).toLocaleDateString("de-DE",{day:"numeric",month:"long"})}); }
+  else if(a==="tagesabfrage"){ const d = b.dataset.d; const allD = [...S.items.values()].filter(i=>i.tagesabfrage===d); const open = allD.filter(isDue); startSession((open.length ? open : allD).sort((x,y)=>priority(y)-priority(x)).map(i=>i.id), {label:"Tagesabfrage "+toDate(d).toLocaleDateString("de-DE",{day:"numeric",month:"long"})+(open.length?"":" (Wiederholung)"), kind:"tages", key:d}); }
+  else if(a==="noop"){ }
   else if(a==="reveal"){ if(session){ session.revealed = true; render(); } }
   else if(a==="grade"){ grade(Number(b.dataset.g)); }
   else if(a==="bibtab"){ bib.cat = b.dataset.t; render(); }
   else if(a==="backcard"){ await backCard(); }
-  else if(a==="endsession"){ session = null; if(b.tagName!=="A") go("aktuell"); }
+  else if(a==="endsession"){ if(session && session.idx < session.ids.length){ saveSess(); toast("Abfrage pausiert – unter „Aktuell“ kannst du weitermachen"); } else saveSess(); session = null; if(b.tagName!=="A") go("aktuell"); }
+  else if(a==="resume"){ resumeSess(); }
+  else if(a==="dropsess"){ if(confirm("Angefangene Abfrage verwerfen? Bereits bewertete Karten bleiben gespeichert.")){ session = null; S.savedSess = null; saveSess(); render(); } }
   else if(a==="writemode"){ S.settings.write = b.checked; saveSettings(); render(); }
   else if(a==="judge"){ judge(id); }
   else if(a==="mnemoedit"){ mnemoEdit = id; render(); setTimeout(()=>{ const m=$("#mtext"); if(m){ m.focus(); m.setSelectionRange(m.value.length,m.value.length); } },30); }
@@ -1631,10 +1724,14 @@ document.addEventListener("click", async e=>{
   else if(a==="learnone"){ const it = S.items.get(id); startSession([id], {label:TYPES[it.type]+" abfragen"}); }
   else if(a==="star"){ const it = S.items.get(id); if(!it) return; const c = clean(it); if(c.star) delete c.star; else c.star = true; await putItem(c); toast(c.star?"Mit Stern markiert":"Stern entfernt"); render(); }
   else if(a==="learnstar"){ startSession([...S.items.values()].filter(i=>i.star).sort((x,y)=>priority(y)-priority(x)).map(i=>i.id), {label:"Sternkarten"}); }
-  else if(a==="learnleech"){ startSession([...S.items.values()].filter(i=>(S.progress.get(i.id)||{}).leech).map(i=>i.id), {label:"Problemkarten"}); }
+  else if(a==="learnleech"){ startSession([...S.items.values()].filter(i=>(S.progress.get(i.id)||{}).leech && inPool(leechPool,i)).map(i=>i.id), {label:"Problemkarten"}); }
   else if(a==="learnnorm"){ const slug = b.dataset.n; let list=[]; for(const [n,l] of normIndex()) if(normSlug(n)===slug) list=l; startSession(list.sort((x,y)=>priority(y)-priority(x)).map(i=>i.id), {label:"Norm abfragen"}); }
   else if(a==="edit"){ editing = id; draftLinksInit = false; render(); }
-  else if(a==="canceledit"){ const was = editing; editing = null; draftLinksInit = false; if(was) render(); else history.length>1 ? history.back() : go("bibliothek"); }
+  else if(a==="canceledit"){ const was = editing; editing = null; draftLinksInit = false; if(backToSession && session){ backToSession = false; go("lernen"); } else if(was) render(); else history.length>1 ? history.back() : go("bibliothek"); }
+  else if(a==="change"){ changeDialog(id); }
+  else if(a==="selfedit"){ $("#layer").innerHTML=""; backToSession = route()==="lernen"; if(route()==="e-"+id){ editing = id; draftLinksInit = false; render(); } else { editNext = id; go("e-"+id); } }
+  else if(a==="aichange"){ aiChange(id); }
+  else if(a==="tosession"){ go("lernen"); }
   else if(a==="save"){ saveEdit(); }
   else if(a==="etype"){ editType = b.dataset.t; render(); }
   else if(a==="unlink"){ draftLinks = draftLinks.filter(x=>x!==id); $("#linkchips").innerHTML = linkChips(); }
@@ -1644,13 +1741,13 @@ document.addEventListener("click", async e=>{
   else if(a==="reload"){ try{ await loadAll(); toast("Aktualisiert"); }catch(e){ toast("Laden fehlgeschlagen."); } render(); }
   else if(a==="del"){ const it=S.items.get(id); if(confirm("„"+titleOf(it)+"“ endgültig löschen?")){ await deleteItem(id); toast("Gelöscht"); go("bibliothek"); } }
   else if(a==="excat"){ const t=b.dataset.t; exam.cats = exam.cats.includes(t)?exam.cats.filter(x=>x!==t):[...exam.cats,t]; render(); }
-  else if(a==="startexam"){ const pool = examPool().sort(()=>Math.random()-0.5).slice(0,exam.n); startSession(pool.map(i=>i.id), {exam:true, label:"Prüfungsmodus"}); }
+  else if(a==="startexam"){ const pool = examPool().sort(()=>Math.random()-0.5).slice(0,exam.n); startSession(pool.map(i=>i.id), {exam:true, label:exam.pool==="zusatz"?"Prüfung: Hemmer-Zusatzfragen":"Prüfungsmodus"}); }
   else if(a==="export"){ doExport(); }
   else if(a==="quizlet"){ doQuizlet(); }
   else if(a==="delexamples"){ const ex=[...S.items.values()].filter(i=>i.example); if(confirm(ex.length+" Beispielinhalte löschen? Dein Lernstand dazu wird ebenfalls entfernt.")){ for(const it of ex) await deleteItem(it.id); toast("Beispielinhalte gelöscht"); render(); } }
   else if(a==="help"){ help(); }
   else if(a==="theme"){ cycleTheme(); }
-  else if(a==="closehelp"){ $("#layer").innerHTML=""; }
+  else if(a==="closehelp"){ if(b.classList.contains("overlay") && e.target!==b) return; $("#layer").innerHTML=""; }
 });
 document.addEventListener("input", e=>{
   const t = e.target;
@@ -1697,7 +1794,7 @@ document.addEventListener("keydown", e=>{
   if(nav && r!=="lernen"){ go(nav); }
 });
 function help(){
-  $("#layer").innerHTML = `<div class="overlay" data-act="closehelp"><div class="panel" onclick="event.stopPropagation()"><div class="row"><h2 style="margin:0">Tastenkürzel</h2><span class="spacer"></span><button class="btn ghost" data-act="closehelp">Schließen</button></div>
+  $("#layer").innerHTML = `<div class="overlay" data-act="closehelp"><div class="panel"><div class="row"><h2 style="margin:0">Tastenkürzel</h2><span class="spacer"></span><button class="btn ghost" data-act="closehelp">Schließen</button></div>
   <div class="keys" style="margin-top:14px">
     <span><kbd>Leertaste</kbd> <kbd>Enter</kbd></span><span>Antwort zeigen</span>
     <span><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> <kbd>5</kbd></span><span>Nochmal, Schwer, Gut, Leicht, Sehr leicht</span>
@@ -1713,6 +1810,85 @@ function help(){
 let toastT;
 function toast(msg){ let t = $(".toast"); if(!t){ t = document.createElement("div"); t.className="toast"; t.setAttribute("role","status"); document.body.appendChild(t); } t.textContent = msg; clearTimeout(toastT); toastT = setTimeout(()=>t.remove(), 2600); }
 
+
+
+/* ---------- Ändern in der App: selbst oder per Claude ---------- */
+const EDIT_FIELDS = {card:["front","back"], def:["term","definition","merkmale"], schema:["title","steps","hinweis"], case:["title","sachverhalt","kern","problems"]};
+const EDIT_RULES = `Du überarbeitest einen Eintrag einer Lernkartei für das bayerische Erste Juristische Staatsexamen nach der Anweisung des Lernenden. Ändere nur, was die Anweisung verlangt oder was dafür nötig ist; Stil und Aufbau des Originals bleiben erhalten. Rechtlich Unsicheres kennzeichnest du im Feld text, statt zu raten; keine erfundenen Aktenzeichen oder Fundstellen. Antworte ausschließlich mit JSON ohne weiteren Text: {"text":"1–3 Sätze: was du geändert hast und warum","patch":{ nur geänderte Felder }}. Erlaubte Felder: front, back (Text) bei Karteikarten; term, definition (Text), merkmale (Liste) bei Definitionen; title (Text), steps (Liste, Unterpunkte mit zwei Leerzeichen eingerückt), hinweis (Text) bei Schemata; title, sachverhalt (Text), kern (Liste), problems (Liste aus {"frage","antwort"}) bei Fällen; bei allen zusätzlich norms (Liste, z. B. "§ 35 BauGB") und tags (Liste). Gib geänderte Felder immer vollständig an, nicht nur den geänderten Teil.`;
+function changeDialog(id){
+  const it = S.items.get(id); if(!it) return;
+  $("#layer").innerHTML = `<div class="overlay" data-act="closehelp"><div class="panel" style="max-width:620px">
+    <div class="row"><h2 style="margin:0">Karte ändern</h2><span class="spacer"></span><button class="btn ghost" data-act="closehelp">Schließen</button></div>
+    <p class="small muted" style="margin:6px 0 14px">${esc(titleOf(it)).slice(0,140)}</p>
+    <div class="row"><button class="btn" data-act="selfedit" data-id="${esc(id)}">✎ Selbst bearbeiten</button></div>
+    ${S.ai?`<h3>Oder Claude sagen, was geändert werden soll</h3>
+    <div class="field"><textarea id="chgtext" style="min-height:90px" placeholder="z. B. „Ergänze die Gegenansicht“, „Rückseite kürzer, in Stichpunkten“, „Norm ist Art. 6 BayBO, nicht § 6“"></textarea></div>
+    <div class="row" style="margin-top:10px"><button class="btn primary" id="chggo" data-act="aichange" data-id="${esc(id)}">Vorschlag von Claude</button><span class="small muted" id="chgstate">Claude schreibt einen Korrekturvorschlag; du übernimmst ihn mit einem Klick.</span></div>`:`<p class="small muted">Änderungen über Claude brauchen die Verbindung zu Supabase.</p>`}
+  </div></div>`;
+  setTimeout(()=>{ const t=$("#chgtext"); if(t) t.focus(); }, 30);
+}
+async function aiChange(id){
+  const it = S.items.get(id); const ta = $("#chgtext"); const wish = (ta && ta.value || "").trim();
+  if(!wish){ toast("Schreib oder diktiere zuerst, was geändert werden soll."); return; }
+  const btn = $("#chggo"), st = $("#chgstate"); if(btn) btn.disabled = true; if(st) st.textContent = "Claude überarbeitet die Karte …";
+  const fields = EDIT_FIELDS[it.type].concat(["norms","tags"]);
+  const cur = {}; fields.forEach(k=>{ if(it[k]!=null) cur[k] = it[k]; });
+  try{
+    const txt = await aiStream([EDIT_RULES, "Typ: "+TYPES[it.type]+"\nRechtsgebiet: "+(it.area||"-")+"\nQuelle: "+(it.source||"-")+"\nAktueller Eintrag (JSON):\n"+JSON.stringify(cur)], [{role:"user", content:"Anweisung: "+wish}], {kind:"check", max_tokens:3000});
+    const a = txt.indexOf("{"), b = txt.lastIndexOf("}"); if(a<0 || b<a) throw {code:"invalid_json"};
+    let d; try{ d = JSON.parse(txt.slice(a,b+1)); }catch(e){ throw {code:"invalid_json"}; }
+    const patch = {}; for(const [k,v] of Object.entries(d.patch||{})) if(fields.includes(k)) patch[k] = v;
+    if(!Object.keys(patch).length){ if(st) st.textContent = d.text || "Claude hat nichts geändert."; if(btn) btn.disabled = false; return; }
+    const c = clean(it); c.suggestion = {status:"offen", text:(d.text||"Änderung nach deiner Anweisung.")+"\n\nDeine Anweisung: "+wish, patch, quelle:"Claude in der App, "+new Date().toLocaleDateString("de-DE"), art:"auftrag"};
+    await putItem(c); $("#layer").innerHTML = ""; toast("Vorschlag liegt oben auf der Karte"); render(); window.scrollTo({top:0, behavior:"smooth"});
+  }catch(e){ if(st) st.textContent = errText(e); if(btn) btn.disabled = false; }
+}
+
+/* ---------- Spracheingabe (an jedem Schreibfeld) ---------- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const MIC_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
+let rec = null, recEl = null, recBtn = null;
+const micTargets = el => el.matches('textarea, input[type="search"], input[type="text"], input:not([type])') && !el.disabled && !el.readOnly && el.id!=="quick" && el.id!=="f-link" && !el.closest(".nomic");
+function enhanceMics(root=document){
+  if(!SR) return;
+  root.querySelectorAll('textarea, input').forEach(el=>{
+    if(el.dataset.mic || !micTargets(el)) return;
+    el.dataset.mic = "1";
+    const wrap = document.createElement("span"); wrap.className = "micwrap" + (el.tagName==="TEXTAREA" ? " ta" : " in");
+    el.parentNode.insertBefore(wrap, el); wrap.appendChild(el);
+    const b = document.createElement("button"); b.type = "button"; b.className = "micbtn"; b.innerHTML = MIC_SVG;
+    b.title = "Spracheingabe (Diktat)"; b.setAttribute("aria-label", "Spracheingabe starten");
+    b.addEventListener("mousedown", ev=>ev.preventDefault());
+    b.addEventListener("click", ev=>{ ev.preventDefault(); ev.stopPropagation(); toggleMic(el, b); });
+    wrap.appendChild(b);
+  });
+}
+function stopMic(){ if(rec){ try{ rec.stop(); }catch(e){} } }
+function toggleMic(el, btn){
+  if(rec && recEl===el){ stopMic(); return; }
+  stopMic();
+  const r = new SR(); r.lang = "de-DE"; r.continuous = true; r.interimResults = true;
+  const start = el.selectionStart!=null ? el.selectionStart : el.value.length;
+  const before = el.value.slice(0, start), after = el.value.slice(el.selectionEnd!=null ? el.selectionEnd : start);
+  const sep = before && !/\s$/.test(before) ? " " : "";
+  let finalText = "";
+  r.onresult = e=>{
+    let interim = "";
+    for(let i=e.resultIndex; i<e.results.length; i++){ const t = e.results[i][0].transcript; if(e.results[i].isFinal) finalText += t; else interim += t; }
+    const spoken = (finalText + interim).replace(/\s+/g," ").trim();
+    if(!document.body.contains(el)) return;
+    el.value = before + sep + spoken + after;
+    const pos = (before + sep + spoken).length; try{ el.setSelectionRange(pos, pos); }catch(x){}
+    el.dispatchEvent(new Event("input", {bubbles:true}));
+  };
+  r.onerror = e=>{ if(e.error==="not-allowed" || e.error==="service-not-allowed") toast("Mikrofon nicht freigegeben. Erlaube den Zugriff in den Browser-Einstellungen."); else if(e.error!=="no-speech" && e.error!=="aborted") toast("Spracheingabe unterbrochen ("+e.error+")."); };
+  r.onend = ()=>{ if(recBtn) recBtn.classList.remove("on"); if(rec===r){ rec = null; recEl = null; recBtn = null; } };
+  rec = r; recEl = el; recBtn = btn; btn.classList.add("on"); btn.setAttribute("aria-label","Spracheingabe beenden");
+  try{ r.start(); el.focus(); }catch(e){ rec = null; btn.classList.remove("on"); toast("Spracheingabe konnte nicht starten."); }
+}
+new MutationObserver(muts=>{ if(!SR) return; for(const m of muts) for(const n of m.addedNodes) if(n.nodeType===1){ if(n.matches && n.matches("textarea,input")) enhanceMics(n.parentNode||document); else enhanceMics(n); } })
+  .observe(document.body, {childList:true, subtree:true});
+
 /* ---------- Start ---------- */
 async function startData(sess){
   S.user = sess.user; S.needLogin = false; S.ready = false; render();
@@ -1723,7 +1899,7 @@ async function startData(sess){
 async function boot(){
   render();
   if(!CONFIGURED || !window.supabase){
-    S.mode = "lokal"; lsLoad(); S.ready = true; render();
+    S.mode = "lokal"; lsLoad(); loadSavedSess(null); S.ready = true; render();
     if(CONFIGURED) toast("Die Datenbank-Bibliothek konnte nicht geladen werden. Prüfe die Internetverbindung.");
     return;
   }
