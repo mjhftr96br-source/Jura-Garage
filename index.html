@@ -219,6 +219,11 @@ ul.kern{margin:8px 0;padding-left:1.2em}
 .grades button span{font-size:12.5px;color:var(--muted)}
 .grades button kbd{margin-left:5px;font-size:9px;padding:2px 4px}
 .grades button[data-g="5"] b{color:var(--g5)}
+.grades button{position:relative}
+.grades .ginfo{position:absolute;top:4px;right:5px;width:18px;height:18px;line-height:16px;border-radius:50%;border:1px solid var(--line);font-size:11px;font-style:normal;font-weight:600;color:var(--muted);background:var(--soft)}
+.grades .ginfo:hover{color:var(--ink);border-color:var(--muted)}
+.ginfo-box{margin-top:10px;padding:10px 14px;border:1px solid var(--line);border-radius:var(--r2);background:var(--soft);font-size:13.5px}
+.ginfo-box p{margin:4px 0}
 .grades button[data-g="1"] b{color:var(--g1)} .grades button[data-g="2"] b{color:var(--g2)}
 .grades button[data-g="3"] b{color:var(--g3)} .grades button[data-g="4"] b{color:var(--g4)}
 .grades button.rec{outline:2px solid var(--ok);outline-offset:2px}
@@ -478,7 +483,7 @@ const S = {
   mode:"lokal", ready:false, stale:false,
   items:new Map(), progress:new Map(),
   settings:{base:50, todayDate:null, todayN:null, cats:["def","card","schema","case"], write:false},
-  log:{days:{}},
+  log:{days:{}}, abg:{},
   sb:null, user:null, ai:false, needLogin:false,
 };
 let taHist = false;
@@ -578,6 +583,7 @@ async function loadAll(){
   meta.forEach(r=>{
     if(r.key==="settings") Object.assign(S.settings, r.data||{});
     if(r.key==="session") sessMeta = r.data;
+    if(r.key==="abgefragt") mergeAbg(r.data);
     if(r.key==="log"){ const days = Object.assign({}, (r.data||{}).days||{}); for(const [k,v] of Object.entries(S.log.days)) days[k] = Math.max(days[k]||0, v); S.log = {days}; }
   });
   if(!session) loadSavedSess(sessMeta);
@@ -597,6 +603,7 @@ function subscribe(){
         else if(t==="progress") S.progress.set(n.id, n.data);
         else if(n.key==="settings") Object.assign(S.settings, n.data||{});
         else if(n.key==="session"){ if(!session) loadSavedSess(n.data); }
+        else if(n.key==="abgefragt") mergeAbg(n.data);
         else if(n.key==="log"){ const days = Object.assign({}, (n.data||{}).days||{}); for(const [k,v] of Object.entries(S.log.days)) days[k] = Math.max(days[k]||0, v); S.log = {days}; }
         later();
       });
@@ -644,14 +651,14 @@ function cachePut(k, v){
     localStorage.setItem(AI_CACHE_KEY, JSON.stringify(m)); }catch(e){}
 }
 const CHAT_RULES = "Du bist Repetitor für das bayerische Erste Juristische Staatsexamen und hilfst beim Lernen mit einer Kartei. Antworte auf Deutsch, knapp (höchstens 6 Sätze, außer es wird ausdrücklich mehr verlangt) und examensnah. Nenne die einschlägigen Normen und bei Streitständen die herrschende Meinung. Ist die Karte fehlerhaft oder unvollständig, weise sachlich darauf hin.";
-const GRADE_RULES = 'Du wertest Antworten auf Karteikarten (Definitionen, Fragen, Schemata) für das bayerische Erste Juristische Staatsexamen aus. Bewerte wohlwollend, wie ein freundlicher Repetitor: Der Lernende antwortet frei aus dem Kopf, oft in Stichworten oder per Spracheingabe. Ein Kernmerkmal ist erfüllt, wenn der Gedanke sinngemäß erkennbar ist; Wortlaut, Reihenfolge, Synonyme, Abkürzungen, Tippfehler und fehlende Normzitate sind egal. Nebenpunkte, Beispiele und Streitstände, die nicht zum Kern gehören, nicht als Merkmal werten. Werte höchstens 2 bis 5 echte Kernmerkmale. gesamt: „vollständig“, wenn der Kern stimmt und höchstens Nebensächliches fehlt; „teilweise“, wenn ein Kernmerkmal fehlt; „unzureichend“ nur, wenn der Kern fehlt oder rechtlich falsch ist. empfehlung: Gut bei „vollständig“, Schwer bei „teilweise“, Nochmal nur bei „unzureichend“; Leicht nur bei einer sehr präzisen Antwort. Antworte ausschließlich mit JSON ohne weiteren Text: {"merkmale":[{"merkmal":"…","erfuellt":true,"hinweis":"nur wenn nicht erfüllt, höchstens 10 Wörter"}],"gesamt":"vollständig|teilweise|unzureichend","empfehlung":"Nochmal|Schwer|Gut|Leicht","kommentar":"ein ermutigender Satz, ggf. mit dem einen wichtigsten fehlenden Punkt"}';
+const GRADE_RULES = 'Du wertest Antworten auf Karteikarten (Definitionen, Fragen, Schemata) für das bayerische Erste Juristische Staatsexamen aus. Bewerte wohlwollend, wie ein freundlicher Repetitor: Der Lernende antwortet frei aus dem Kopf, oft in Stichworten oder per Spracheingabe. Ein Kernmerkmal ist erfüllt, wenn der Gedanke sinngemäß erkennbar ist; Wortlaut, Reihenfolge, Synonyme, Abkürzungen, Tippfehler und fehlende Normzitate sind egal. Nebenpunkte, Beispiele und Streitstände, die nicht zum Kern gehören, nicht als Merkmal werten. Werte höchstens 2 bis 5 echte Kernmerkmale. gesamt: „vollständig“, wenn der Kern stimmt und höchstens Nebensächliches fehlt; „teilweise“, wenn ein Kernmerkmal fehlt; „unzureichend“ nur, wenn der Kern fehlt oder rechtlich falsch ist. empfehlung nach diesen Stufen: Leicht, wenn alle Kernmerkmale erfüllt sind und die Antwort sicher und treffend ist (auch in Stichworten; fehlende Normzitate oder ein fehlendes Detail ohne Kernbedeutung schaden nicht). Gut, wenn der Kern stimmt (gesamt „vollständig“), die Antwort aber unsicher, umständlich oder ungenau formuliert ist oder ein Nebenaspekt fehlt, auf den es in der Klausur ankommen kann. Schwer bei „teilweise“. Nochmal nur bei „unzureichend“. Im Zweifel zwischen Gut und Leicht: Sind alle Merkmale erfüllt, Leicht. Antworte ausschließlich mit JSON ohne weiteren Text: {"merkmale":[{"merkmal":"…","erfuellt":true,"hinweis":"nur wenn nicht erfüllt, höchstens 10 Wörter"}],"gesamt":"vollständig|teilweise|unzureichend","empfehlung":"Nochmal|Schwer|Gut|Leicht","kommentar":"ein ermutigender Satz, ggf. mit dem einen wichtigsten fehlenden Punkt"}';
 const CHECK_RULES = `Du bist Korrektor für das bayerische Erste Juristische Staatsexamen. Der Lernende skizziert in eigenen Worten das Kernproblem eines Übungsfalls. Prüfe die Skizze an der beigefügten Lösung; deren Rechtsauffassung gilt. Antworte auf Deutsch, knapp und konkret, in genau diesem Format (Abschnitte ohne Inhalt weglassen):
 Richtig erkannt: Stichpunkte, jeweils mit „– “ beginnend
 Fehlt oder ungenau: Stichpunkte mit „– “; nenne das fehlende Problem und die einschlägige Norm
 Richtigstellung: nur wenn etwas rechtlich falsch ist
 Tipp für die Klausur: ein Satz
 Empfehlung: Nochmal|Schwer|Gut|Leicht
-Bewerte wohlwollend: Eine Skizze in Stichworten oder per Spracheingabe genügt, Formulierung und Vollständigkeit der Details sind zweitrangig. Erkennt der Lernende das Hauptproblem und löst es im Ergebnis vertretbar, ist das mindestens „Gut“. Kritisiere nur, was für die Klausur wirklich zählt (verkanntes Hauptproblem, falsche Anspruchsgrundlage, rechtlich falsches Ergebnis), und nenne bei „Fehlt oder ungenau“ höchstens drei Punkte. Keine Einleitung, keine Wiederholung der Skizze.`;
+Bewerte wohlwollend: Eine Skizze in Stichworten oder per Spracheingabe genügt, Formulierung und Vollständigkeit der Details sind zweitrangig. Erkennt der Lernende das Hauptproblem und löst es im Ergebnis vertretbar, ist das mindestens „Gut“. Empfehlung: Leicht, wenn das Hauptproblem und alle für die Klausur wesentlichen Punkte richtig erfasst sind (unter „Fehlt oder ungenau“ steht dann nichts Wesentliches); Gut, wenn das Hauptproblem stimmt, aber ein wesentlicher Punkt fehlt oder ungenau ist; Schwer, wenn das Hauptproblem nur teilweise erkannt ist; Nochmal, wenn es verkannt oder falsch gelöst ist. Kritisiere nur, was für die Klausur wirklich zählt (verkanntes Hauptproblem, falsche Anspruchsgrundlage, rechtlich falsches Ergebnis), und nenne bei „Fehlt oder ungenau“ höchstens drei Punkte. Keine Einleitung, keine Wiederholung der Skizze.`;
 async function aiStream(system, turns, opts={}){
   const r = await aiCall({kind:opts.kind||"chat", system, messages:normTurns(turns).slice(-8), stream:true, max_tokens:opts.max_tokens||2000}, opts.signal);
   const reader = r.body.getReader(), dec = new TextDecoder(); let buf = "", text = "";
@@ -683,47 +690,130 @@ async function aiJson(prompt){
   try{ return JSON.parse(t.slice(a,b+1)); }catch(e){ throw {code:"invalid_json"}; }
 }
 
-/* ---------- Wiederholungssystem (Stufenleiter) ---------- */
-// Neue Karten (auch aus „heute“/Tagesabfrage): zwei Tage in Folge, dann nach 3 Tagen, nach 1 Woche, danach monatlich.
-// Stufe 0 = noch nie gekonnt. „Gut“ rückt eine Stufe weiter: morgen → 3 Tage → 1 Woche → monatlich.
-// „In 3 Tagen“ (4) und „In 1 Woche“ (5) springen direkt auf diese Stufe; wer sie dann kann, kommt wöchentlich bzw. monatlich dran.
-// „Schwer“: morgen, Stufe bleibt. „Nochmal“: morgen, zurück auf Anfang. Nie über das Examen hinaus.
-const STEPS = [1, 3, 7, 30];
+/* ---------- Wiederholungssystem: FSRS (wie in Anki) mit Examensbremse ---------- */
+// Jede Karte hat eine Merkdauer S (Tage, bis die Erinnerung auf 90 % fällt) und eine Schwierigkeit D (1–10).
+// Knöpfe: 1 Nochmal = vergessen (gleich nochmal, dann morgen), 2 Schwer, 3 Gut, 4 Leicht (FSRS „Again/Hard/Good/Easy“),
+// 5 Sehr leicht = ausgliedern bis zum Endspurt.
+// Neue Karten (nie gelernt): bei Nochmal, Schwer oder Gut zuerst morgen und übermorgen, danach FSRS.
+// Gesichert: Reicht die Merkdauer bis zum Examen, fällt die Karte aus allen Abfragen heraus und kommt erst im
+// Endspurt (Standard: 21 Tage vor dem Examen) einmal zur Endwiederholung. Kein Abstand reicht über das Examen hinaus.
+const FSRS_W = [0.4872, 1.4003, 3.7145, 13.8206, 5.1618, 1.2298, 0.8975, 0.031, 1.6474, 0.1367, 1.0461, 2.1072, 0.0793, 0.3246, 1.587, 0.2272, 2.8755];
+const FSRS_DECAY = -0.5, FSRS_FACTOR = 19/81, FSRS_RET = 0.9;
 const EXAM_DEFAULT = "2027-03-01";
 const examDate = () => S.settings.examDate || EXAM_DEFAULT;
 const daysToExam = () => Math.max(0, diffDays(today(), examDate()));
-function stageOf(p){
-  if(!p) return 0;
-  if(p.stage!=null) return p.stage;
-  const i = p.ivl||0; return i>=30 ? 4 : i>=7 ? 3 : i>=3 ? 2 : p.reps ? 1 : 0; // ältere Lernstände übernehmen
+const endspurtStart = () => addDays(examDate(), -(S.settings.endspurt||21));
+const clampD = d => Math.min(10, Math.max(1, d));
+const fsrsR = (t, st) => Math.pow(1 + FSRS_FACTOR * Math.max(0,t) / st, FSRS_DECAY);
+const fsrsIvl = st => st / FSRS_FACTOR * (Math.pow(FSRS_RET, 1/FSRS_DECAY) - 1); // bei 90 % = S
+const fsrsD0 = g => clampD(FSRS_W[4] - (g-3) * FSRS_W[5]);
+function fsrsState(p){
+  if(!p) return null;
+  if(p.fs) return p.fs;
+  // ältere Lernstände übernehmen: bisheriger Abstand als Merkdauer, Fehler erhöhen die Schwierigkeit
+  return {s: Math.max(1, p.ivl||1), d: clampD(5 + Math.min(p.lapses||0, 5) * 0.8)};
 }
-function schedule(prev, grade, tier){
+function fsrsNext(st, g, t){
+  const w = FSRS_W;
+  if(!st) return {s: w[g-1], d: fsrsD0(g)};
+  const r = fsrsR(t, st.s);
+  let d = st.d - w[6] * (g-3); d = clampD(w[7] * fsrsD0(3) + (1 - w[7]) * d);
+  let s;
+  if(g===1) s = Math.min(st.s, w[11] * Math.pow(st.d, -w[12]) * (Math.pow(st.s+1, w[13]) - 1) * Math.exp(w[14] * (1-r)));
+  else s = st.s * (1 + Math.exp(w[8]) * (11 - st.d) * Math.pow(st.s, -w[9]) * (Math.exp(w[10] * (1-r)) - 1) * (g===2 ? w[15] : 1) * (g===4 ? w[16] : 1));
+  return {s: Math.max(0.1, s), d};
+}
+function stageOf(p){ return p && p.lastGrade ? p.lastGrade : 0; }
+const isGesichert = p => !!(p && p.gesichert && p.due > today());
+function schedule(prev, grade, tier, base){
+  base = base || today();
   const p = Object.assign({ivl:0, reps:0, lapses:0}, prev||{});
-  let st = stageOf(prev), ivl;
-  // Heute schon mit „Gut“ gelernt (z. B. Tagesabfrage zweimal gestartet): Plan nicht doppelt weiterschieben
-  if(grade===3 && prev && prev.last===today() && prev.lastGrade>=3 && prev.due>today()){ return Object.assign({}, prev, {reps:(prev.reps||0)+1}); }
-  if(grade===1){ ivl = 1; st = 0; p.lapses++; }
-  else if(grade===2){ ivl = 1; }
-  else if(grade===3){ ivl = STEPS[Math.min(st, STEPS.length-1)]; st = Math.min(st+1, STEPS.length); }
-  else if(grade===4){ ivl = 3; st = 2; }
-  else { ivl = 7; st = 3; }
-  const cap = Math.max(1, daysToExam()-2);
-  ivl = Math.min(cap, Math.max(1, ivl));
+  // Heute schon mit derselben oder besseren Bewertung gelernt (z. B. Abfrage zweimal gestartet): Plan nicht doppelt weiterschieben
+  if(grade>=3 && grade<5 && prev && prev.last===today() && prev.lastGrade>=grade && prev.due>today()){ return Object.assign({}, prev, {reps:(prev.reps||0)+1}); }
+  const isNewCard = !prev || !prev.reps;
+  const g4 = Math.min(grade, 4);
+  const old = fsrsState(prev);
+  const t = old && prev.last ? diffDays(prev.last, base) : 0;
+  const fs = fsrsNext(old, g4, t);
+  if(grade===1) p.lapses++;
+  const daysLeft = Math.max(1, diffDays(base, examDate()) - 2);
+  let ivl = Math.max(1, Math.round(fsrsIvl(fs.s)));
+  if(grade===1) ivl = 1;                                   // vergessen: gleich nochmal, dann morgen
+  if(isNewCard && grade<=3) ivl = 1;                        // neue Karte: morgen …
+  p.follow = isNewCard && grade<=3 ? addDays(base, 2) : null; // … und übermorgen
+  // Gesichert: „Sehr leicht“ oder Merkdauer reicht bis zum Examen → bis zum Endspurt ausgliedern
+  const es = endspurtStart();
+  p.gesichert = false;
+  if((grade===5 || fs.s >= diffDays(base, examDate())) && base < es){
+    if(grade===5) fs.s = Math.max(fs.s, diffDays(base, examDate()));
+    p.gesichert = true; ivl = diffDays(base, es);
+  } else ivl = Math.min(daysLeft, ivl);
+  let due = addDays(base, ivl);
+  if(due <= today() && grade>=2) due = addDays(today(), 1);
+  if(prev && prev.follow && grade>=2 && prev.follow > today() && due > prev.follow && !p.gesichert) due = prev.follow;
   if(grade>=3 && !p.sure) p.sure = today();
-  p.stage = st; p.ivl = ivl; p.reps++; p.due = addDays(today(), ivl); p.last = today(); p.lastGrade = grade;
+  p.fs = {s: Math.round(fs.s*100)/100, d: Math.round(fs.d*100)/100};
+  p.stage = grade; p.ivl = diffDays(today(), due); p.reps++; p.due = due; p.last = today(); p.lastGrade = grade;
   p.leech = p.lapses >= 3;
   return p;
 }
-const GRADE_HINT = (p, g) => g===1 ? "morgen, von vorn" : g===2 ? "morgen" : g===4 ? "in 3 Tagen" : g===5 ? "in 1 Woche" : fmtIvl(schedule(p, 3).ivl);
+const GRADE_INFO = {
+  1:"Die Karte kommt gleich nochmal in derselben Abfrage, dann morgen. Ihre Merkdauer sinkt stark.",
+  2:"FSRS berechnet den Abstand. Sichere Karten rücken schnell weit nach hinten, wackelige bleiben eng getaktet.",
+  3:"FSRS berechnet den Abstand. Sichere Karten rücken schnell weit nach hinten, wackelige bleiben eng getaktet.",
+  4:"FSRS berechnet den Abstand. Sichere Karten rücken schnell weit nach hinten, wackelige bleiben eng getaktet.",
+  5:"Die Karte wird bis zum Endspurt ausgegliedert."};
+const g2txt = g => g+" "+GRADE_TXT[g]+":";
+let gradeInfo = 0;
+const GRADE_HINT = (p, g) => { if(g===1) return "gleich nochmal, dann morgen"; const n = schedule(p, g); return n.gesichert ? "gesichert bis Endspurt" : fmtIvl(Math.max(1, diffDays(today(), n.due))); };
 const TIER_W = {1:8, 2:6, 3:3, 4:1};
 function priority(it){
   const p = S.progress.get(it.id), w = TIER_W[tierOf(it)];
   if(!p) return w + 0.5;
-  const over = Math.max(0, diffDays(p.due, today()));
-  return w + Math.min(p.lapses,5) + Math.min(over,30)*0.2 + (p.ease<2 ? 1.5 : 0);
+  const st = fsrsState(p), risk = p.last ? 1 - fsrsR(diffDays(p.last, today()), st.s) : 0.5;
+  return w + risk*20 + Math.min(p.lapses,5) + (st.d>7 ? 1.5 : 0);
 }
 const isDue = it => { const p = S.progress.get(it.id); return !p || p.due <= today(); };
 const isNew = it => !S.progress.get(it.id);
+/* Schon abgefragt: Je Abfrage in „Aktuell“ (Tagesabfrage eines Datums, Fall, Pensum) merkt sich die App, welche Karten
+   im laufenden Durchgang bewertet wurden. Beim erneuten Start kommen nur die übrigen – auch über Mitternacht und Geräte hinweg.
+   Ist der Durchgang fertig, gilt die Liste noch bis Tagesende; ein nicht beendeter Durchgang verfällt nach 36 Stunden. */
+const ABG_KEY = "juragarage-abgefragt", ABG_TTL = 36*3600e3;
+let abgTimer = null;
+try{ S.abg = JSON.parse(localStorage.getItem(ABG_KEY)||"{}") || {}; }catch(e){ S.abg = {}; }
+const abgKeyOf = s => s && !s.exam && s.kind ? s.kind+":"+(s.key||"") : "";
+function abgLive(e){ return !!e && (e.fin ? e.fin===today() : Date.now()-(e.t||0) < ABG_TTL); }
+function abgDone(key){ const e = S.abg[key]; return abgLive(e) ? new Set(e.ids||[]) : new Set(); }
+function isOpenIn(key){ const d = abgDone(key); return it => isDue(it) && !d.has(it.id); }
+function saveAbg(){
+  for(const [k,e] of Object.entries(S.abg)) if(!abgLive(e)) delete S.abg[k];
+  try{ localStorage.setItem(ABG_KEY, JSON.stringify(S.abg)); }catch(e){}
+  clearTimeout(abgTimer); abgTimer = setTimeout(()=>{ putMeta("abgefragt", S.abg).catch(()=>{}); }, 1200);
+}
+function markAbg(key, id){
+  if(!key) return; let e = S.abg[key];
+  if(!abgLive(e)) e = S.abg[key] = {ids:[], t:0, fin:null};
+  e.fin = null; // neue Karten nach Abschluss (z. B. 22-Uhr-Lauf): Durchgang läuft weiter, Bisheriges bleibt ausgeschlossen
+  if(!e.ids.includes(id)) e.ids.push(id); e.t = Date.now(); saveAbg();
+}
+function unmarkAbg(key, id){ const e = S.abg[key]; if(!e) return; e.ids = (e.ids||[]).filter(x=>x!==id); e.fin = null; e.t = Date.now(); saveAbg(); }
+function finishAbg(key){ const e = S.abg[key]; if(key && e){ e.fin = today(); e.t = Date.now(); saveAbg(); } }
+/* Tagesabfrage: jede Karte wird darin genau einmal abgefragt. Erledigt ist sie, sobald sie am oder nach dem Tag
+   dieser Tagesabfrage bewertet wurde – auch nach 0 Uhr. Eine abgeschlossene Tagesabfrage startet nicht neu. */
+const taPending = it => { const p = S.progress.get(it.id); return !p || !p.last || p.last < it.tagesabfrage || (p.lastGrade===1 && isDue(it)); };
+function mergeAbg(remote){
+  if(!remote || typeof remote!=="object") return;
+  for(const [k,r] of Object.entries(remote)){
+    if(!r || !Array.isArray(r.ids)) continue;
+    const l = S.abg[k];
+    if(!l || (r.t||0) > (l.t||0)){
+      // gleicher, noch offener Durchgang auf zwei Geräten: Listen zusammenführen
+      const ids = l && !l.fin && !r.fin && abgLive(l) ? [...new Set([...(l.ids||[]), ...r.ids])] : r.ids;
+      S.abg[k] = Object.assign({}, r, {ids});
+    }
+  }
+  try{ localStorage.setItem(ABG_KEY, JSON.stringify(S.abg)); }catch(e){}
+}
 function todayTarget(){ return S.settings.todayDate===today() && S.settings.todayN!=null ? S.settings.todayN : S.settings.base; }
 const doneToday = () => S.log.days[today()]||0;
 function fmtIvl(n){ return n===1 ? "morgen" : n===7 ? "in 1 Woche" : n===30 ? "in 1 Monat" : n<30 ? "in "+n+" Tagen" : n<365 ? "in "+Math.round(n/30)+" Mon." : "in 1 Jahr"; }
@@ -910,16 +1000,19 @@ const fallAge = g => diffDays(g.datum, today());
 const fallTitle = g => (g.summary && g.summary.title) || g.fall.titel || g.fall.name;
 function startFall(key){
   const g = fallGroups().find(x=>x.key===key); if(!g) return;
-  startSession(g.items.map(i=>i.id), {label:"Fallabfrage "+(g.fall.name||"")});
+  const k = "fall:"+key, open = g.items.filter(isOpenIn(k));
+  if(!open.length){ toast("Für heute erledigt. Fällige Karten kommen an ihrem Tag wieder."); return; }
+  startSession(open.map(i=>i.id), {label:"Fallabfrage "+(g.fall.name||""), kind:"fall", key});
 }
 
 /* ---------- Ansicht: Aktuell ---------- */
 function vAktuell(){
   const all = [...S.items.values()];
   const cats = S.settings.cats, pool = S.settings.pool||"";
-  const dueBy = t => all.filter(i=>i.type===t && inPool(pool,i) && isDue(i)).length;
+  const pOpen = isOpenIn("pensum:"+today());
+  const dueBy = t => all.filter(i=>i.type===t && inPool(pool,i) && pOpen(i)).length;
   const target = todayTarget(), done = doneToday();
-  const avail = all.filter(i=>cats.includes(i.type) && inPool(pool,i) && isDue(i)).length;
+  const avail = all.filter(i=>cats.includes(i.type) && inPool(pool,i) && pOpen(i)).length;
   const n = Math.min(Math.max(0,target-done), avail);
   const leech = all.filter(i=>(S.progress.get(i.id)||{}).leech).length;
   const fixes = all.filter(i=>i.suggestion && i.suggestion.status==="offen").length;
@@ -931,12 +1024,12 @@ function vAktuell(){
   // 1) Tägliches Pensum
   const pensum = `<section class="zone z-pensum">
     <header>${ILL.pensum()}<div><h2>Tägliches Pensum</h2><p>Ausgewählt nach Fälligkeit, Tier (1 bis 4) und deinem Lernstand.</p></div></header>
-    ${poolTabs(pool, "pool", k=>all.filter(i=>inPool(k,i) && cats.includes(i.type) && isDue(i)).length+" fällig")}
+    ${poolTabs(pool, "pool", k=>all.filter(i=>inPool(k,i) && cats.includes(i.type) && pOpen(i)).length+" fällig")}
     <h3>Was möchtest du abfragen?</h3>
     <div class="cats">${TKEYS.map(t=>`<button class="chip t-${t}" data-act="cat" data-t="${t}" aria-pressed="${cats.includes(t)}"><i class="dot"></i>${TYPES_PL[t]} <span class="n">${dueBy(t)}</span></button>`).join("")}</div>
     <h3>Wie viele heute?</h3>
     <div class="slider"><input id="daily" type="range" min="0" max="200" step="5" value="${target}" aria-label="Karten heute"><output id="dailyOut">${target}</output></div>
-    <p class="small muted" style="margin:0 0 16px">Grundpensum ${S.settings.base} pro Tag, der Regler gilt nur für heute. Erledigt: ${done}.</p>
+    <p class="small muted" style="margin:0 0 16px">Grundpensum ${S.settings.base} pro Tag, der Regler gilt nur für heute. Erledigt: ${done}. Höchstens ${S.settings.newMax!=null?S.settings.newMax:20} neue Karten am Tag.${(()=>{ const g=[...S.progress.values()].filter(isGesichert).length; return g ? ` ${g} ${g===1?"Karte ist":"Karten sind"} gesichert und kommen ab ${toDate(endspurtStart()).toLocaleDateString("de-DE")} zur Endwiederholung.` : ""; })()}</p>
     <div class="row">${n ? `<button class="btn big st-open" data-act="start">${n} Karten abfragen</button><span class="stpill open">offen</span>`
       : done>=target && done>0 ? `<button class="btn big st-done" data-act="${avail?"more":"noop"}" title="${avail?"Noch 10 weitere abfragen":"Alles erledigt"}">✓ Tagespensum geschafft</button>`
       : `<button class="btn big st-done" disabled>✓ Nichts fällig</button>`}
@@ -948,9 +1041,9 @@ function vAktuell(){
   const taDates = [...new Set(all.filter(i=>i.tagesabfrage).map(i=>i.tagesabfrage))].sort().reverse();
   const taCount = d => all.filter(i=>i.tagesabfrage===d).length;
   const taNew = d => all.filter(i=>i.tagesabfrage===d && isNew(i)).length;
-  const taOpen = d => all.filter(i=>i.tagesabfrage===d && isDue(i)).length;
+  const taOpen = d => all.filter(i=>i.tagesabfrage===d && taPending(i)).length;
   const taRow = d => { const o = taOpen(d), c = taCount(d);
-    return `<div class="zrow"><div><div class="t">${d===today()?"Heute":d===addDays(today(),-1)?"Gestern":toDate(d).toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long"})}</div><div class="s">${c} ${c===1?"Karte":"Karten"}${taNew(d)?", "+taNew(d)+" noch nie gelernt":""}</div></div><span class="spacer"></span>${o ? `<button class="btn st-open" data-act="tagesabfrage" data-d="${esc(d)}" title="${o} von ${c} heute fällig">Abfragen <span class="stn">${o}</span></button>` : `<button class="btn st-done" data-act="tagesabfrage" data-d="${esc(d)}" title="Für heute erledigt – zum Wiederholen tippen">✓ Erledigt</button>`}</div>`; };
+    return `<div class="zrow"><div><div class="t">${d===today()?"Heute":d===addDays(today(),-1)?"Gestern":toDate(d).toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long"})}</div><div class="s">${c} ${c===1?"Karte":"Karten"}${taNew(d)?", "+taNew(d)+" noch nie gelernt":""}</div></div><span class="spacer"></span>${o ? `<button class="btn st-open" data-act="tagesabfrage" data-d="${esc(d)}" title="${o} von ${c} noch nicht abgefragt">Abfragen <span class="stn">${o}</span></button>` : `<button class="btn st-done" data-act="tagesabfrage" data-d="${esc(d)}" title="Alle Karten dieser Tagesabfrage sind abgefragt">✓ Erledigt</button>`}</div>`; };
   const taShown = taHist ? taDates : taDates.slice(0,3);
   const tages = `<section class="zone z-tages">
     <header>${ILL.tages()}<div><h2>Tagesabfrage</h2><p>Claude schaut dreimal täglich (16, 19 und 22 Uhr) in deinen Lernordner und fragt dich nur das ab, was neu oder geändert ist.</p></div></header>
@@ -967,7 +1060,7 @@ function vAktuell(){
     return `<div class="zrow"><div style="min-width:0"><div class="row" style="gap:8px"><span class="tag-reihe">${esc(g.fall.reihe||"Fall")} ${esc(g.fall.name||"")}</span></div>
       <div class="t" style="margin-top:6px">${esc(fallTitle(g))}</div>
       <div class="s">${g.items.length} ${g.items.length===1?"Eintrag":"Einträge"} · ${esc(status)} · noch ${left} ${left===1?"Tag":"Tage"} hier</div></div>
-      <span class="spacer"></span>${g.items.some(isDue) ? `<button class="btn st-open" data-act="fall" data-k="${esc(g.key)}">Abfragen <span class="stn">${g.items.filter(isDue).length}</span></button>` : `<button class="btn st-done" data-act="fall" data-k="${esc(g.key)}" title="Für heute erledigt – zum Wiederholen tippen">✓ Erledigt</button>`}</div>`;
+      <span class="spacer"></span>${g.items.some(isOpenIn("fall:"+g.key)) ? `<button class="btn st-open" data-act="fall" data-k="${esc(g.key)}">Abfragen <span class="stn">${g.items.filter(isOpenIn("fall:"+g.key)).length}</span></button>` : `<button class="btn st-done" data-act="fall" data-k="${esc(g.key)}" title="Für heute erledigt">✓ Erledigt</button>`}</div>`;
   };
   const fall = `<section class="zone z-fall">
     <header>${ILL.fall()}<div><h2>Fallabfrage</h2><p>Neue Klausuren aus UKK, KLK und der Klausurenbesprechung. Du skizzierst das Kernproblem, Claude prüft es gegen die Lösung.</p></div></header>
@@ -1001,7 +1094,13 @@ function streak(){
 }
 function buildQueue(cats, n){
   const pool = S.settings.pool||"";
-  return [...S.items.values()].filter(i=>cats.includes(i.type) && inPool(pool,i) && isDue(i)).sort((a,b)=>priority(b)-priority(a)).slice(0,n).map(i=>i.id);
+  const open = isOpenIn("pensum:"+today()), newMax = S.settings.newMax!=null ? S.settings.newMax : 20;
+  const newToday = [...S.progress.values()].filter(p=>p.reps===1 && p.last===today()).length;
+  let newLeft = Math.max(0, newMax - newToday);
+  const list = [...S.items.values()].filter(i=>cats.includes(i.type) && inPool(pool,i) && open(i)).sort((a,b)=>priority(b)-priority(a));
+  const out = [];
+  for(const i of list){ if(out.length>=n) break; if(isNew(i) && !i.tagesabfrage && !i.fallabfrage){ if(!newLeft) continue; newLeft--; } out.push(i.id); }
+  return out;
 }
 function startSession(ids, opts={}){
   if(!ids.length){ toast("Keine passenden Karten gefunden."); return; }
@@ -1100,11 +1199,12 @@ function sheet(it, revealed, study){
   const ck = it.type==="case" ? checks.get(it.id) : null;
   const rec = v && v.result ? ({"Nochmal":1,"Schwer":2,"Gut":3,"Leicht":4,"Sehr leicht":5}[v.result.empfehlung]||0) : ck && ck.rec ? ck.rec : 0;
   const gradeBtns = [1,2,3,4,5].map(g=>{
-    return `<button data-act="grade" data-g="${g}" class="${rec===g?"rec":""}"><b>${GRADE_TXT[g]}<kbd>${g}</kbd></b><span>${session.exam ? "" : g===1 && tierOf(it)<=2 ? "gleich nochmal, dann morgen" : GRADE_HINT(p, g)}</span></button>`;
-  }).join("");
+    return `<button data-act="grade" data-g="${g}" class="${rec===g?"rec":""}">${session.exam ? "" : `<i class="ginfo" data-act="gradeinfo" data-g="${g}" title="Was bewirkt „${GRADE_TXT[g]}“?" role="button" aria-label="Info zu ${GRADE_TXT[g]}">i</i>`}<b>${GRADE_TXT[g]}<kbd>${g}</kbd></b><span>${session.exam ? "" : GRADE_HINT(p, g)}</span></button>`;
+  }).join("") ;
+  const gInfo = gradeInfo && !session.exam ? `<div class="ginfo-box"><p><b>${g2txt(gradeInfo)}</b> ${GRADE_INFO[gradeInfo]}</p>${gradeInfo<=3?`<p class="muted">Neue Karten: Bei Nochmal, Schwer oder Gut kommen sie zuerst morgen und übermorgen, danach rechnet FSRS.</p>`:""}</div>` : "";
   const sketch = it.type==="case" ? sketchBox(it, revealed) : "";
   return `<article class="sheet t-${it.type}">${meta}${q}${!revealed?norms:""}${write}${verdictHtml}${sketch}
-    ${revealed ? `<div class="answer">${it.type==="case"?'<h3 style="margin-top:0">Lösung</h3>':""}${a}</div>${mnemoBox(it)}${norms}<div class="grades">${gradeBtns}</div>${linkedLine(it)}`
+    ${revealed ? `<div class="answer">${it.type==="case"?'<h3 style="margin-top:0">Lösung</h3>':""}${a}</div>${mnemoBox(it)}${norms}<div class="grades">${gradeBtns}</div>${gInfo}${linkedLine(it)}`
       : it.type==="case" ? "" : `<div class="reveal"><button class="btn primary big" data-act="reveal">Antwort zeigen <kbd style="margin-left:6px">Leertaste</kbd></button></div>`}
   </article>`;
 }
@@ -1195,15 +1295,18 @@ async function grade(g){
   if(!session.history) session.history = [];
   session.history.push(hist);
   if(!session.exam){
-    const p = schedule(S.progress.get(id), g, tierOf(it));
+    // Abfrage vom Vortag nach 0 Uhr fortgesetzt: Abstände zählen ab dem Tag dieser Abfrage („morgen“ = heute, aber in einer neuen Abfrage)
+    const base = session.kind && session.started && session.started < today() ? session.started : today();
+    const p = schedule(S.progress.get(id), g, tierOf(it), base);
     putProgress(id, p);
     if(!session.counted.has(id)){ session.counted.add(id); bumpLog(); }
-    if(g===1 && tierOf(it)<=2){ const at = Math.min(session.ids.length, session.idx+4); session.ids.splice(at,0,id); hist.inserted = at; }
+    if(g>=2) markAbg(abgKeyOf(session), id);
+    if(g===1){ const at = Math.min(session.ids.length, session.idx+4); session.ids.splice(at,0,id); hist.inserted = at; }
   }
-  verdicts.delete(id); checks.delete(id); own.delete(id); mnemoEdit = null;
+  verdicts.delete(id); checks.delete(id); own.delete(id); mnemoEdit = null; gradeInfo = 0;
   session.idx++; session.revealed = false;
   saveSess();
-  if(session.idx >= session.ids.length) toast("✓ "+session.label+" abgeschlossen");
+  if(session.idx >= session.ids.length){ finishAbg(abgKeyOf(session)); toast("✓ "+session.label+" abgeschlossen"); }
   render();
 }
 
@@ -1216,7 +1319,7 @@ async function backCard(){
   session.revealed = true;
   verdicts.delete(h.id); checks.delete(h.id); own.delete(h.id); mnemoEdit = null;
   saveSess(); render();
-  if(!session.exam){ if(h.prev) await putProgress(h.id, h.prev); else await deleteProgress(h.id); }
+  if(!session.exam){ if(!session.ids.slice(session.idx+1).includes(h.id)) unmarkAbg(abgKeyOf(session), h.id); if(h.prev) await putProgress(h.id, h.prev); else await deleteProgress(h.id); }
 }
 
 /* ---------- KI: Auswertung & Chat ---------- */
@@ -1242,7 +1345,7 @@ async function judge(id){
 Musterantwort: ${jDef(it)}
 Kernmerkmale: ${merk}
 Antwort: ${input}`;
-  const key = "g2:"+hashStr(jTerm(it)+"|"+jDef(it)+"|"+merk)+":"+hashStr(normQ(input));
+  const key = "g3:"+hashStr(jTerm(it)+"|"+jDef(it)+"|"+merk)+":"+hashStr(normQ(input));
   const hit = cacheGet(key);
   if(hit){ verdicts.set(id, {input, result:hit}); }
   else try{
@@ -1392,7 +1495,7 @@ function vDetail(id){
       <dl class="kv">
         <dt>Tier</dt><dd>${tierTag(it)} ${TIER_TXT[tierOf(it)]}</dd>
         <dt>Nächste Abfrage</dt><dd>${!p?"noch nie gelernt":p.due<=today()?"heute fällig":toDate(p.due).toLocaleDateString("de-DE")+" ("+fmtIvl(diffDays(today(),p.due))+")"}</dd>
-        ${p?`<dt>Stufe</dt><dd>${["Anfang","Tag 2","3 Tage","1 Woche","monatlich"][Math.min(4,stageOf(p))]}</dd><dt>Wiederholungen</dt><dd>${p.reps}, davon ${p.lapses}× vergessen${p.leech?" (Problemkarte)":""}</dd><dt>Letzte Bewertung</dt><dd>${GRADE_TXT[p.lastGrade]||"-"} am ${toDate(p.last).toLocaleDateString("de-DE")}</dd>`:""}
+        ${p?`<dt>Nächste Abfrage</dt><dd>${toDate(p.due).toLocaleDateString("de-DE")}</dd><dt>Wiederholungen</dt><dd>${p.reps}, davon ${p.lapses}× vergessen${p.leech?" (Problemkarte)":""}</dd><dt>Letzte Bewertung</dt><dd>${GRADE_TXT[p.lastGrade]||"-"} am ${toDate(p.last).toLocaleDateString("de-DE")}</dd>`:""}
       </dl>
       <div class="row" style="margin-top:22px">
         <button class="btn primary" data-act="learnone" data-id="${esc(id)}">Jetzt abfragen</button>
@@ -1621,7 +1724,10 @@ function vDaten(){
     <section class="panel"><h3 style="margin-top:0">Sicherung laden</h3><p class="small muted">Gleiche Einträge werden überschrieben, alle anderen bleiben erhalten.</p>
       <input type="file" id="importfile" accept=".json,application/json"></section>
     <section class="panel"><h3 style="margin-top:0">Grundpensum</h3><p class="small muted">So viele Karten schlägt „Aktuell“ jeden Tag vor.</p>
-      <div class="slider"><input type="range" min="10" max="200" step="5" value="${S.settings.base}" data-act="base" aria-label="Grundpensum"><output id="baseOut">${S.settings.base}</output></div></section>
+      <div class="slider"><input type="range" min="10" max="200" step="5" value="${S.settings.base}" data-act="base" aria-label="Grundpensum"><output id="baseOut">${S.settings.base}</output></div>
+      <div class="row" style="margin-top:10px;gap:18px;flex-wrap:wrap"><label class="small muted">Neue Karten pro Tag (Pensum) <input type="number" id="newmax" min="0" max="200" value="${S.settings.newMax!=null?S.settings.newMax:20}" style="width:70px;padding:6px 8px;border:1px solid var(--line);border-radius:10px;background:var(--soft);color:var(--ink)"></label>
+      <label class="small muted">Endspurt: Tage vor dem Examen <input type="number" id="endspurt" min="7" max="60" value="${S.settings.endspurt||21}" style="width:70px;padding:6px 8px;border:1px solid var(--line);border-radius:10px;background:var(--soft);color:var(--ink)"></label></div>
+      <p class="small muted" style="margin:8px 0 0">Karten, deren Merkdauer bis zum Examen reicht oder die du mit „Sehr leicht“ bewertest, sind gesichert: Sie fallen aus allen Abfragen heraus und kommen im Endspurt einmal zur Endwiederholung.</p></section>
     ${ex?`<section class="panel"><h3 style="margin-top:0">Beispielinhalte</h3><p class="small muted">${ex} Einträge sind nur zum Ausprobieren da. Lösch sie, bevor du deine eigenen Karten importierst.</p><button class="btn" data-act="delexamples">Beispielinhalte löschen</button></section>`:""}
   </div>
   <h2>Quizlet-Text einfügen</h2>
@@ -1664,7 +1770,9 @@ async function doImport(file, noStart){
       const ids = d.items.filter(it=>it && it.id && it.type).map(it=>it.id);
       toast(ids.length+" Karten der Tagesabfrage übernommen");
       if(noStart){ render(); return; }
-      startSession(ids, {label:"Tagesabfrage "+toDate(d.tagesabfrage.datum).toLocaleDateString("de-DE",{day:"numeric",month:"long"})});
+      const rest = ids.filter(x=>{ const it = S.items.get(x); return it && taPending(it); });
+      if(!rest.length){ render(); return; }
+      startSession(rest, {kind:"tages", key:d.tagesabfrage.datum, label:"Tagesabfrage "+toDate(d.tagesabfrage.datum).toLocaleDateString("de-DE",{day:"numeric",month:"long"})});
       return;
     }
     toast(d.items.length+" Einträge geladen"); render();
@@ -1687,9 +1795,10 @@ async function doQuizlet(){
 document.addEventListener("click", async e=>{
   const b = e.target.closest("[data-act]"); if(!b) return;
   const a = b.dataset.act, id = b.dataset.id;
+  if(a==="gradeinfo"){ e.preventDefault(); e.stopPropagation(); const g = Number(b.dataset.g); gradeInfo = gradeInfo===g ? 0 : g; render(); return; }
   if(a==="cat"){ const t=b.dataset.t, c=S.settings.cats; S.settings.cats = c.includes(t) ? c.filter(x=>x!==t) : [...c,t]; saveSettings(); render(); }
-  else if(a==="start"){ const n = Math.max(0, todayTarget()-doneToday()); startSession(buildQueue(S.settings.cats, n), {label:S.settings.pool==="zusatz"?"Hemmer-Zusatzfragen":"Heutige Abfrage", kind:"pensum"}); }
-  else if(a==="more"){ startSession(buildQueue(S.settings.cats, 10), {label:"Zusätzliche Runde", kind:"pensum"}); }
+  else if(a==="start"){ const n = Math.max(0, todayTarget()-doneToday()); startSession(buildQueue(S.settings.cats, n), {label:S.settings.pool==="zusatz"?"Hemmer-Zusatzfragen":"Heutige Abfrage", kind:"pensum", key:today()}); }
+  else if(a==="more"){ startSession(buildQueue(S.settings.cats, 10), {label:"Zusätzliche Runde", kind:"pensum", key:today()}); }
   else if(a==="pool"){ S.settings.pool = b.dataset.t; saveSettings(); render(); }
   else if(a==="expool"){ exam.pool = b.dataset.t; render(); }
   else if(a==="lpool"){ leechPool = b.dataset.t; render(); }
@@ -1698,7 +1807,7 @@ document.addEventListener("click", async e=>{
   else if(a==="check"){ checkCase(id); }
   else if(a==="stopcheck"){ const c = checks.get(id); if(c&&c.ctl) c.ctl.abort(); }
   else if(a==="recheck"){ const c = checks.get(id); checks.set(id, {input:c?c.input:""}); if(session) session.revealed = false; render(); const t=$("#sktext"); if(t) t.focus(); }
-  else if(a==="tagesabfrage"){ const d = b.dataset.d; const allD = [...S.items.values()].filter(i=>i.tagesabfrage===d); const open = allD.filter(isDue); startSession((open.length ? open : allD).sort((x,y)=>priority(y)-priority(x)).map(i=>i.id), {label:"Tagesabfrage "+toDate(d).toLocaleDateString("de-DE",{day:"numeric",month:"long"})+(open.length?"":" (Wiederholung)"), kind:"tages", key:d}); }
+  else if(a==="tagesabfrage"){ const d = b.dataset.d; const allD = [...S.items.values()].filter(i=>i.tagesabfrage===d); const open = allD.filter(taPending); if(!open.length){ toast("Diese Tagesabfrage ist abgeschlossen."); return; } startSession(open.sort((x,y)=>priority(y)-priority(x)).map(i=>i.id), {label:"Tagesabfrage "+toDate(d).toLocaleDateString("de-DE",{day:"numeric",month:"long"}), kind:"tages", key:d}); }
   else if(a==="noop"){ }
   else if(a==="reveal"){ if(session){ session.revealed = true; render(); } }
   else if(a==="grade"){ grade(Number(b.dataset.g)); }
@@ -1765,6 +1874,7 @@ document.addEventListener("input", e=>{
   else if(t.id==="chatin"){ t.style.height="auto"; t.style.height=Math.min(140,t.scrollHeight)+"px"; }
 });
 document.addEventListener("change", async e=>{
+  if(e.target.id==="newmax" || e.target.id==="endspurt"){ const v = Math.round(Number(e.target.value)); if(isFinite(v) && v>=0){ S.settings[e.target.id==="newmax"?"newMax":"endspurt"] = v; await saveSettings(); } return; }
   if(e.target.id==="examdate"){ if(e.target.value){ S.settings.examDate = e.target.value; await saveSettings(); render(); } return; }
   const t = e.target;
   if(t.dataset.bib){ if(t.dataset.bib==="fix") bib.fix = t.checked; else if(t.dataset.bib==="star") bib.star = t.checked; else if(t.dataset.bib!=="q") bib[t.dataset.bib] = t.value; render(); }
