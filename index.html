@@ -399,6 +399,43 @@ body.locked nav.tabs, body.locked .qs{display:none}
 .stn{display:inline-block;min-width:20px;padding:1px 7px;border-radius:999px;background:var(--muted);color:var(--paper);font-size:12.5px;line-height:1.4;text-align:center}
 .stpill{font-size:12.5px;font-weight:600;padding:3px 10px;border-radius:999px}.stpill.open{background:color-mix(in srgb,var(--muted) 16%,transparent);color:var(--muted)}
 .hint.resume{align-items:center;border-style:solid;border-color:var(--acc);background:color-mix(in srgb,var(--acc-soft) 70%,transparent)}
+/* Rückseiten-Formatierung */
+.fmt p{margin:0 0 .6em}
+.fmt .lbl{font-weight:700;color:var(--ink)}
+.fmt .fh{font-weight:700;margin:.9em 0 .35em;color:var(--acc-ink)}
+.fmt .fh:first-child{margin-top:0}
+.fmt .fgl{display:flex;gap:.5em;margin:0 0 .35em;padding-left:calc(var(--lv,0)*1.3em)}
+.fmt .fgl .gm{flex:none;min-width:1.6em;color:var(--acc-ink)}
+.fmt .fl{margin:.1em 0 .6em}
+.fmt .fli{position:relative;padding-left:calc(1.1em + var(--i,0)*1.2em);margin:0 0 .3em}
+.fmt .fli::before{content:"•";position:absolute;left:calc(var(--i,0)*1.2em + .15em);color:var(--acc-ink)}
+.fmt .fli.ar::before{content:"→";left:calc(var(--i,0)*1.2em)}
+.fmt .fbox{border-radius:12px;padding:9px 13px;margin:.7em 0;border:1px solid;font-size:.97em}
+.fmt .fbox .flab{text-transform:uppercase;letter-spacing:.04em;font-size:.78em;margin-right:.35em}
+.fmt .fbox.tip{background:var(--warn-soft);border-color:color-mix(in srgb,var(--warn) 35%,transparent)}
+.fmt .fbox.tip .flab{color:var(--warn)}
+.fmt .fbox.res{background:var(--ok-soft);border-color:color-mix(in srgb,var(--ok) 40%,transparent);font-weight:600}
+.fmt .fbox.res::before{content:"⇒ ";color:var(--ok)}
+.fmt .fbox.ex{background:var(--soft);border-color:var(--line);border-style:dashed}
+.fmt .fbox.ex .flab{color:var(--muted)}
+.fmt .fopn{border-left:3px solid var(--line);padding:2px 0 2px 11px}
+.fmt .fopn.hm{border-left-color:var(--ok)}
+.fmt .fopn.aa{border-left-color:var(--muted)}
+.fmt .fopn.stn{border-left-color:var(--acc)}
+.op{font-weight:700;white-space:nowrap}
+.op-hm{color:var(--ok)}
+.op-aa{color:var(--muted)}
+.pm{font-weight:800;white-space:nowrap}
+.pm-p{color:var(--ok)}
+.pm-m{color:var(--clay)}
+.pm-o{color:var(--warn)}
+.lead{color:var(--acc-ink)}
+strong.own-b{font-weight:700}
+mark.own-m{background:color-mix(in srgb,#F2D53C 55%,transparent);color:inherit;border-radius:3px;padding:0 2px}
+.mdbar{display:flex;gap:6px;align-items:center;margin:0 0 6px;flex-wrap:wrap}
+.mdbar button{font:600 13px/1 var(--sans);padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:var(--soft);color:var(--ink);cursor:pointer}
+.mdbar button.mk{background:color-mix(in srgb,#F2D53C 45%,var(--soft))}
+.mdbar small{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -472,7 +509,7 @@ function normUrl(n){
 const normChip = n => { const u = normUrl(n); return u ? `<a class="norm" href="${u}" target="_blank" rel="noopener noreferrer" title="Im amtlichen Gesetzestext öffnen">${esc(n)}<span class="ext">↗</span></a>` : `<a class="norm" href="#${normSlug(n)}">${esc(n)}</a>`; };
 const NORM_RE = /(§§?|Art\.)\s*\d+[a-z]?(?:\s*(?:,|und|\/)\s*(?:§\s*)?\d+[a-z]?)*(?:\s*(?:Abs\.\s*)?(?:[IVX]+|\d+)(?![\dA-Za-z]))?(?:\s+(?:(?:S\.|Satz)\s*)?\d+(?![\d.]))?(?:\s+Nr\.\s*\d+[a-z]?)?(?:\s+(?:Alt\.|Var\.)\s*\d+)?(?:\s+(?:[a-z]\)|lit\.\s*[a-z]))?\s+([A-ZÄÖÜ][A-Za-zÄÖÜäöüß]{1,9})(?![A-Za-zÄÖÜäöüß])/g;
 const linkNorms = h => String(h).replace(NORM_RE, m => { const u = normUrl(m); return u ? `<a class="norm norm-inline" href="${u}" target="_blank" rel="noopener noreferrer" title="Im amtlichen Gesetzestext öffnen">${m}</a>` : m; });
-const nl = t => linkNorms(esc(t));
+const nl = t => linkNorms(ownMarks(esc(t)));
 const normSlug = n => "n-"+fold(n).replace(/§+/g,"p").replace(/art\./g,"art").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 const TYPES = {def:"Definition", card:"Karteikarte", schema:"Schema", case:"Fall"};
 const TYPES_PL = {def:"Definitionen", card:"Karteikarten", schema:"Schemata", case:"Fälle"};
@@ -755,7 +792,7 @@ function schedule(prev, grade, tier, base){
   } else ivl = Math.min(daysLeft, ivl);
   let due = addDays(base, ivl);
   if(due <= today() && grade>=2) due = addDays(today(), 1);
-  if(prev && prev.follow && grade>=2 && prev.follow > today() && due > prev.follow && !p.gesichert) due = prev.follow;
+  if(prev && prev.follow && grade>=2 && grade<=3 && prev.follow > today() && due > prev.follow && !p.gesichert) due = prev.follow; // „Leicht“ überspringt den Übermorgen-Termin
   if(grade>=3 && !p.sure) p.sure = today();
   p.fs = {s: Math.round(fs.s*100)/100, d: Math.round(fs.d*100)/100};
   p.stage = grade; p.ivl = diffDays(today(), due); p.reps++; p.due = due; p.last = today(); p.lastGrade = grade;
@@ -821,7 +858,7 @@ function mergeAbg(remote){
 }
 function todayTarget(){ return S.settings.todayDate===today() && S.settings.todayN!=null ? S.settings.todayN : S.settings.base; }
 const doneToday = () => S.log.days[today()]||0;
-function fmtIvl(n){ return n===1 ? "morgen" : n===7 ? "in 1 Woche" : n===30 ? "in 1 Monat" : n<30 ? "in "+n+" Tagen" : n<365 ? "in "+Math.round(n/30)+" Mon." : "in 1 Jahr"; }
+function fmtIvl(n){ return n===1 ? "morgen" : n===7 ? "in 1 Woche" : n<=45 ? "in "+n+" Tagen" : n<365 ? "in "+n+" Tagen (~"+(Math.round(n/3.044)/10).toLocaleString("de-DE")+" Mon.)" : "in "+n+" Tagen"; }
 
 /* ---------- Hilfsfunktionen Einträge ---------- */
 const titleOf = it => it.type==="card" ? it.front : it.type==="def" ? it.term : it.title;
@@ -845,8 +882,153 @@ function normIndex(){
 }
 const areas = () => [...new Set([...S.items.values()].map(i=>i.area).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"de"));
 
+/* ---------- Rückseiten-Formatierung (nur Anzeige, DB bleibt unverändert) ---------- */
+const FMT_LS = "ek-fmt";
+let fmtOn = (()=>{ try{ return localStorage.getItem(FMT_LS)!=="0"; }catch(e){ return true; } })();
+function setFmt(on){ fmtOn = !!on; try{ localStorage.setItem(FMT_LS, on?"1":"0"); }catch(e){} }
+/* eigene Markierungen: **fett** und ==markiert== (auf bereits escaptem Text) */
+const ownMarks = h => String(h)
+  .replace(/\*\*(?=\S)([^\n]*?\S)\*\*/g, '<strong class="own-b">$1</strong>')
+  .replace(/==(?=\S)([^\n]*?\S)==/g, '<mark class="own-m">$1</mark>');
+const stripMarks = t => String(t||"").replace(/\*\*(?=\S)([^\n]*?\S)\*\*/g,"$1").replace(/==(?=\S)([^\n]*?\S)==/g,"$1");
+const FMT_B = '(^|[\\s(„"/–-])', FMT_E = '(?=[\\s,;:.)“"/]|$)';
+const RE_HM = new RegExp(FMT_B+'((?:ganz |wohl |noch )?h\\.\\s?M\\.|h\\.\\s?L\\.|(?:st\\.\\s?)?Rspr\\.|BGH|BVerfG|BVerwG|BayVGH|BayObLG|BAG|EuGH|herrschende Meinung|ständige Rechtsprechung)'+FMT_E, "g");
+const RE_AA = new RegExp(FMT_B+'(a\\.\\s?A\\.|e\\.\\s?A\\.|M\\.\\s?M\\.|m\\.\\s?M\\.|Mindermeinung|Gegenansicht|andere Ansicht|Teile der Literatur|Lit\\.|str\\.)'+FMT_E, "g");
+const LABELS = "Grund|Gründe|Arg\\.|Argument|Argumente|Begründung|Beispiele?|Bsp\\.|Standardbeispiel|Folge|Rechtsfolge|Besondere Voraussetzungen|Voraussetzungen?|Problem|Abgrenzung|Ausnahmen?|Grundsatz|Zweck|Sinn und Zweck|Früher|Heute|Def\\.|Definition|Streitstand|Stellungnahme|Konsequenz|Anwendungsfälle?|Aufbau|Vorteile?|Nachteile?|Merke|Achtung|Beachte|Wichtig|Hinweis|Klausurhinweis|Klausurtipp|Examenstipp|Tipp|Ergebnis|Zwischenergebnis|Anm\\.|Prüfung|Lösung|Pro|Contra|Kontra|Dafür|Dagegen";
+const RE_LBL_MID = new RegExp('(^|[.!?“")]\\s+)('+LABELS+')(\\s?:)', "g");
+const RE_LBL_START = /^([^:\n]{1,34}?)(\s?:)(\s|$)/;
+const RE_TIP = /^(Merke|Achtung|Beachte|Wichtig|Hinweis|Klausurhinweis|Klausurtipp|Examenstipp|Tipp|Vorsicht|Aufbauhinweis)\b\s*[:!]?/;
+const RE_EX = /^(Standardbeispiel|Beispiele?|Bsp\.|Bspe?\.|Etwa|z\.\s?B\.)\s*:/;
+const RE_RES = /^(Ergebnis|Im Ergebnis|Zwischenergebnis|Endergebnis|Ergo)\b/;
+const RE_RES_END = /^(Somit|Folglich|Mithin|Im Ergebnis|Ergebnis|Damit|Also|Daher|Deshalb|Demnach)\b/;
+const RE_OPN_HM = /^(Nach (?:der )?(?:ganz )?(?:h\.\s?M\.|h\.\s?L\.|herrschender Meinung|st\.\s?Rspr\.|Rspr\.|(?:ständiger )?Rechtsprechung)|Die (?:ganz )?(?:h\.\s?M\.|h\.\s?L\.|Rspr\.|Rechtsprechung|herrschende Meinung)|(?:Ganz )?h\.\s?M\.|h\.\s?L\.|(?:St\.\s?)?Rspr\.|Rechtsprechung und|Der BGH|Das BVerfG|Das BVerwG|Der BayVGH|BGH|BVerfG|BVerwG)/;
+const RE_OPN_AA = /^(Nach (?:einer |der |anderer )?(?:a\.\s?A\.|e\.\s?A\.|M\.\s?M\.|Mindermeinung|Gegenansicht|(?:anderer |vermittelnder |einer |weiterer )?Ansicht|Teilen der Literatur)|Eine (?:andere |weitere |vermittelnde |früher vertretene |starke )?(?:Ansicht|Auffassung|Meinung|Mindermeinung)|Die Gegenansicht|Die (?:Mindermeinung|Literatur)|Teile der Literatur|Teilweise wird|Andere (?:halten|meinen|vertreten|wollen)|a\.\s?A\.|e\.\s?A\.|M\.\s?M\.|m\.\s?M\.|Ansicht \d|\d\.\s?Ansicht|Vermittelnde Ansicht|Gegenansicht)/;
+const RE_STN = /^(Stellungnahme|Streitentscheid|Streitentscheidung|Entscheidung des Streits)\b/;
+const RE_SPLIT_BEFORE = /([.!?“"])\s+(?=(?:Eine (?:andere |weitere |vermittelnde )?(?:Ansicht|Auffassung|Meinung)|Nach (?:einer |der |anderer )?(?:Ansicht|a\.\s?A\.|e\.\s?A\.|h\.\s?M\.|st\.\s?Rspr|Rspr|Rechtsprechung|herrschender)|Die (?:ganz )?(?:h\.\s?M\.|Rspr\.|Rechtsprechung|Gegenansicht|Literatur|herrschende)|Rechtsprechung und|Rspr\. und|Teile der Literatur|Teilweise wird|Andere (?:halten|meinen|vertreten)|Stellungnahme|Streitentscheid|Im Ergebnis|Ergebnis\s?:|Zwischenergebnis|Merke|Achtung\s?:|Beachte\s?:|Hinweis\s?:|Klausurtipp|Klausurhinweis|Standardbeispiel|Beispiel\s?:|Bsp\.\s?:|Grund\s?:|Arg\.\s?:|Folge\s?:|Rechtsfolge\s?:|Früher\s?:|Heute\s?:))/g;
+/* Gliederungsmarken */
+const GL = [
+  {re:/^([A-H])\.\s+(?=\S)/, lv:0},
+  {re:/^((?:X{0,3})(?:IX|IV|V?I{0,3}))\.\s+(?=\S)/, lv:1, ok:m=>m[1].length>0},
+  {re:/^(\d{1,2})\.\s+(?=[^\d\s])/, lv:2},
+  {re:/^([a-h])\)\s+/, lv:3},
+  {re:/^((?:aa|bb|cc|dd|ee|ff|gg|hh))\)\s+/, lv:4},
+  {re:/^\((\d{1,2})\)\s+/, lv:5},
+  {re:/^\(([a-h])\)\s+/, lv:6}
+];
+const INL_ENUM = [
+  {re:/(^|\s)([a-h])\)\s+(?=\S)/g, key:m=>m.charCodeAt(0)},
+  {re:/(^|\s)(aa|bb|cc|dd|ee|ff|gg|hh)\)\s+(?=\S)/g, key:m=>m.charCodeAt(0)},
+  {re:/(^|\s)\((\d{1,2})\)\s+(?=\S)/g, key:m=>+m},
+  {re:/(^|[\s:])(\d)\.\s+(?=[A-ZÄÖÜ])/g, key:m=>+m}
+];
+/* eine Zeile mit "a) … b) … c) …" in Zeilen zerlegen (nur bei fortlaufender Folge) */
+function splitInlineEnum(line){
+  for(const E of INL_ENUM){
+    const hits = []; let m; E.re.lastIndex = 0;
+    while((m = E.re.exec(line))){ hits.push({pos:m.index+m[1].length, k:E.key(m[2])}); }
+    if(hits.length<2) continue;
+    // längste fortlaufende Kette
+    let best = [], cur = [hits[0]];
+    for(let i=1;i<hits.length;i++){ if(hits[i].k===cur[cur.length-1].k+1) cur.push(hits[i]); else { if(cur.length>best.length) best = cur; cur = [hits[i]]; } }
+    if(cur.length>best.length) best = cur;
+    if(best.length<2) continue;
+    const out = []; let last = 0;
+    best.forEach(h=>{ const s = line.slice(last, h.pos).trim(); if(s) out.push(s); last = h.pos; });
+    out.push(line.slice(last).trim());
+    return out.flatMap(splitInlineEnum2);
+  }
+  return [line];
+}
+function splitInlineEnum2(l){ // eine Ebene tiefer (z. B. aa) bb) innerhalb von a))
+  const m = l.match(/^(\S+\)\s+)([\s\S]*)$/);
+  if(!m) return [l];
+  const inner = splitInlineEnum(m[2]);
+  if(inner.length<2) return [l];
+  return [m[1]+inner[0], ...inner.slice(1)];
+}
+function fmtInline(raw){
+  let h = ownMarks(esc(raw));
+  h = h.replace(/\((\+|-|–|−)\)/g, (m,s)=> s==="+" ? '<span class="pm pm-p">(+)</span>' : '<span class="pm pm-m">(–)</span>');
+  h = h.replace(/\(([+][/][-–]|[-–][/][+]|\+\s?\/\s?-|str\.)\)/g, '<span class="pm pm-o">($1)</span>');
+  h = h.replace(RE_HM, '$1<span class="op op-hm">$2</span>');
+  h = h.replace(RE_AA, '$1<span class="op op-aa">$2</span>');
+  h = h.replace(RE_LBL_MID, '$1<b class="lbl">$2$3</b>');
+  return linkNorms(h);
+}
+function fmtLabelStart(raw){ // „Label: Rest“ am Zeilenanfang → Label fett
+  const m = raw.match(RE_LBL_START);
+  if(!m || /[.!?]\s+[A-ZÄÖÜ][a-zäöü]{2,}/.test(m[1]) || /^\d+$/.test(m[1].trim()) || /\*\*|==/.test(m[1])) return null;
+  if(new RegExp('^(?:'+LABELS+')$').test(m[1].trim())) return null; // übernimmt RE_LBL_MID
+  return {lbl:m[1]+m[2], rest:raw.slice(m[0].length - m[3].length)};
+}
+function fmtLine(raw){
+  const ls = fmtLabelStart(raw);
+  return ls ? `<b class="lbl">${fmtInline(ls.lbl)}</b>${fmtInline(ls.rest)}` : fmtInline(raw);
+}
+function fmtBack(t){
+  t = String(t||"").replace(/\r/g,"");
+  if(!t.trim()) return "";
+  if(!fmtOn) return paras(t);
+  // 1. Zeilen bilden
+  let lines = [];
+  t.split("\n").forEach(l=>{
+    if(!l.trim()){ lines.push(""); return; }
+    const ind = (l.match(/^\s*/)[0].replace(/\t/g,"  ").length);
+    let s = l.trim();
+    if(s.length>200 && !/^(?:[-–•*]|->|→|=>|⇒)\s/.test(s)) s = s.replace(RE_SPLIT_BEFORE, "$1\n");
+    s.split("\n").forEach(x=> splitInlineEnum(x).forEach(y=> lines.push(ind ? " ".repeat(ind)+y : y)));
+  });
+  // 2. klassifizieren
+  const B = [];
+  lines.forEach(l=>{
+    if(!l.trim()){ B.push({k:"gap"}); return; }
+    const ind = Math.min(3, Math.floor(l.match(/^\s*/)[0].length/2)); const s = l.trim();
+    let m;
+    if((m = s.match(/^(->|→|=>|⇒|>)\s*(.*)$/))) { B.push({k:"li", ar:true, ind, html:fmtLine(m[2])}); return; }
+    if((m = s.match(/^([-–•*·])\s+(.*)$/))) { B.push({k:"li", ind, html:fmtLine(m[2])}); return; }
+    for(const g of GL){ const mm = s.match(g.re); if(mm && (!g.ok || g.ok(mm)) && s.length>mm[0].length){ B.push({k:"gl", lv:g.lv, ind, mk:mm[0].trim(), html:fmtLine(s.slice(mm[0].length))}); return; } }
+    if(s.length<=70 && /:$/.test(s) && !/[.!?]\s/.test(s)) { B.push({k:"h", html:fmtInline(s)}); return; }
+    if((m = s.match(RE_TIP))) { B.push({k:"box", cls:"tip", lbl:m[1], html:fmtInline(s.slice(m[0].length).trim())}); return; }
+    if((m = s.match(RE_EX))) { B.push({k:"box", cls:"ex", lbl:m[1], html:fmtInline(s.slice(m[0].length).trim())}); return; }
+    if(RE_RES.test(s)) { B.push({k:"box", cls:"res", html:fmtLine(s)}); return; }
+    if(RE_STN.test(s)) { B.push({k:"opn", cls:"stn", html:fmtLine(s)}); return; }
+    if(RE_OPN_HM.test(s)) { B.push({k:"opn", cls:"hm", html:fmtLine(s)}); return; }
+    if(RE_OPN_AA.test(s)) { B.push({k:"opn", cls:"aa", html:fmtLine(s)}); return; }
+    B.push({k:"p", s, html:fmtLine(s)});
+  });
+  // Ja/Nein-Antwort am Anfang hervorheben
+  const first = B.find(b=>b.k!=="gap");
+  if(first && first.k==="p"){
+    first.html = first.html.replace(/^((?:Grds\.\s|Grundsätzlich\s|Im Grundsatz\s)?(?:Ja|Nein|Jein)|\(\+\)|\(–\))(?=[.,:;!]|\s[–—-]\s)/, '<strong class="lead">$1</strong>');
+  }
+  // Schlusssatz als Ergebnis
+  const real = B.filter(b=>b.k!=="gap");
+  const last = real[real.length-1];
+  if(real.length>=2 && last.k==="p" && RE_RES_END.test(last.s)) { last.k = "box"; last.cls = "res"; }
+  // Gliederungsebenen normalisieren
+  const gls = B.filter(b=>b.k==="gl"); const minLv = gls.length ? Math.min(...gls.map(b=>b.lv)) : 0;
+  // 3. ausgeben
+  let out = "", inList = false;
+  const closeList = ()=>{ if(inList){ out += "</div>"; inList = false; } };
+  B.forEach(b=>{
+    if(b.k==="li"){ if(!inList){ out += '<div class="fl">'; inList = true; } out += `<div class="fli${b.ar?" ar":""}" style="--i:${b.ind}">${b.html}</div>`; return; }
+    closeList();
+    if(b.k==="gap") return;
+    if(b.k==="gl"){ const lv = Math.min(4, b.lv-minLv + b.ind); out += `<div class="fgl" style="--lv:${lv}"><b class="gm">${esc(b.mk)}</b><span>${b.html}</span></div>`; return; }
+    if(b.k==="h"){ out += `<p class="fh">${b.html}</p>`; return; }
+    if(b.k==="box"){
+      const lab = b.lbl ? `<b class="flab">${esc(b.lbl)}</b> ` : "";
+      out += `<div class="fbox ${b.cls}">${lab}${b.html}</div>`; return; }
+    if(b.k==="opn"){ out += `<p class="fopn ${b.cls}">${b.html}</p>`; return; }
+    out += `<p>${b.html}</p>`;
+  });
+  closeList();
+  return `<div class="fmt">${out}</div>`;
+}
+
 function paras(t){ return String(t||"").split(/\n{2,}|\n/).filter(x=>x.trim()).map(x=>"<p>"+nl(x)+"</p>").join(""); }
 function hl(text, toks){
+  text = stripMarks(text);
   let h = esc(text); if(!toks.length) return h;
   const f = fold(text); const marks = [];
   toks.forEach(t=>{ let i = f.indexOf(t); while(i>=0 && t){ marks.push([i,i+t.length]); i = f.indexOf(t,i+t.length); } });
@@ -855,6 +1037,7 @@ function hl(text, toks){
   let out="", pos=0; merged.forEach(([a,b])=>{ out+=esc(text.slice(pos,a))+"<mark>"+esc(text.slice(a,b))+"</mark>"; pos=b; }); return out+esc(text.slice(pos));
 }
 function snippet(text, toks, len=160){
+  text = stripMarks(text);
   const f = fold(text); let i = -1; for(const t of toks){ const j=f.indexOf(t); if(j>=0 && (i<0||j<i)) i=j; }
   if(i<0 || text.length<=len) return text.length>len ? text.slice(0,len)+" …" : text;
   const s = Math.max(0, i-50); return (s>0?"… ":"")+text.slice(s, s+len)+(s+len<text.length?" …":"");
@@ -1172,18 +1355,18 @@ function sheet(it, revealed, study){
   let q="", a="";
   if(it.type==="card"){
     q = `<p class="q">${nl(it.front)}</p>`;
-    a = `<div class="prose">${paras(it.back)}</div>`;
+    a = `<div class="prose">${fmtBack(it.back)}</div>`;
   } else if(it.type==="def"){
     q = `<p class="small muted" style="margin:0 0 4px">Definiere</p><p class="q">${esc(it.term)}</p>`;
-    a = `<div class="prose">${paras(it.definition)}</div>${(it.merkmale||[]).length?`<h3>Kernmerkmale</h3><ul class="kern">${it.merkmale.map(m=>"<li>"+nl(m)+"</li>").join("")}</ul>`:""}`;
+    a = `<div class="prose">${fmtBack(it.definition)}</div>${(it.merkmale||[]).length?`<h3>Kernmerkmale</h3><ul class="kern">${it.merkmale.map(m=>"<li>"+nl(m)+"</li>").join("")}</ul>`:""}`;
   } else if(it.type==="schema"){
     q = `<p class="small muted" style="margin:0 0 4px">Gib das Prüfungsschema wieder</p><p class="q">${esc(it.title)}</p>`;
-    a = schemaList(it.steps)+(it.hinweis?`<div class="prose small" style="margin-top:10px;color:var(--muted)">${paras(it.hinweis)}</div>`:"");
+    a = schemaList(it.steps)+(it.hinweis?`<div class="prose small" style="margin-top:10px">${fmtBack(it.hinweis)}</div>`:"");
   } else {
     q = `<p class="q">${esc(it.title)}</p>${it.sachverhalt?`<div class="prose" style="color:var(--muted);font-size:15.5px">${paras(it.sachverhalt)}</div>`:""}
       ${study && !it.fall?`<p style="margin:14px 0 0;font-weight:600">Was sind die wesentlichen Bestandteile und die Probleme dieses Falls?</p>`:""}`;
     a = `${(it.kern||[]).length?`<h3 style="margin-top:0">Wesentliche Bestandteile</h3><ul class="kern prose" style="font-size:16px">${it.kern.map(k=>"<li>"+nl(k)+"</li>").join("")}</ul>`:""}
-      ${(it.problems||[]).length?`<h3>Problemschwerpunkte</h3><ol class="probs prose" style="font-size:16px">${it.problems.map(pr=>`<li><b>${nl(pr.frage)}</b><br>${nl(pr.antwort)}</li>`).join("")}</ol>`:""}
+      ${(it.problems||[]).length?`<h3>Problemschwerpunkte</h3><ol class="probs prose" style="font-size:16px">${it.problems.map(pr=>`<li><b>${nl(pr.frage)}</b>${fmtBack(pr.antwort)}</li>`).join("")}</ol>`:""}
       ${(it.gliederung||[]).length?`<h3>Lösungsaufbau</h3>${schemaList(it.gliederung)}`:""}`;
   }
   const norms = (it.norms||[]).length ? `<div class="margin-norms">${it.norms.map(normChip).join("")}</div>` : "";
@@ -1525,14 +1708,14 @@ function vEdit(it){
   <h1>${isNewItem?"Eintrag anlegen":esc(titleOf(it))}</h1>
   <div class="form" id="editform" data-id="${it?esc(it.id):""}">
     ${isNewItem?`<div class="field"><label>Art</label><div class="cats" style="margin:0">${TKEYS.map(x=>`<button class="chip t-${x}" data-act="etype" data-t="${x}" aria-pressed="${t===x}"><i class="dot"></i>${TYPES[x]}</button>`).join("")}</div></div>`:""}
-    ${t==="card"?`<div class="field"><label for="f-front">Vorderseite (Frage)</label><textarea id="f-front">${v("front")}</textarea></div>
-      <div class="field"><label for="f-back">Rückseite (Antwort)</label><textarea id="f-back" style="min-height:140px">${v("back")}</textarea></div>`:""}
+    ${t==="card"?`<div class="field"><label for="f-front">Vorderseite (Frage)</label><div class="mdbar"><button type="button" data-act="md" data-for="f-front" data-m="**" title="Auswahl fett">B</button><button type="button" class="mk" data-act="md" data-for="f-front" data-m="==" title="Auswahl markieren">Markieren</button><small>**fett** · ==markiert==</small></div><textarea id="f-front">${v("front")}</textarea></div>
+      <div class="field"><label for="f-back">Rückseite (Antwort)</label><div class="mdbar"><button type="button" data-act="md" data-for="f-back" data-m="**" title="Auswahl fett">B</button><button type="button" class="mk" data-act="md" data-for="f-back" data-m="==" title="Auswahl markieren">Markieren</button><small>**fett** · ==markiert==</small></div><textarea id="f-back" style="min-height:140px">${v("back")}</textarea></div>`:""}
     ${t==="def"?`<div class="field"><label for="f-term">Begriff</label><input id="f-term" value="${v("term")}"></div>
-      <div class="field"><label for="f-definition">Definition</label><textarea id="f-definition">${v("definition")}</textarea></div>
+      <div class="field"><label for="f-definition">Definition</label><div class="mdbar"><button type="button" data-act="md" data-for="f-definition" data-m="**" title="Auswahl fett">B</button><button type="button" class="mk" data-act="md" data-for="f-definition" data-m="==" title="Auswahl markieren">Markieren</button><small>**fett** · ==markiert==</small></div><textarea id="f-definition">${v("definition")}</textarea></div>
       <div class="field"><label for="f-merkmale">Kernmerkmale</label><textarea id="f-merkmale" placeholder="Ein Merkmal pro Zeile">${esc((it&&it.merkmale||[]).join("\n"))}</textarea><small>Maßstab für die Auswertung im Schreibmodus. Ein Merkmal pro Zeile.</small></div>`:""}
     ${t==="schema"?`<div class="field"><label for="f-title">Titel</label><input id="f-title" value="${v("title")}" placeholder="z. B. Begründetheit der Anfechtungsklage"></div>
       <div class="field"><label for="f-steps">Prüfungspunkte</label><textarea id="f-steps" style="min-height:220px;font-family:var(--sans);font-size:14.5px" placeholder="A. Zulässigkeit&#10;  I. Verwaltungsrechtsweg&#10;  II. Statthafte Klageart">${esc((it&&it.steps||[]).join("\n"))}</textarea><small>Ein Punkt pro Zeile. Mit zwei Leerzeichen am Zeilenanfang rückst du einen Unterpunkt ein.</small></div>
-      <div class="field"><label for="f-hinweis">Hinweise (optional)</label><textarea id="f-hinweis">${v("hinweis")}</textarea></div>`:""}
+      <div class="field"><label for="f-hinweis">Hinweise (optional)</label><div class="mdbar"><button type="button" data-act="md" data-for="f-hinweis" data-m="**" title="Auswahl fett">B</button><button type="button" class="mk" data-act="md" data-for="f-hinweis" data-m="==" title="Auswahl markieren">Markieren</button><small>**fett** · ==markiert==</small></div><textarea id="f-hinweis">${v("hinweis")}</textarea></div>`:""}
     ${t==="case"?`<div class="field"><label for="f-title">Titel</label><input id="f-title" value="${v("title")}"></div>
       <div class="field"><label for="f-sachverhalt">Sachverhalt (kurz)</label><textarea id="f-sachverhalt">${v("sachverhalt")}</textarea></div>
       <div class="field"><label for="f-kern">Wesentliche Bestandteile</label><textarea id="f-kern" placeholder="Ein Punkt pro Zeile">${esc((it&&it.kern||[]).join("\n"))}</textarea></div>
@@ -1728,6 +1911,8 @@ function vDaten(){
       <button class="btn" data-act="export">Als Datei sichern</button><div id="exportbox"></div></section>
     <section class="panel"><h3 style="margin-top:0">Sicherung laden</h3><p class="small muted">Gleiche Einträge werden überschrieben, alle anderen bleiben erhalten.</p>
       <input type="file" id="importfile" accept=".json,application/json"></section>
+    <section class="panel"><h3 style="margin-top:0">Darstellung der Antworten</h3><p class="small muted">Gliedert Rückseiten automatisch (a), b), 1., Spiegelstriche), hebt Ergebnis, Merke, h.M./a.A. und (+)/(–) hervor. Nur Anzeige – der gespeicherte Text bleibt unverändert. Eigene Markierungen: **fett** und ==markiert==.</p>
+      <label class="row" style="gap:8px;cursor:pointer"><input type="checkbox" data-act="fmt" ${fmtOn?"checked":""}> Automatisch formatieren</label></section>
     <section class="panel"><h3 style="margin-top:0">Grundpensum</h3><p class="small muted">So viele Karten schlägt „Aktuell“ jeden Tag vor.</p>
       <div class="slider"><input type="range" min="10" max="200" step="5" value="${S.settings.base}" data-act="base" aria-label="Grundpensum"><output id="baseOut">${S.settings.base}</output></div>
       <div class="row" style="margin-top:10px;gap:18px;flex-wrap:wrap"><label class="small muted">Neue Karten pro Tag (Pensum) <input type="number" id="newmax" min="0" max="200" value="${S.settings.newMax!=null?S.settings.newMax:20}" style="width:70px;padding:6px 8px;border:1px solid var(--line);border-radius:10px;background:var(--soft);color:var(--ink)"></label>
@@ -1861,6 +2046,8 @@ document.addEventListener("click", async e=>{
   else if(a==="delexamples"){ const ex=[...S.items.values()].filter(i=>i.example); if(confirm(ex.length+" Beispielinhalte löschen? Dein Lernstand dazu wird ebenfalls entfernt.")){ for(const it of ex) await deleteItem(it.id); toast("Beispielinhalte gelöscht"); render(); } }
   else if(a==="help"){ help(); }
   else if(a==="theme"){ cycleTheme(); }
+  else if(a==="md"){ e.preventDefault(); const ta = document.getElementById(b.dataset.for); if(ta){ const m = b.dataset.m, s0 = ta.selectionStart, s1 = ta.selectionEnd, sel = ta.value.slice(s0,s1); const wrapped = sel.startsWith(m) && sel.endsWith(m) && sel.length>=2*m.length; const ins = wrapped ? sel.slice(m.length, -m.length) : m+(sel||"Text")+m; ta.setRangeText(ins, s0, s1, "end"); if(!sel) ta.setSelectionRange(s0+m.length, s0+m.length+4); ta.focus(); ta.dispatchEvent(new Event("input",{bubbles:true})); } }
+  else if(a==="fmt"){ setFmt(b.checked); toast(b.checked ? "Rückseiten werden formatiert" : "Rückseiten im Originaltext"); }
   else if(a==="closehelp"){ if(b.classList.contains("overlay") && e.target!==b) return; $("#layer").innerHTML=""; }
 });
 document.addEventListener("input", e=>{
