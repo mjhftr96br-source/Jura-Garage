@@ -199,6 +199,11 @@ ol.schema .sh{font-weight:inherit}ol.schema ul.sub{list-style:none;margin:3px 0 
 .answer{margin-top:22px;padding-top:20px;position:relative}
 .answer::before{content:"";position:absolute;left:0;right:0;top:0;height:8px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='8' viewBox='0 0 40 8'%3E%3Cpath d='M0 4 Q10 0 20 4 T40 4' fill='none' stroke='%23C9B996' stroke-width='1.4'/%3E%3C/svg%3E") repeat-x;opacity:.9}
 .margin-norms{display:flex;gap:6px;flex-wrap:wrap;margin-top:16px}
+.links-line{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:16px}
+.lchip{display:inline-flex;align-items:center;gap:6px;max-width:100%;font:600 12.5px/1.2 var(--sans);color:var(--tc);background:color-mix(in srgb,var(--tc) 14%,transparent);padding:6px 10px;border-radius:999px;text-decoration:none;cursor:pointer}
+.lchip .dot{width:7px;height:7px;border-radius:50%;background:var(--tc);flex:none}
+.lchip .lt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:28ch}
+.lchip:hover{background:color-mix(in srgb,var(--tc) 24%,transparent)}
 .norm{display:inline-block;font:600 12.5px/1 var(--sans);color:var(--acc-ink);background:var(--acc-soft);padding:6px 10px;border-radius:999px;text-decoration:none;white-space:nowrap;cursor:pointer;border:0}
 .tag{display:inline-block;font-size:12.5px;color:var(--muted);border:1px solid var(--line);padding:3px 10px;border-radius:999px;cursor:pointer;background:transparent}
 .rel{display:inline-flex;gap:3px;align-items:center}
@@ -1285,7 +1290,7 @@ async function checkCase(id){
 }
 function linkedLine(it){
   const l = linksOf(it.id); if(!l.length) return "";
-  return `<p class="small muted" style="margin:16px 0 0">Verknüpft: ${l.slice(0,6).map(o=>`<a href="#e-${esc(o.id)}" data-act="peek">${esc(TYPES[o.type])}: ${esc(titleOf(o))}</a>`).join(", ")}${l.length>6?" und "+(l.length-6)+" weitere":""}</p>`;
+  return `<div class="links-line"><span class="small muted">Verknüpft:</span>${l.slice(0,8).map(o=>`<a class="lchip t-${esc(o.type)}" href="#e-${esc(o.id)}" data-act="peek" title="${esc(TYPES[o.type])}: ${esc(titleOf(o))}"><i class="dot"></i><span class="lt">${esc(titleOf(o))}</span></a>`).join("")}${l.length>8?`<span class="small muted">und ${l.length-8} weitere</span>`:""}</div>`;
 }
 async function grade(g){
   if(!session || !session.revealed) return;
@@ -1495,7 +1500,7 @@ function vDetail(id){
       <dl class="kv">
         <dt>Tier</dt><dd>${tierTag(it)} ${TIER_TXT[tierOf(it)]}</dd>
         <dt>Nächste Abfrage</dt><dd>${!p?"noch nie gelernt":p.due<=today()?"heute fällig":toDate(p.due).toLocaleDateString("de-DE")+" ("+fmtIvl(diffDays(today(),p.due))+")"}</dd>
-        ${p?`<dt>Nächste Abfrage</dt><dd>${toDate(p.due).toLocaleDateString("de-DE")}</dd><dt>Wiederholungen</dt><dd>${p.reps}, davon ${p.lapses}× vergessen${p.leech?" (Problemkarte)":""}</dd><dt>Letzte Bewertung</dt><dd>${GRADE_TXT[p.lastGrade]||"-"} am ${toDate(p.last).toLocaleDateString("de-DE")}</dd>`:""}
+        ${p?`<dt>Wiederholungen</dt><dd>${p.reps}, davon ${p.lapses}× vergessen${p.leech?" (Problemkarte)":""}</dd><dt>Letzte Bewertung</dt><dd>${GRADE_TXT[p.lastGrade]||"-"} am ${toDate(p.last).toLocaleDateString("de-DE")}</dd>`:""}
       </dl>
       <div class="row" style="margin-top:22px">
         <button class="btn primary" data-act="learnone" data-id="${esc(id)}">Jetzt abfragen</button>
