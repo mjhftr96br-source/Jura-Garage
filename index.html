@@ -397,7 +397,7 @@ body.locked nav.tabs, body.locked .qs{display:none}
 :root[data-theme="dark"] .btn.st-done{color:#1A1813}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.st-done{color:#1A1813}}
 .stn{display:inline-block;min-width:20px;padding:1px 7px;border-radius:999px;background:var(--muted);color:var(--paper);font-size:12.5px;line-height:1.4;text-align:center}
-.stpill{font-size:12.5px;font-weight:600;padding:3px 10px;border-radius:999px}.stpill.part{background:color-mix(in srgb,var(--acc) 22%,transparent);color:var(--acc-ink)}.stpill.open{background:color-mix(in srgb,var(--muted) 16%,transparent);color:var(--muted)}
+.stpill{font-size:12.5px;font-weight:600;padding:3px 10px;border-radius:999px}.stpill.open{background:color-mix(in srgb,var(--muted) 16%,transparent);color:var(--muted)}
 .hint.resume{align-items:center;border-style:solid;border-color:var(--acc);background:color-mix(in srgb,var(--acc-soft) 70%,transparent)}
 /* Rückseiten-Formatierung */
 .fmt p{margin:0 0 .6em}
@@ -421,7 +421,7 @@ body.locked nav.tabs, body.locked .qs{display:none}
 .fmt .fopn{border-left:3px solid var(--line);padding:2px 0 2px 11px}
 .fmt .fopn.hm{border-left-color:var(--ok)}
 .fmt .fopn.aa{border-left-color:var(--muted)}
-.fmt .fopn.stl{border-left-color:var(--acc)}
+.fmt .fopn.stn{border-left-color:var(--acc)}
 .op{font-weight:700;white-space:nowrap}
 .op-hm{color:var(--ok)}
 .op-aa{color:var(--muted)}
@@ -792,7 +792,7 @@ function schedule(prev, grade, tier, base){
   } else ivl = Math.min(daysLeft, ivl);
   let due = addDays(base, ivl);
   if(due <= today() && grade>=2) due = addDays(today(), 1);
-  if(prev && prev.follow && grade>=2 && grade<=3 && prev.follow > today() && due > prev.follow && !p.gesichert) due = prev.follow; // „Leicht“ überspringt den Übermorgen-Termin
+  if(prev && prev.follow && grade>=2 && prev.follow > today() && due > prev.follow && !p.gesichert) due = prev.follow;
   if(grade>=3 && !p.sure) p.sure = today();
   p.fs = {s: Math.round(fs.s*100)/100, d: Math.round(fs.d*100)/100};
   p.stage = grade; p.ivl = diffDays(today(), due); p.reps++; p.due = due; p.last = today(); p.lastGrade = grade;
@@ -858,7 +858,7 @@ function mergeAbg(remote){
 }
 function todayTarget(){ return S.settings.todayDate===today() && S.settings.todayN!=null ? S.settings.todayN : S.settings.base; }
 const doneToday = () => S.log.days[today()]||0;
-function fmtIvl(n){ return n===1 ? "morgen" : n===7 ? "in 1 Woche" : n<=45 ? "in "+n+" Tagen" : n<365 ? "in "+n+" Tagen (~"+(Math.round(n/3.044)/10).toLocaleString("de-DE")+" Mon.)" : "in "+n+" Tagen"; }
+function fmtIvl(n){ return n===1 ? "morgen" : n===7 ? "in 1 Woche" : n===30 ? "in 1 Monat" : n<30 ? "in "+n+" Tagen" : n<365 ? "in "+Math.round(n/30)+" Mon." : "in 1 Jahr"; }
 
 /* ---------- Hilfsfunktionen Einträge ---------- */
 const titleOf = it => it.type==="card" ? it.front : it.type==="def" ? it.term : it.title;
@@ -991,7 +991,7 @@ function fmtBack(t){
     if((m = s.match(RE_TIP))) { B.push({k:"box", cls:"tip", lbl:m[1], html:fmtInline(s.slice(m[0].length).trim())}); return; }
     if((m = s.match(RE_EX))) { B.push({k:"box", cls:"ex", lbl:m[1], html:fmtInline(s.slice(m[0].length).trim())}); return; }
     if(RE_RES.test(s)) { B.push({k:"box", cls:"res", html:fmtLine(s)}); return; }
-    if(RE_STN.test(s)) { B.push({k:"opn", cls:"stl", html:fmtLine(s)}); return; }
+    if(RE_STN.test(s)) { B.push({k:"opn", cls:"stn", html:fmtLine(s)}); return; }
     if(RE_OPN_HM.test(s)) { B.push({k:"opn", cls:"hm", html:fmtLine(s)}); return; }
     if(RE_OPN_AA.test(s)) { B.push({k:"opn", cls:"aa", html:fmtLine(s)}); return; }
     B.push({k:"p", s, html:fmtLine(s)});
@@ -1218,12 +1218,10 @@ function vAktuell(){
     <h3>Wie viele heute?</h3>
     <div class="slider"><input id="daily" type="range" min="0" max="200" step="5" value="${target}" aria-label="Karten heute"><output id="dailyOut">${target}</output></div>
     <p class="small muted" style="margin:0 0 16px">Grundpensum ${S.settings.base} pro Tag, der Regler gilt nur für heute. Erledigt: ${done}. Höchstens ${S.settings.newMax!=null?S.settings.newMax:20} neue Karten am Tag.${(()=>{ const g=[...S.progress.values()].filter(isGesichert).length; return g ? ` ${g} ${g===1?"Karte ist":"Karten sind"} gesichert und kommen ab ${toDate(endspurtStart()).toLocaleDateString("de-DE")} zur Endwiederholung.` : ""; })()}</p>
-    ${(()=>{ const d = pendSess(), ps = d && d.kind==="pensum" && sessPool(d)===pool ? d : null, extra = ps && ps.label==="Zusätzliche Runde";
-      if(ps && !extra) return `<div class="row">${resBtn(ps, true)}<span class="stpill part">${esc(ps.label)} nicht fertig</span></div>`;
-      return `<div class="row">${n ? `<button class="btn big st-open" data-act="start">${n} Karten abfragen</button><span class="stpill open">offen</span>`
-      : done>=target && done>0 ? (extra ? `<button class="btn big st-done" disabled>✓ Tagespensum geschafft</button>` : `<button class="btn big st-done" data-act="${avail?"more":"noop"}" title="${avail?"Noch 10 weitere abfragen":"Alles erledigt"}">✓ Tagespensum geschafft</button>`)
+    <div class="row">${n ? `<button class="btn big st-open" data-act="start">${n} Karten abfragen</button><span class="stpill open">offen</span>`
+      : done>=target && done>0 ? `<button class="btn big st-done" data-act="${avail?"more":"noop"}" title="${avail?"Noch 10 weitere abfragen":"Alles erledigt"}">✓ Tagespensum geschafft</button>`
       : `<button class="btn big st-done" disabled>✓ Nichts fällig</button>`}
-    ${extra ? `${resBtn(ps)}<span class="stpill part">Zusätzliche Runde nicht fertig</span>` : !n && avail ? `<button class="btn" data-act="more">10 weitere</button>`:""}</div>`; })()}
+    ${!n && avail ? `<button class="btn" data-act="more">10 weitere</button>`:""}</div>
     <p class="small muted" style="margin:14px 0 0"><kbd>Leertaste</kbd> Antwort zeigen, <kbd>1</kbd>–<kbd>5</kbd> bewerten, <kbd>?</kbd> alle Tastenkürzel</p>
   </section>`;
 
@@ -1233,7 +1231,7 @@ function vAktuell(){
   const taNew = d => all.filter(i=>i.tagesabfrage===d && isNew(i)).length;
   const taOpen = d => all.filter(i=>i.tagesabfrage===d && taPending(i)).length;
   const taRow = d => { const o = taOpen(d), c = taCount(d);
-    return `<div class="zrow"><div><div class="t">${d===today()?"Heute":d===addDays(today(),-1)?"Gestern":toDate(d).toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long"})}</div><div class="s">${c} ${c===1?"Karte":"Karten"}${taNew(d)?", "+taNew(d)+" noch nie gelernt":""}</div></div><span class="spacer"></span>${(()=>{ const ps = pendSess(); return ps && ps.kind==="tages" && ps.key===d; })() ? resBtn(pendSess()) : o ? `<button class="btn st-open" data-act="tagesabfrage" data-d="${esc(d)}" title="${o} von ${c} noch nicht abgefragt">Abfragen <span class="stn">${o}</span></button>` : `<button class="btn st-done" data-act="tagesabfrage" data-d="${esc(d)}" title="Alle Karten dieser Tagesabfrage sind abgefragt">✓ Erledigt</button>`}</div>`; };
+    return `<div class="zrow"><div><div class="t">${d===today()?"Heute":d===addDays(today(),-1)?"Gestern":toDate(d).toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long"})}</div><div class="s">${c} ${c===1?"Karte":"Karten"}${taNew(d)?", "+taNew(d)+" noch nie gelernt":""}</div></div><span class="spacer"></span>${o ? `<button class="btn st-open" data-act="tagesabfrage" data-d="${esc(d)}" title="${o} von ${c} noch nicht abgefragt">Abfragen <span class="stn">${o}</span></button>` : `<button class="btn st-done" data-act="tagesabfrage" data-d="${esc(d)}" title="Alle Karten dieser Tagesabfrage sind abgefragt">✓ Erledigt</button>`}</div>`; };
   const taShown = taHist ? taDates : taDates.slice(0,3);
   const tages = `<section class="zone z-tages">
     <header>${ILL.tages()}<div><h2>Tagesabfrage</h2><p>Claude schaut dreimal täglich (16, 19 und 22 Uhr) in deinen Lernordner und fragt dich nur das ab, was neu oder geändert ist.</p></div></header>
@@ -1250,7 +1248,7 @@ function vAktuell(){
     return `<div class="zrow"><div style="min-width:0"><div class="row" style="gap:8px"><span class="tag-reihe">${esc(g.fall.reihe||"Fall")} ${esc(g.fall.name||"")}</span></div>
       <div class="t" style="margin-top:6px">${esc(fallTitle(g))}</div>
       <div class="s">${g.items.length} ${g.items.length===1?"Eintrag":"Einträge"} · ${esc(status)} · noch ${left} ${left===1?"Tag":"Tage"} hier</div></div>
-      <span class="spacer"></span>${(()=>{ const ps = pendSess(); return ps && ps.kind==="fall" && ps.key===g.key; })() ? resBtn(pendSess()) : g.items.some(isOpenIn("fall:"+g.key)) ? `<button class="btn st-open" data-act="fall" data-k="${esc(g.key)}">Abfragen <span class="stn">${g.items.filter(isOpenIn("fall:"+g.key)).length}</span></button>` : `<button class="btn st-done" data-act="fall" data-k="${esc(g.key)}" title="Für heute erledigt">✓ Erledigt</button>`}</div>`;
+      <span class="spacer"></span>${g.items.some(isOpenIn("fall:"+g.key)) ? `<button class="btn st-open" data-act="fall" data-k="${esc(g.key)}">Abfragen <span class="stn">${g.items.filter(isOpenIn("fall:"+g.key)).length}</span></button>` : `<button class="btn st-done" data-act="fall" data-k="${esc(g.key)}" title="Für heute erledigt">✓ Erledigt</button>`}</div>`;
   };
   const fall = `<section class="zone z-fall">
     <header>${ILL.fall()}<div><h2>Fallabfrage</h2><p>Neue Klausuren aus UKK, KLK und der Klausurenbesprechung. Du skizzierst das Kernproblem, Claude prüft es gegen die Lösung.</p></div></header>
@@ -1268,7 +1266,7 @@ function vAktuell(){
         <div class="pebble"><b>${all.filter(isNew).length}</b><span>noch nie gelernt</span></div>
       </div>
     </div>${ILL.hero()}</div>
-    ${(()=>{ const d = session && session.idx<session.ids.length ? {label:session.label, idx:session.idx, ids:session.ids, kind:session.kind, live:true} : S.savedSess; if(!d || ["pensum","tages","fall"].includes(d.kind)) return "";
+    ${(()=>{ const d = session && session.idx<session.ids.length ? {label:session.label, idx:session.idx, ids:session.ids, live:true} : S.savedSess; if(!d) return "";
       return `<div class="hint resume">${ILL.idee()}<span><b>Angefangene Abfrage:</b> ${esc(d.label)}, ${d.idx} von ${d.ids.length} erledigt. Dein Stand ist gespeichert.</span><span class="spacer"></span><button class="btn st-part" data-act="${d.live?"tosession":"resume"}">Fortsetzen</button>${d.live?"":`<button class="btn ghost small" data-act="dropsess">Verwerfen</button>`}</div>`; })()}
     ${example?`<div class="hint">${ILL.idee()}<span>Die Kartei enthält noch Beispielinhalte zum Ausprobieren. Du kannst sie unter „Daten“ löschen.</span></div>`:""}
     ${leech?`<div class="hint">${ILL.idee()}<span><b>${leech} Problemkarte${leech>1?"n":""}:</b> Karten, die du immer wieder vergisst. <a href="#problemkarten" class="linkbtn">Ansehen</a></span></div>`:""}
@@ -1641,11 +1639,7 @@ const isHemmer = i => /hemmer/i.test(i.source||"") || (i.tags||[]).some(t=>/^hem
 const isZusatz = i => (i.tags||[]).some(t=>/^(wiederholungsfrage|zusatzfrage|sonderheft)$/i.test(t)) || /wiederholungs|zusatzfrage|sonderheft/i.test(i.source||"");
 const POOLS = {"":["Alle", ()=>true], "zusatz":["Hemmer-Zusatzfragen", i=>isZusatz(i)]};
 const inPool = (pool, i) => (POOLS[pool||""]||POOLS[""])[1](i);
-/* angefangene Abfrage (laufend oder pausiert) → am passenden Knopf statt als Banner */
-function pendSess(){ return session && !session.exam && session.idx<session.ids.length ? {label:session.label, idx:session.idx, ids:session.ids, kind:session.kind, key:session.key, live:true} : S.savedSess && !S.savedSess.exam ? S.savedSess : null; }
-const sessPool = d => /Zusatzfragen/.test(d.label||"") ? "zusatz" : "";
-function resBtn(d, big){ return `<button class="btn ${big?"big ":""}st-part" data-act="${d.live?"tosession":"resume"}" title="${esc(d.label)}: ${d.idx} von ${d.ids.length} erledigt – noch nicht fertig">⏸ Weiter: noch ${d.ids.length-d.idx} von ${d.ids.length}</button>${d.live?"":`<button class="btn ghost small" data-act="dropsess" title="Angefangene Abfrage verwerfen">Verwerfen</button>`}`; }
-function poolTabs(cur, act, countFn){ return `<div class="subtabs" role="tablist">${Object.entries(POOLS).map(([k,[l]])=>`<button role="tab" class="tab ${(cur||"")===k?"on":""}" aria-selected="${(cur||"")===k}" data-act="${act}" data-t="${k}">${l}${countFn?` <span class="muted">${countFn(k)}</span>`:""}${act==="pool" && (()=>{ const d = pendSess(); return d && d.kind==="pensum" && sessPool(d)===k; })() ? ` <span class="stpill part">nicht fertig</span>`:""}</button>`).join("")}</div>`; }
+function poolTabs(cur, act, countFn){ return `<div class="subtabs" role="tablist">${Object.entries(POOLS).map(([k,[l]])=>`<button role="tab" class="tab ${(cur||"")===k?"on":""}" aria-selected="${(cur||"")===k}" data-act="${act}" data-t="${k}">${l}${countFn?` <span class="muted">${countFn(k)}</span>`:""}</button>`).join("")}</div>`; }
 const CATS = {"hemmer-zusatz":["Hemmer-Zusatzfragen", i=>i.type==="card"&&isZusatz(i)], "hemmer-faelle":["Hemmer-Fälle", i=>i.type==="case"&&isHemmer(i)], "hemmer-karten":["Hemmer-Karteikarten", i=>i.type==="card"&&isHemmer(i)], "hemmer-alle":["Alles von Hemmer", isHemmer]};
 function vBib(){
   const ar = areas();
