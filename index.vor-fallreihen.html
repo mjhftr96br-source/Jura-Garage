@@ -1,0 +1,2230 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jura Garage</title>
+<meta name="theme-color" content="#F3ECDD" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1A1813" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Jura Garage">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="manifest" href="manifest.webmanifest">
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..700,0..100,0..1&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============ Jura Garage – organisches Layout ============ */
+:root{
+  --bg:#F3ECDD; --paper:#FFFBF3; --ink:#2A2620; --muted:#6C6455; --line:#E2D6BF; --soft:#F7F0E2;
+  --acc:#D19A3F; --acc-ink:#8A5F1C; --acc-soft:#F4E3C2; --on-acc:#2A2620; --head:#F3ECDD; --head-ink:#2A2620;
+  --moss:#7C9A64; --moss-soft:#E3EBD6; --clay:#C47A5A; --clay-soft:#F5DFD3; --sky:#6F92B0; --sky-soft:#DCE7EF; --plum:#957AA0; --plum-soft:#E9DFEC;
+  --c-def:#5F84A6; --c-card:#6E8D57; --c-case:#B86A4E; --c-schema:#8A6E96;
+  --chat:#E9EDE2; --chat-ink:#2D382C; --chat-line:#CED7C3; --bubble:#FFFDF8;
+  --ok:#5E7F50; --ok-soft:#E3EBD6; --warn:#8A621D; --warn-soft:#F4E6C8;
+  --g1:#B86A4E; --g2:#B0832F; --g3:#5E7F50; --g4:#5F84A6; --g5:#7A6BA8;
+  --blob-a:#EBD3A6; --blob-b:#D6E0C6; --blob-c:#EBCFC0; --blob-d:#D3E0EA;
+  --shadow:0 1px 0 rgba(90,70,30,.06), 0 14px 34px -22px rgba(80,58,20,.45);
+  --r1:28px 22px 30px 24px / 24px 30px 22px 28px;
+  --r2:22px 30px 24px 28px / 30px 22px 28px 24px;
+  --r3:18px 24px 20px 26px / 24px 18px 26px 20px;
+  --sans:"Source Sans 3", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+  --serif:"Fraunces", Georgia, "Times New Roman", serif;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1A1813; --paper:#23201A; --ink:#EEE6D4; --muted:#AFA58F; --line:#3A3428; --soft:#2A261F;
+    --acc:#D5A657; --acc-ink:#E4C07E; --acc-soft:#3B3121; --on-acc:#1F1B13; --head:#1A1813; --head-ink:#EEE6D4;
+    --moss:#9DB886; --moss-soft:#27301F; --clay:#D99479; --clay-soft:#3A2820; --sky:#93B1CB; --sky-soft:#1F2A33; --plum:#B9A0C3; --plum-soft:#2E2532;
+    --c-def:#93B1CB; --c-card:#9DB886; --c-case:#D99479; --c-schema:#B9A0C3;
+    --chat:#1F241D; --chat-ink:#D8DFD0; --chat-line:#343C31; --bubble:#2A3127;
+    --ok:#9DB886; --ok-soft:#27301F; --warn:#E4C07E; --warn-soft:#352C1C;
+    --g1:#D99479; --g2:#E4C07E; --g3:#9DB886; --g4:#93B1CB; --g5:#B9A0C3;
+    --blob-a:#3A3020; --blob-b:#25301F; --blob-c:#3A261F; --blob-d:#1F2A33;
+    --shadow:0 1px 0 rgba(0,0,0,.25), 0 16px 36px -22px rgba(0,0,0,.8);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1A1813; --paper:#23201A; --ink:#EEE6D4; --muted:#AFA58F; --line:#3A3428; --soft:#2A261F;
+  --acc:#D5A657; --acc-ink:#E4C07E; --acc-soft:#3B3121; --on-acc:#1F1B13; --head:#1A1813; --head-ink:#EEE6D4;
+  --moss:#9DB886; --moss-soft:#27301F; --clay:#D99479; --clay-soft:#3A2820; --sky:#93B1CB; --sky-soft:#1F2A33; --plum:#B9A0C3; --plum-soft:#2E2532;
+  --c-def:#93B1CB; --c-card:#9DB886; --c-case:#D99479; --c-schema:#B9A0C3;
+  --chat:#1F241D; --chat-ink:#D8DFD0; --chat-line:#343C31; --bubble:#2A3127;
+  --ok:#9DB886; --ok-soft:#27301F; --warn:#E4C07E; --warn-soft:#352C1C;
+  --g1:#D99479; --g2:#E4C07E; --g3:#9DB886; --g4:#93B1CB; --g5:#B9A0C3;
+  --blob-a:#3A3020; --blob-b:#25301F; --blob-c:#3A261F; --blob-d:#1F2A33;
+  --shadow:0 1px 0 rgba(0,0,0,.25), 0 16px 36px -22px rgba(0,0,0,.8);
+  color-scheme: dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16.5px/1.55 var(--sans);-webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden}
+/* ruhiger, flacher Grund */
+
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+button,input,textarea,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--acc-ink);outline-offset:3px;border-radius:8px}
+a{color:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+svg.ill{display:block;overflow:visible}
+
+/* Kopfzeile */
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;padding:10px 0 6px;background:color-mix(in srgb,var(--bg) 82%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.topin{display:flex;align-items:center;gap:8px;min-height:56px;background:color-mix(in srgb,var(--paper) 88%,transparent);border:1px solid var(--line);border-radius:999px;padding:6px 8px 6px 10px;box-shadow:var(--shadow)}
+.brand{display:flex;align-items:center;gap:9px;text-decoration:none;white-space:nowrap;padding-right:4px}
+.brand svg{width:38px;height:38px;flex:none}
+.brand b{font:600 19px/1 var(--serif);letter-spacing:-.01em;font-variation-settings:"SOFT" 100,"WONK" 1}
+@media (max-width:1260px){.brand b{display:none}}
+nav.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;flex:1}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs{justify-content:center}
+nav.tabs a{padding:7px 9px;font-size:15px;border-radius:999px;text-decoration:none;color:var(--ink);opacity:.68;font-weight:500;white-space:nowrap;transition:background .15s,opacity .15s}
+nav.tabs a:hover{opacity:1;background:var(--soft)}
+nav.tabs a[aria-current="page"]{opacity:1;font-weight:600;background:var(--acc-soft);color:var(--acc-ink)}
+.qs{position:relative;width:165px;flex:none}
+.themebtn{flex:none;display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;padding:0;border:1px solid var(--line);background:var(--soft);color:var(--ink);border-radius:50%;cursor:pointer}
+.themebtn svg{width:15px;height:15px}
+.themebtn:hover{border-color:var(--muted)}
+.themebtn span{display:none}
+.qs input{width:100%;padding:8px 12px 8px 33px;border:1px solid var(--line);border-radius:999px;background:var(--soft);color:var(--ink)}
+.qs svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);z-index:1}
+.qs kbd{position:absolute;right:10px;top:50%;transform:translateY(-50%)}
+@media (max-width:1120px){ .qs{display:none} }
+@media (max-width:820px){ nav.tabs{justify-content:flex-start} nav.tabs a{padding:7px 8px;font-size:14.5px} }
+
+main{padding:22px 0 80px}
+h1{font:600 34px/1.12 var(--serif);letter-spacing:-.015em;margin:0 0 6px;font-variation-settings:"SOFT" 100,"WONK" 1}
+h2{font:600 22px/1.25 var(--serif);margin:30px 0 12px;font-variation-settings:"SOFT" 100}
+h3{font:600 15.5px/1.3 var(--sans);margin:18px 0 8px}
+.sub{color:var(--muted);margin:0 0 20px;max-width:68ch}
+.muted{color:var(--muted)}
+.small{font-size:13.5px}
+kbd{font:600 10px/1 var(--sans);letter-spacing:.02em;border:0;border-radius:4px;padding:3px 5px;color:var(--muted);background:color-mix(in srgb,var(--muted) 16%,transparent);vertical-align:1px}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.spacer{flex:1}
+
+.btn{appearance:none;border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:9px 17px;cursor:pointer;font-weight:500;line-height:1.3;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:transform .12s,box-shadow .12s,border-color .12s}
+.btn:hover{border-color:var(--muted)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--acc);border-color:color-mix(in srgb,var(--acc) 70%,var(--ink));color:var(--on-acc);font-weight:600;box-shadow:0 6px 16px -10px color-mix(in srgb,var(--acc) 80%,black)}
+.btn.primary:hover{filter:brightness(1.06)}
+.btn.moss{background:var(--moss);border-color:color-mix(in srgb,var(--moss) 70%,var(--ink));color:#fff;font-weight:600}
+.btn.clay{background:var(--clay);border-color:color-mix(in srgb,var(--clay) 70%,var(--ink));color:#fff;font-weight:600}
+:root[data-theme="dark"] .btn.moss,:root[data-theme="dark"] .btn.clay{color:#1A1813}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.moss,:root:not([data-theme="light"]) .btn.clay{color:#1A1813}}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--muted)}
+.btn.ghost:hover{color:var(--ink);background:var(--soft)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.big{padding:13px 24px;font-size:16.5px}
+.linkbtn{background:none;border:0;padding:0;color:var(--acc-ink);cursor:pointer;font-weight:600;text-decoration:underline;text-decoration-style:wavy;text-decoration-thickness:1px;text-underline-offset:4px}
+
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:var(--r1);padding:22px;box-shadow:var(--shadow)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+.grid2 .panel:nth-child(2n){border-radius:var(--r2)}
+
+/* Aktuell */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:12px;align-items:center;margin-bottom:8px}
+.hero .ill{width:100%;max-width:260px;justify-self:end}
+@media (max-width:760px){.hero{grid-template-columns:1fr}.hero .ill{display:none}}
+.pebbles{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 4px}
+.pebble{background:var(--paper);border:1px solid var(--line);padding:10px 16px;border-radius:var(--r3);box-shadow:var(--shadow);min-width:118px}
+.pebble:nth-child(2){border-radius:var(--r2)} .pebble:nth-child(3){border-radius:var(--r1)}
+.pebble b{display:block;font:600 24px/1.1 var(--serif);font-variant-numeric:tabular-nums}
+.pebble span{color:var(--muted);font-size:13px}
+.zones{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;align-items:start;margin-top:18px}
+@media (max-width:1060px){.zones{grid-template-columns:1fr 1fr}.zones .zone:first-child{grid-column:1/-1}}
+@media (max-width:700px){.zones{grid-template-columns:1fr}}
+.zone{position:relative;background:var(--paper);border:1px solid var(--line);border-radius:var(--r1);padding:20px 20px 22px;box-shadow:var(--shadow);overflow:hidden}
+.zone:nth-child(2){border-radius:var(--r2)} .zone:nth-child(3){border-radius:var(--r3)}
+.zone{border-top:3px solid var(--zc,var(--acc))}
+.zone > *{position:relative;z-index:1}
+.zone.z-pensum{--zc:var(--acc)} .zone.z-tages{--zc:var(--moss)} .zone.z-fall{--zc:var(--clay)}
+.zone header{display:flex;gap:12px;align-items:flex-start;margin-bottom:6px}
+.zone header .ill{width:64px;height:64px;flex:none;margin:-4px 0 0 -4px}
+.zone header h2{margin:2px 0 2px;font-size:21px}
+.zone header p{margin:0;color:var(--muted);font-size:13.5px;line-height:1.45}
+.zlist{margin-top:12px}
+.zrow{display:flex;gap:10px;align-items:center;padding:11px 0;border-top:1px dashed var(--line)}
+.zrow .t{font-weight:600;line-height:1.3}
+.zrow .s{font-size:13px;color:var(--muted)}
+.zrow .tag-reihe{font:600 11.5px/1 var(--sans);letter-spacing:.02em;padding:4px 8px;border-radius:999px;background:var(--clay-soft);color:var(--clay);white-space:nowrap}
+.zempty{border-top:1px dashed var(--line);padding-top:12px;font-size:13.5px;color:var(--muted)}
+.cats{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 16px}
+.chip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;padding:7px 14px;background:var(--paper);cursor:pointer;font-weight:500;user-select:none}
+.chip[aria-pressed="true"]{border-color:var(--tc,var(--ink));background:var(--tc,var(--ink));color:var(--paper)}
+.chip[aria-pressed="true"] .dot{background:var(--paper)}
+.chip[aria-pressed="false"] .dot{background:var(--tc)}
+.chip .n{font-variant-numeric:tabular-nums;opacity:.75}
+.slider{display:flex;align-items:center;gap:14px;margin:4px 0 6px}
+.slider input[type=range]{flex:1;accent-color:var(--acc-ink)}
+.slider output{font:600 30px/1 var(--serif);min-width:3ch;text-align:right;font-variant-numeric:tabular-nums}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.facts div{background:var(--paper);padding:12px 14px;border:1px solid var(--line);border-radius:var(--r3)}
+.facts b{display:block;font:600 24px/1.1 var(--serif);font-variant-numeric:tabular-nums}
+.facts span{color:var(--muted);font-size:13px}
+.hint{display:flex;gap:10px;align-items:flex-start;background:color-mix(in srgb,var(--paper) 70%,transparent);border:1px dashed var(--line);border-radius:var(--r3);padding:12px 14px;font-size:14px;margin-top:14px}
+.hint svg{flex:none}
+
+/* Karte */
+.study{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,1fr);gap:24px;align-items:start}
+@media (max-width:900px){.study{grid-template-columns:1fr}}
+.bar{height:8px;background:var(--line);border-radius:8px;overflow:hidden;margin:8px 0 18px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--moss),var(--acc));border-radius:8px;transition:width .25s}
+.sheet{position:relative;background:var(--paper);border:1px solid var(--line);border-radius:var(--r1);box-shadow:var(--shadow);padding:28px 30px 28px 30px;min-height:300px;overflow:hidden}
+.sheet{box-shadow:var(--shadow), inset 0 3px 0 var(--tc,var(--acc))}
+.sheet > *{position:relative}
+.t-def{--tc:var(--c-def)} .t-card{--tc:var(--c-card)} .t-case{--tc:var(--c-case)} .t-schema{--tc:var(--c-schema)}
+.dot{display:inline-block;width:4px;height:14px;border-radius:2px;background:var(--tc)}
+.sheet .meta{display:flex;gap:10px;flex-wrap:wrap;align-items:center;color:var(--muted);font-size:13px;margin-bottom:16px}
+.starbtn{border:0;background:transparent;font-size:22px;line-height:1;cursor:pointer;color:var(--muted);padding:0 4px}.starbtn.on{color:#e6a700}.starbtn:hover{color:#e6a700}.starmark{color:#e6a700;margin-left:4px}
+.norm.norm-inline{display:inline;background:none;padding:0;border-radius:0;font:inherit;font-weight:inherit;color:inherit;text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px;white-space:normal}.norm.norm-inline:hover{color:var(--acc-ink)}
+ol.schema .sh{font-weight:inherit}ol.schema ul.sub{list-style:none;margin:3px 0 0;padding:0 0 0 4px;font-size:15px}ol.schema ul.sub li{margin:0 0 3px;padding:0 0 0 16px;position:relative;line-height:1.45}ol.schema ul.sub li::before{content:"–";position:absolute;left:2px;color:var(--muted)}
+.subtabs{display:flex;gap:4px;margin:6px 0 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}.tab{border:0;background:transparent;padding:8px 14px;border-radius:10px 10px 0 0;cursor:pointer;font:inherit;color:var(--muted)}.tab:hover{color:var(--ink);background:var(--soft)}.tab.on{color:var(--ink);font-weight:600;box-shadow:inset 0 -2px 0 var(--acc-ink)}.tab .muted{font-weight:400}
+.zone .subtabs{margin:2px 0 10px}.zone .tab{padding:6px 11px;font-size:14.5px}
+.typetag{font-weight:600;color:var(--tc);background:color-mix(in srgb,var(--tc) 14%,transparent);padding:3px 10px;border-radius:999px}
+.fallchip{font-weight:600;color:var(--clay);background:var(--clay-soft);padding:3px 10px;border-radius:999px;text-decoration:none}
+.q{font:500 23px/1.35 var(--serif);margin:0 0 6px;max-width:62ch;font-variation-settings:"SOFT" 100}
+.prose{font:400 17px/1.62 var(--sans);max-width:68ch}
+.prose p{margin:0 0 .7em}
+.answer{margin-top:22px;padding-top:20px;position:relative}
+.answer::before{content:"";position:absolute;left:0;right:0;top:0;height:8px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='8' viewBox='0 0 40 8'%3E%3Cpath d='M0 4 Q10 0 20 4 T40 4' fill='none' stroke='%23C9B996' stroke-width='1.4'/%3E%3C/svg%3E") repeat-x;opacity:.9}
+.margin-norms{display:flex;gap:6px;flex-wrap:wrap;margin-top:16px}
+.links-line{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:16px}
+.lchip{display:inline-flex;align-items:center;gap:6px;max-width:100%;font:600 12.5px/1.2 var(--sans);color:var(--tc);background:color-mix(in srgb,var(--tc) 14%,transparent);padding:6px 10px;border-radius:999px;text-decoration:none;cursor:pointer}
+.lchip .dot{width:7px;height:7px;border-radius:50%;background:var(--tc);flex:none}
+.lchip .lt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:28ch}
+.lchip:hover{background:color-mix(in srgb,var(--tc) 24%,transparent)}
+.norm{display:inline-block;font:600 12.5px/1 var(--sans);color:var(--acc-ink);background:var(--acc-soft);padding:6px 10px;border-radius:999px;text-decoration:none;white-space:nowrap;cursor:pointer;border:0}
+.tag{display:inline-block;font-size:12.5px;color:var(--muted);border:1px solid var(--line);padding:3px 10px;border-radius:999px;cursor:pointer;background:transparent}
+.rel{display:inline-flex;gap:3px;align-items:center}
+.rel i{width:7px;height:7px;border-radius:50%;background:var(--line)}
+.rel i.on{background:var(--acc-ink)}
+ol.probs{padding-left:1.2em;margin:8px 0}
+ol.schema{padding-left:0;margin:8px 0;list-style:none;counter-reset:s}
+ol.schema li{margin:0 0 6px;padding-left:calc(var(--lv,0)*22px)}
+ol.schema li.l0{font-weight:600;margin-top:10px}
+ol.probs li{margin:0 0 12px}
+ol.probs b{font-weight:600}
+ul.kern{margin:8px 0;padding-left:1.2em}
+.grades{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:20px}
+.grades button{border:1px solid var(--line);background:var(--paper);border-radius:var(--r3);padding:11px 6px;cursor:pointer;text-align:center;transition:transform .12s}
+.grades button:nth-child(2){border-radius:var(--r2)} .grades button:nth-child(3){border-radius:var(--r1)}
+.grades button:hover{transform:translateY(-2px);border-color:var(--muted)}
+.grades button b{display:block;font-weight:600;white-space:nowrap;font-size:15px}
+.grades button span{font-size:12.5px;color:var(--muted)}
+.grades button kbd{margin-left:5px;font-size:9px;padding:2px 4px}
+.grades button[data-g="5"] b{color:var(--g5)}
+.grades button{position:relative}
+.grades .ginfo{position:absolute;top:4px;right:5px;width:18px;height:18px;line-height:16px;border-radius:50%;border:1px solid var(--line);font-size:11px;font-style:normal;font-weight:600;color:var(--muted);background:var(--soft)}
+.grades .ginfo:hover{color:var(--ink);border-color:var(--muted)}
+.ginfo-box{margin-top:10px;padding:10px 14px;border:1px solid var(--line);border-radius:var(--r2);background:var(--soft);font-size:13.5px}
+.ginfo-box p{margin:4px 0}
+.grades button[data-g="1"] b{color:var(--g1)} .grades button[data-g="2"] b{color:var(--g2)}
+.grades button[data-g="3"] b{color:var(--g3)} .grades button[data-g="4"] b{color:var(--g4)}
+.grades button.rec{outline:2px solid var(--ok);outline-offset:2px}
+@media (max-width:520px){.grades{grid-template-columns:repeat(3,1fr)} .sheet{padding:22px 18px}}
+.reveal{margin-top:22px}
+
+.notice{border-radius:var(--r3);padding:14px 16px;margin:0 0 16px;border:1px solid}
+.notice.fix{background:var(--warn-soft);border-color:color-mix(in srgb,var(--warn) 35%,transparent)}
+.notice.fix h4{margin:0 0 6px;font:600 14px/1.3 var(--sans);color:var(--warn)}
+.notice.fix .row{margin-top:10px}
+.notice.info{background:var(--soft);border-color:var(--line)}
+
+.write textarea{width:100%;min-height:110px;padding:14px;border:1px solid var(--line);border-radius:var(--r3);background:var(--soft);font:400 16px/1.6 var(--sans);resize:vertical}
+.verdict{margin-top:12px;border:1px solid var(--line);border-radius:var(--r3);padding:12px 14px;background:var(--soft)}
+.verdict ul{list-style:none;padding:0;margin:8px 0 0}
+.verdict li{padding:3px 0 3px 22px;position:relative}
+.verdict li::before{position:absolute;left:0;font-weight:700}
+.verdict li.y::before{content:"✓";color:var(--ok)}
+.verdict li.n::before{content:"✗";color:var(--g1)}
+.switch{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;color:var(--muted)}
+.switch input{accent-color:var(--acc-ink);width:16px;height:16px}
+
+/* Fallabfrage mit Claude */
+.sketch{margin-top:18px;background:color-mix(in srgb,var(--clay-soft) 55%,var(--paper));border:1px solid color-mix(in srgb,var(--clay) 25%,var(--line));border-radius:var(--r2);padding:16px}
+.sketch h3{margin:0 0 4px;display:flex;align-items:center;gap:8px}
+.sketch textarea{width:100%;min-height:130px;margin-top:8px;padding:13px;border:1px solid var(--line);border-radius:var(--r3);background:var(--paper);font:400 16px/1.6 var(--sans);resize:vertical}
+.feedback{margin-top:14px;background:var(--paper);border:1px solid var(--line);border-radius:var(--r3);padding:14px 16px;white-space:pre-wrap;font-size:15.5px;line-height:1.6}
+.feedback.busy{color:var(--muted)}
+.feedback b{color:var(--ink)}
+.mysketch{margin-top:12px;font-size:14.5px;color:var(--muted);white-space:pre-wrap;border-left:3px solid var(--clay);padding:2px 0 2px 12px}
+
+/* Chat */
+.chat{background:var(--chat);color:var(--chat-ink);border:1px solid var(--chat-line);border-radius:var(--r2);display:flex;flex-direction:column;max-height:calc(100vh - 140px);min-height:340px;position:sticky;top:92px;box-shadow:var(--shadow);overflow:hidden}
+@media (max-width:900px){.chat{position:static;max-height:none}}
+.chat header{padding:14px 16px 10px;border-bottom:1px dashed var(--chat-line);display:flex;gap:10px;align-items:center}
+.chat header svg{flex:none}
+.chat header b{display:block;font:600 16px/1.2 var(--serif)}
+.chat header span{font-size:12.5px;opacity:.75}
+.msgs{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;min-height:140px}
+.msg{max-width:92%;padding:10px 13px;border-radius:16px;white-space:pre-wrap;word-wrap:break-word;font-size:14.5px;line-height:1.55;color:var(--chat-ink)}
+.msg.u{align-self:flex-end;background:var(--chat-ink);color:var(--chat);border-bottom-right-radius:5px}
+.msg.a{align-self:flex-start;background:var(--bubble);border:1px solid var(--chat-line);border-bottom-left-radius:5px}
+.msg.a.think{opacity:.7;font-style:italic}
+.msg.err{background:transparent;border:1px dashed var(--chat-line);font-size:13px}
+.chat .starters{display:flex;flex-wrap:wrap;gap:6px}
+.chat .starters button{border:1px solid var(--chat-line);background:transparent;border-radius:999px;padding:5px 11px;font-size:13px;cursor:pointer;color:inherit}
+.compose{display:flex;gap:8px;padding:10px 12px 12px;border-top:1px dashed var(--chat-line)}
+.compose textarea{flex:1;resize:none;min-height:44px;max-height:140px;border:1px solid var(--chat-line);border-radius:14px;padding:10px 12px;background:var(--bubble);font-size:14.5px}
+.compose .btn{background:var(--chat-ink);color:var(--chat);border-color:var(--chat-ink);align-self:flex-end}
+
+/* Listen */
+.list{display:flex;flex-direction:column;background:var(--paper);border:1px solid var(--line);border-radius:var(--r3);overflow:hidden;box-shadow:var(--shadow)}
+.item{display:grid;grid-template-columns:104px minmax(0,1fr) auto;gap:14px;align-items:baseline;padding:13px 18px;border-top:1px dashed var(--line);text-decoration:none;color:inherit;cursor:pointer;position:relative}
+.item:first-child{border-top:0}
+.item:hover{background:var(--soft)}
+.item .t{font:500 16.5px/1.4 var(--serif);font-variation-settings:"SOFT" 100}
+.item .s{color:var(--muted);font-size:13px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.item .k{font-size:12px;font-weight:600;color:var(--tc);display:inline-flex;align-items:center;gap:6px}
+.item .k::before{content:"";width:4px;height:12px;border-radius:2px;background:var(--tc)}
+.item .r{text-align:right;font-size:12.5px;color:var(--muted);white-space:nowrap}
+@media (max-width:600px){.item{grid-template-columns:1fr}.item .r{text-align:left}}
+mark{background:color-mix(in srgb,var(--acc) 45%,transparent);color:inherit;border-radius:3px;padding:0 1px}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 14px}
+.filters select,.filters input,.field input,.field select,.field textarea{border:1px solid var(--line);background:var(--paper);border-radius:14px;padding:9px 12px}
+.bigsearch{width:100%;font:500 21px/1.3 var(--serif);padding:15px 20px;border:1px solid var(--line);border-radius:var(--r1);background:var(--paper);margin-bottom:18px;box-shadow:var(--shadow)}
+.empty{padding:28px 18px;text-align:center;color:var(--muted)}
+
+/* Detail */
+.detail{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,1fr);gap:24px;align-items:start}
+@media (max-width:900px){.detail{grid-template-columns:1fr}}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-size:14px}
+.kv dt{color:var(--muted)} .kv dd{margin:0}
+.crumbs{font-size:13px;color:var(--muted);margin-bottom:10px}
+.crumbs a{color:var(--muted)}
+
+/* Formular */
+.form{display:grid;gap:14px;max-width:760px}
+.field label{display:block;font-weight:600;font-size:13.5px;margin-bottom:5px}
+.field small{display:block;color:var(--muted);font-size:12.5px;margin-top:4px}
+.field input,.field select,.field textarea{width:100%}
+.field textarea{min-height:90px;resize:vertical;font:400 15px/1.55 var(--sans)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:600px){.two{grid-template-columns:1fr}}
+.picker{position:relative}
+.picker .drop{position:absolute;left:0;right:0;top:100%;z-index:4;background:var(--paper);border:1px solid var(--line);border-radius:14px;margin-top:4px;max-height:240px;overflow:auto;box-shadow:var(--shadow)}
+.picker .drop button{display:block;width:100%;text-align:left;border:0;background:none;padding:8px 12px;cursor:pointer}
+.picker .drop button:hover{background:var(--soft)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chips span{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--line);border-radius:999px;padding:3px 4px 3px 10px;font-size:13px}
+.chips button{border:0;background:var(--soft);border-radius:50%;width:20px;height:20px;cursor:pointer;line-height:1}
+
+/* Statistik */
+.areas{display:flex;flex-direction:column;gap:12px}
+.area .row{justify-content:space-between}
+.stack{display:flex;height:12px;border-radius:12px;overflow:hidden;background:var(--line);margin-top:6px}
+.stack i{display:block;height:100%}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin-top:10px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.forecast{display:flex;align-items:flex-end;gap:6px;height:150px;padding-top:18px}
+.forecast div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px;min-width:0}
+.forecast i{display:block;width:100%;max-width:30px;background:var(--moss);border-radius:10px 10px 4px 4px;min-height:3px}
+.forecast div:first-child i{background:var(--acc)}
+.forecast span{font-size:11px;color:var(--muted);white-space:nowrap}
+.forecast em{font-style:normal;font-size:11.5px;font-variant-numeric:tabular-nums}
+
+/* Overlay */
+.overlay{position:fixed;inset:0;z-index:20;background:rgba(20,16,10,.45);display:flex;align-items:center;justify-content:center;padding:20px}
+.overlay .panel{max-width:520px;width:100%;max-height:85vh;overflow:auto}
+.keys{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;font-size:14px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:11px 18px;border-radius:999px;z-index:30;font-size:14px;max-width:90vw;box-shadow:var(--shadow)}
+.status{font-size:12.5px;color:var(--muted)}
+.done{text-align:center;padding:40px 20px}
+.done .ill{width:150px;margin:0 auto 10px}
+.done b{font:600 46px/1 var(--serif);display:block;margin-bottom:8px}
+body.locked nav.tabs, body.locked .qs{display:none}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* Tier, eigene Antwort, Eselsbrücke, Statistik */
+.tier{display:inline-block;font:700 11px/1 var(--sans);letter-spacing:.03em;padding:3px 7px;border-radius:5px;color:var(--ink);background:var(--soft);border:1px solid var(--line)}
+.tier.t1{background:var(--acc);border-color:var(--acc);color:var(--on-acc)} .tier.t2{background:var(--acc-soft);border-color:var(--acc);color:var(--acc-ink)}
+.tier.t3{color:var(--muted)} .tier.t4{color:var(--muted);border-style:dashed}
+.own{margin-top:16px} .own label{display:block;font:600 13px/1.3 var(--sans);color:var(--muted);margin-bottom:6px}
+.own textarea{width:100%;min-height:84px;padding:11px 13px;border:1px solid var(--line);border-radius:var(--r3);background:var(--soft);color:var(--ink);font:16px/1.5 var(--sans);resize:vertical}
+.own textarea:focus{outline:2px solid var(--acc);outline-offset:1px;background:var(--paper)}
+.ownshow{margin:16px 0 0;padding:12px 14px;border-left:3px solid var(--tc,var(--acc));background:var(--soft);border-radius:0 var(--r3) var(--r3) 0}
+.ownshow h4,.mnemo h4{margin:0 0 4px;font:700 11px/1.2 var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.ownshow div{font-size:15.5px;white-space:pre-wrap}
+.mnemo{margin:18px 0 0;padding:13px 16px 14px;background:var(--acc-soft);border:1px dashed var(--acc);border-radius:var(--r2);position:relative}
+.mnemo h4{color:var(--acc-ink)}
+.mnemo .txt{font:italic 500 17px/1.45 var(--serif);font-variation-settings:"SOFT" 100;white-space:pre-wrap}
+.mnemo textarea{width:100%;min-height:64px;padding:9px 11px;border:1px solid var(--acc);border-radius:var(--r3);background:var(--paper);color:var(--ink);font:16px/1.45 var(--sans)}
+.mnemo .act{margin-top:8px;display:flex;gap:10px;align-items:center}
+.addmnemo{margin-top:14px}
+.norm .ext{opacity:.55;margin-left:3px;font-size:.9em}
+.goalbar{position:relative;height:14px;background:var(--line);border-radius:7px;overflow:hidden}
+.goalbar i{position:absolute;left:0;top:0;bottom:0;border-radius:7px}
+.goalmark{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink);opacity:.7}
+.tiers4{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-top:6px}
+.tcard{background:var(--paper);border:1px solid var(--line);border-radius:var(--r3);padding:14px 16px}
+.tcard b.big{display:block;font:600 30px/1.1 var(--serif);font-variant-numeric:tabular-nums;margin:6px 0 8px}
+.bigstat{display:flex;gap:26px;flex-wrap:wrap;align-items:flex-end;margin:6px 0 14px}
+.bigstat b{display:block;font:600 40px/1 var(--serif);font-variant-numeric:tabular-nums}
+.bigstat span{color:var(--muted);font-size:13.5px}
+.proj svg{width:100%;height:auto;max-height:230px;display:block}
+
+/* Spracheingabe */
+.micwrap{position:relative;display:block;width:100%}
+.micwrap.in{display:block;width:100%}
+.filters .micwrap.in{width:auto;flex:1 1 180px;min-width:150px}
+.compose .micwrap{flex:1;min-width:0}.compose .micwrap textarea{width:100%}
+.micwrap.in:has(.bigsearch) .micbtn{top:calc(50% - 9px);width:32px;height:32px;right:12px}
+.micwrap.ta>textarea{padding-right:42px}
+.micwrap.in>input{padding-right:38px;width:100%}
+.micbtn{position:absolute;right:6px;bottom:6px;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--paper);color:var(--muted);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;opacity:.85;z-index:2}
+.micwrap.in .micbtn{top:50%;bottom:auto;transform:translateY(-50%);width:26px;height:26px}
+.micbtn:hover{color:var(--ink);border-color:var(--muted);opacity:1}
+.micbtn.on{background:var(--clay);border-color:var(--clay);color:#fff;opacity:1;animation:micpulse 1.2s ease-in-out infinite}
+@keyframes micpulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--clay) 55%,transparent)}50%{box-shadow:0 0 0 6px transparent}}
+
+/* Status: offen (grau) / teilweise (gelb) / erledigt (grün) */
+.btn.st-open{background:color-mix(in srgb,var(--muted) 14%,var(--paper));border-color:color-mix(in srgb,var(--muted) 45%,transparent);color:var(--ink);font-weight:600}
+.btn.st-open:hover{background:color-mix(in srgb,var(--muted) 22%,var(--paper))}
+.btn.st-done{background:var(--ok);border-color:color-mix(in srgb,var(--ok) 70%,var(--ink));color:#fff;font-weight:600}
+.btn.st-done:disabled{opacity:.9;cursor:default}
+.btn.st-part{background:var(--acc);border-color:color-mix(in srgb,var(--acc) 70%,var(--ink));color:var(--on-acc);font-weight:600}
+:root[data-theme="dark"] .btn.st-done{color:#1A1813}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.st-done{color:#1A1813}}
+.stn{display:inline-block;min-width:20px;padding:1px 7px;border-radius:999px;background:var(--muted);color:var(--paper);font-size:12.5px;line-height:1.4;text-align:center}
+.stpill{font-size:12.5px;font-weight:600;padding:3px 10px;border-radius:999px}.stpill.part{background:color-mix(in srgb,var(--acc) 22%,transparent);color:var(--acc-ink)}.stpill.open{background:color-mix(in srgb,var(--muted) 16%,transparent);color:var(--muted)}
+.hint.resume{align-items:center;border-style:solid;border-color:var(--acc);background:color-mix(in srgb,var(--acc-soft) 70%,transparent)}
+/* Rückseiten-Formatierung */
+.fmt p{margin:0 0 .6em}
+.fmt .lbl{font-weight:700;color:var(--ink)}
+.fmt .fh{font-weight:700;margin:.9em 0 .35em;color:var(--acc-ink)}
+.fmt .fh:first-child{margin-top:0}
+.fmt .fgl{display:flex;gap:.5em;margin:0 0 .35em;padding-left:calc(var(--lv,0)*1.3em)}
+.fmt .fgl .gm{flex:none;min-width:1.6em;color:var(--acc-ink)}
+.fmt .fl{margin:.1em 0 .6em}
+.fmt .fli{position:relative;padding-left:calc(1.1em + var(--i,0)*1.2em);margin:0 0 .3em}
+.fmt .fli::before{content:"•";position:absolute;left:calc(var(--i,0)*1.2em + .15em);color:var(--acc-ink)}
+.fmt .fli.ar::before{content:"→";left:calc(var(--i,0)*1.2em)}
+.fmt .fbox{border-radius:12px;padding:9px 13px;margin:.7em 0;border:1px solid;font-size:.97em}
+.fmt .fbox .flab{text-transform:uppercase;letter-spacing:.04em;font-size:.78em;margin-right:.35em}
+.fmt .fbox.tip{background:var(--warn-soft);border-color:color-mix(in srgb,var(--warn) 35%,transparent)}
+.fmt .fbox.tip .flab{color:var(--warn)}
+.fmt .fbox.res{background:var(--ok-soft);border-color:color-mix(in srgb,var(--ok) 40%,transparent);font-weight:600}
+.fmt .fbox.res::before{content:"⇒ ";color:var(--ok)}
+.fmt .fbox.ex{background:var(--soft);border-color:var(--line);border-style:dashed}
+.fmt .fbox.ex .flab{color:var(--muted)}
+.fmt .fopn{border-left:3px solid var(--line);padding:2px 0 2px 11px}
+.fmt .fopn.hm{border-left-color:var(--ok)}
+.fmt .fopn.aa{border-left-color:var(--muted)}
+.fmt .fopn.stl{border-left-color:var(--acc)}
+.op{font-weight:700;white-space:nowrap}
+.op-hm{color:var(--ok)}
+.op-aa{color:var(--muted)}
+.pm{font-weight:800;white-space:nowrap}
+.pm-p{color:var(--ok)}
+.pm-m{color:var(--clay)}
+.pm-o{color:var(--warn)}
+.lead{color:var(--acc-ink)}
+strong.own-b{font-weight:700}
+mark.own-m{background:color-mix(in srgb,#F2D53C 55%,transparent);color:inherit;border-radius:3px;padding:0 2px}
+.mdbar{display:flex;gap:6px;align-items:center;margin:0 0 6px;flex-wrap:wrap}
+.mdbar button{font:600 13px/1 var(--sans);padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:var(--soft);color:var(--ink);cursor:pointer}
+.mdbar button.mk{background:color-mix(in srgb,#F2D53C 45%,var(--soft))}
+.mdbar small{color:var(--muted)}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap topin">
+    <a class="brand" href="#aktuell" aria-label="Jura Garage, zu Aktuell" title="Jura Garage"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 3c9 0 18 5 20 14s-2 21-11 25-21 2-26-6S1 16 7 10 15 3 24 3z" fill="var(--acc-soft)"/><path d="M24 3c9 0 18 5 20 14s-2 21-11 25-21 2-26-6S1 16 7 10 15 3 24 3z" fill="none" stroke="var(--acc-ink)" stroke-width="1.4" stroke-dasharray="2 3" opacity=".6"/><text x="24" y="33" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-size="26" font-weight="600" fill="var(--acc-ink)">§</text><path d="M35 9c3 0 5 2 5 5-3 0-5-2-5-5z" fill="var(--moss)"/></svg><b>Jura Garage</b></a>
+    <nav class="tabs" id="tabs">
+      <a href="#aktuell">Aktuell</a>
+      <a href="#suche">Suche</a>
+      <a href="#bibliothek">Bibliothek</a>
+      <a href="#normen">Normen</a>
+      <a href="#problemkarten" title="Problemkarten">Problemkarten</a>
+      <a href="#pruefung">Prüfung</a>
+      <a href="#statistik">Statistik</a>
+      <a href="#daten">Daten</a>
+    </nav>
+    <button class="themebtn" id="themebtn" data-act="theme" type="button"></button>
+    <div class="qs">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="quick" type="search" placeholder="Suchen" aria-label="Suchen">
+      <kbd>Strg F</kbd>
+    </div>
+  </div>
+</header>
+<main><div class="wrap" id="main"><p class="muted">Lade Kartei …</p></div></main>
+<div id="layer"></div>
+
+<script>
+"use strict";
+/* ---------- Hell / Dunkel ---------- */
+const THEMES = ["auto","light","dark"];
+const THEME_TXT = {auto:"Automatisch", light:"Tagmodus", dark:"Dunkelmodus"};
+const THEME_ICON = {
+  auto:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><path d="M12 4v16" /><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg>',
+  light:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
+  dark:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>'
+};
+function getTheme(){ try{ return localStorage.getItem("examenskartei-theme") || "auto"; }catch(e){ return "auto"; } }
+function applyTheme(t){
+  if(t==="auto") document.documentElement.removeAttribute("data-theme"); else document.documentElement.setAttribute("data-theme", t);
+  const b = document.getElementById("themebtn");
+  if(b){ b.innerHTML = THEME_ICON[t] + "<span>" + THEME_TXT[t] + "</span>"; b.title = "Darstellung: " + THEME_TXT[t] + " (zum Wechseln tippen)"; b.setAttribute("aria-label", "Darstellung: " + THEME_TXT[t] + ", wechseln"); }
+}
+function cycleTheme(){ const t = THEMES[(THEMES.indexOf(getTheme())+1)%THEMES.length]; try{ localStorage.setItem("examenskartei-theme", t); }catch(e){} applyTheme(t); }
+applyTheme(getTheme());
+/* ---------- Grundlagen ---------- */
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pad = n => String(n).padStart(2,"0");
+const ds = d => d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const today = () => ds(new Date());
+const addDays = (s,n) => { const [y,m,d]=s.split("-").map(Number); return ds(new Date(y,m-1,d+n)); };
+const toDate = s => { const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d); };
+const diffDays = (a,b) => { const p=s=>{const [y,m,d]=s.split("-").map(Number);return Date.UTC(y,m-1,d)}; return Math.round((p(b)-p(a))/864e5); };
+const fold = s => String(s ?? "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ß/g,"ss");
+const uid = p => p+"-"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const FED_LAWS = new Set("BGB StGB GG VwGO VwVfG StPO ZPO BauGB BauNVO HGB StVG StVO KrWG ProdHaftG BVerfGG GVG InsO AO FGO SGG UWG GWB UrhG MarkenG PatG HGrG ZVG GBO ArbGG KSchG BetrVG TVG AGG BDSG VwZG WHG BNatSchG BImSchG UVPG OWiG JGG BRAO RVG GKG FamFG AktG GmbHG WEG BeurkG UKlaG AsylG AufenthG ROG BBodSchG EStG KStG UStG GwG KWG VVG InsVV BtMG StVollzG BGBEG EGBGB ZwVwV UmwRG WpHG EGStGB PartGG BeamtStG BVerfGG IfSG ZVG".split(" "));
+// Abweichende Kürzel auf gesetze-im-internet.de (geprüft: BauGB = bbaug)
+const SLUG_EXC = {BauGB:"bbaug", EGBGB:"bgbeg", BGBEG:"bgbeg", OWiG:"owig_1968", GwG:"gwg_2017", WEG:"woeigg", AO:"ao_1977", BDSG:"bdsg_2018", UStG:"ustg_1980", KStG:"kstg_1977", BNatSchG:"bnatschg_2009", WHG:"whg_2009", ROG:"rog_2008", VwZG:"vwzg_2005", AsylG:"asylvfg_1992", AufenthG:"aufenthg_2004", BtMG:"btmg_1981", GKG:"gkg_2004", KWG:"kredwg", VVG:"vvg_2008", StVO:"stvo_2013", UWG:"uwg_2004", EGStGB:"stgbeg", IfSG:"ifsg"};
+// Bayerische Gesetze: gesetze-bayern.de verlinkt jeden Artikel als <Kürzel>-<Nummer>, z. B. BayVwVfG-35
+const BAY_LAWS = {PAG:"BayPAG", BayPAG:"BayPAG", LStVG:"BayLStVG", BayLStVG:"BayLStVG", GO:"BayGO", BayGO:"BayGO", LKrO:"BayLKrO", BezO:"BayBezO", BayBO:"BayBO", BayVwVfG:"BayVwVfG", VwZVG:"BayVwZVG", BayVwZVG:"BayVwZVG", BayStrWG:"BayStrWG", BayDSG:"BayDSG", KAG:"BayKAG", BayKAG:"BayKAG", BayNatSchG:"BayNatSchG", BayWaldG:"BayWaldG", BayVerf:"BayVerf", BV:"BayVerf", BayEUG:"BayEUG", BayHSchG:"BayHSchG", BayBG:"BayBG", POG:"BayPOG", BayVSG:"BayVSG", BayStVollzG:"BayStVollzG", VerfGHG:"BayVfGHG", BayVfGHG:"BayVfGHG", AGVwGO:"BayAGVwGO", BayAGVwGO:"BayAGVwGO", KommZG:"BayKommZG", BayKommZG:"BayKommZG", BayVersG:"BayVersG", BayImSchG:"BayImSchG", BayWG:"BayWG", BayEG:"BayEG", BayAGBGB:"BayAGBGB", AGBGB:"BayAGBGB", BayKG:"BayKG", BayRDG:"BayRDG", FAG:"BayFAG"};
+function normUrl(n){
+  const t = String(n).trim();
+  const m = t.match(/(§§?|Art\.?|Artikel)\s*(\d+[a-z]?)/i); if(!m) return null;
+  const abbr = (t.match(/([A-ZÄÖÜ][A-Za-zÄÖÜäöüß]*)\s*$/)||[])[1]; if(!abbr) return null;
+  const isArt = /^art/i.test(m[1]), num = m[2].toLowerCase();
+  if(BAY_LAWS[abbr]) return "https://www.gesetze-bayern.de/Content/Document/"+BAY_LAWS[abbr]+"-"+num;
+  if(FED_LAWS.has(abbr)){ const slug = SLUG_EXC[abbr] || abbr.toLowerCase(); return "https://www.gesetze-im-internet.de/"+slug+"/"+(isArt ? "art_"+num+".html" : "__"+num+".html"); }
+  return null;
+}
+const normChip = n => { const u = normUrl(n); return u ? `<a class="norm" href="${u}" target="_blank" rel="noopener noreferrer" title="Im amtlichen Gesetzestext öffnen">${esc(n)}<span class="ext">↗</span></a>` : `<a class="norm" href="#${normSlug(n)}">${esc(n)}</a>`; };
+const NORM_RE = /(§§?|Art\.)\s*\d+[a-z]?(?:\s*(?:,|und|\/)\s*(?:§\s*)?\d+[a-z]?)*(?:\s*(?:Abs\.\s*)?(?:[IVX]+|\d+)(?![\dA-Za-z]))?(?:\s+(?:(?:S\.|Satz)\s*)?\d+(?![\d.]))?(?:\s+Nr\.\s*\d+[a-z]?)?(?:\s+(?:Alt\.|Var\.)\s*\d+)?(?:\s+(?:[a-z]\)|lit\.\s*[a-z]))?\s+([A-ZÄÖÜ][A-Za-zÄÖÜäöüß]{1,9})(?![A-Za-zÄÖÜäöüß])/g;
+const linkNorms = h => String(h).replace(NORM_RE, m => { const u = normUrl(m); return u ? `<a class="norm norm-inline" href="${u}" target="_blank" rel="noopener noreferrer" title="Im amtlichen Gesetzestext öffnen">${m}</a>` : m; });
+const nl = t => linkNorms(ownMarks(esc(t)));
+const normSlug = n => "n-"+fold(n).replace(/§+/g,"p").replace(/art\./g,"art").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+const TYPES = {def:"Definition", card:"Karteikarte", schema:"Schema", case:"Fall"};
+const TYPES_PL = {def:"Definitionen", card:"Karteikarten", schema:"Schemata", case:"Fälle"};
+const TKEYS = ["def","card","schema","case"];
+const TIER_TXT = {1:"Tier 1 · Fundament",2:"Tier 2 · Klassiker",3:"Tier 3 · Vertiefung",4:"Tier 4 · Randwissen"};
+const tierOf = it => it.tier || ({5:1,4:2,3:3,2:4,1:4}[it.relevance]||3);
+const tierTag = it => { const t = tierOf(it); return `<span class="tier t${t}" title="${TIER_TXT[t]}">T${t}</span>`; };
+const GRADE_TXT = {1:"Nochmal",2:"Schwer",3:"Gut",4:"Leicht",5:"Sehr leicht"};
+// Leicht = in 3 Tagen, Sehr leicht = in 1 Woche (siehe Wiederholungssystem)
+
+/* ---------- Zustand ---------- */
+const S = {
+  mode:"lokal", ready:false, stale:false,
+  items:new Map(), progress:new Map(),
+  settings:{base:50, todayDate:null, todayN:null, cats:["def","card","schema","case"], write:false},
+  log:{days:{}}, abg:{},
+  sb:null, user:null, ai:false, needLogin:false,
+};
+let taHist = false;
+let session = null;          // laufende Abfrage
+const chats = new Map();     // Chat-Verlauf je Eintrag (nur in dieser Sitzung)
+const own = new Map();  // Antworten „in eigenen Worten“ der laufenden Abfrage
+let mnemoEdit = null;
+const verdicts = new Map();  // KI-Auswertung im Schreibmodus
+const checks = new Map();    // Fallabfrage: Skizze des Kernproblems und Claudes Prüfung
+
+/* ---------- Speicher (Supabase) ---------- */
+const CFG = window.EXAMENSKARTEI_CONFIG || {};
+const CONFIGURED = !!(CFG.supabaseUrl && CFG.supabaseKey && !/DEIN|XXX/.test(CFG.supabaseUrl + CFG.supabaseKey));
+const LS_KEY = "examenskartei-v1";
+function lsLoad(){
+  try{ const raw = localStorage.getItem(LS_KEY); if(!raw) return;
+    const d = JSON.parse(raw);
+    (d.items||[]).forEach(it=>S.items.set(it.id,it));
+    Object.entries(d.progress||{}).forEach(([k,v])=>S.progress.set(k,v));
+    Object.assign(S.settings, d.settings||{}); S.log = d.log||{days:{}};
+  }catch(e){}
+}
+function lsSave(){
+  if(S.sb) return;
+  try{ localStorage.setItem(LS_KEY, JSON.stringify({items:[...S.items.values()], progress:Object.fromEntries(S.progress), settings:S.settings, log:S.log})); }catch(e){}
+}
+const clean = o => JSON.parse(JSON.stringify(o));
+const queues = new Map();
+function serial(key, fn){ const prev = queues.get(key)||Promise.resolve(); const next = prev.catch(()=>{}).then(fn); queues.set(key,next); return next; }
+const isAuthErr = e => e && (e.status===401 || e.code==="PGRST301" || /jwt|token/i.test(e.message||""));
+async function sbRun(key, fn){
+  const once = async () => { const r = await fn(); if(r && r.error) throw r.error; return r; };
+  try{ return await serial(key, once); }
+  catch(e){
+    if(!isAuthErr(e)){ await new Promise(r=>setTimeout(r,600+Math.random()*600)); try{ return await serial(key, once); }catch(e2){ e = e2; } }
+    toast(isAuthErr(e) ? "Deine Anmeldung ist abgelaufen. Bitte melde dich neu an." : !navigator.onLine ? "Keine Internetverbindung. Die Änderung wurde nicht gespeichert." : "Speichern fehlgeschlagen. Bitte noch einmal versuchen.");
+    throw e;
+  }
+}
+const now = () => new Date().toISOString();
+const rowOf = (id, data) => ({user_id:S.user.id, id, data:clean(data), updated_at:now()});
+async function putItem(it){
+  it.updated = now();
+  S.items.set(it.id, it);
+  if(S.sb) await sbRun("i/"+it.id, ()=>S.sb.from("items").upsert(rowOf(it.id,it), {onConflict:"user_id,id"})); else lsSave();
+}
+async function putItems(list){
+  list.forEach(it=>{ it.updated = it.updated || now(); S.items.set(it.id, it); });
+  if(!S.sb){ lsSave(); return; }
+  for(let i=0; i<list.length; i+=300){ const part = list.slice(i, i+300);
+    await sbRun("bulk-items", ()=>S.sb.from("items").upsert(part.map(it=>rowOf(it.id,it)), {onConflict:"user_id,id"})); }
+}
+async function putProgressMany(entries){
+  entries.forEach(([k,v])=>S.progress.set(k,v));
+  if(!S.sb){ lsSave(); return; }
+  for(let i=0; i<entries.length; i+=300){ const part = entries.slice(i, i+300);
+    await sbRun("bulk-progress", ()=>S.sb.from("progress").upsert(part.map(([k,v])=>rowOf(k,v)), {onConflict:"user_id,id"})); }
+}
+async function deleteItem(id){
+  S.items.delete(id); S.progress.delete(id);
+  for(const it of S.items.values()){
+    if((it.links||[]).includes(id)){ it.links = it.links.filter(x=>x!==id); await putItem(it); }
+  }
+  if(S.sb){ await sbRun("i/"+id, ()=>S.sb.from("items").delete().eq("id",id)); await sbRun("p/"+id, ()=>S.sb.from("progress").delete().eq("id",id)); } else lsSave();
+}
+async function putProgress(id,p){
+  S.progress.set(id,p);
+  if(S.sb) await sbRun("p/"+id, ()=>S.sb.from("progress").upsert(rowOf(id,p), {onConflict:"user_id,id"})); else lsSave();
+}
+async function deleteProgress(id){
+  S.progress.delete(id);
+  if(S.sb) await sbRun("p/"+id, ()=>S.sb.from("progress").delete().eq("id",id)); else lsSave();
+}
+async function putMeta(key, data){
+  if(S.sb) await sbRun("m/"+key, ()=>S.sb.from("meta").upsert({user_id:S.user.id, key, data:clean(data), updated_at:now()}, {onConflict:"user_id,key"})); else lsSave();
+}
+async function saveSettings(){ await putMeta("settings", S.settings); }
+async function bumpLog(){
+  const t = today(); S.log.days[t] = (S.log.days[t]||0)+1;
+  await putMeta("log", S.log);
+}
+async function fetchAll(table){
+  const out = [], step = 1000;
+  for(let from=0;; from+=step){
+    const {data, error} = await S.sb.from(table).select("*").range(from, from+step-1);
+    if(error) throw error;
+    out.push(...data); if(data.length < step) break;
+  }
+  return out;
+}
+let lastLoad = 0;
+async function loadAll(){
+  let sessMeta = null;
+  const [items, prog, meta] = await Promise.all([fetchAll("items"), fetchAll("progress"), fetchAll("meta")]);
+  S.items = new Map(items.map(r=>[r.id, Object.assign({}, r.data, {id:r.id})]));
+  S.progress = new Map(prog.map(r=>[r.id, r.data]));
+  meta.forEach(r=>{
+    if(r.key==="settings") Object.assign(S.settings, r.data||{});
+    if(r.key==="session") sessMeta = r.data;
+    if(r.key==="abgefragt") mergeAbg(r.data);
+    if(r.key==="log"){ const days = Object.assign({}, (r.data||{}).days||{}); for(const [k,v] of Object.entries(S.log.days)) days[k] = Math.max(days[k]||0, v); S.log = {days}; }
+  });
+  if(!session) loadSavedSess(sessMeta);
+  lastLoad = Date.now(); S.stale = false;
+}
+let rtTimer;
+const later = () => { clearTimeout(rtTimer); rtTimer = setTimeout(()=>{ if(S.ready) refresh(); }, 150); };
+function subscribe(){
+  try{
+    const ch = S.sb.channel("kartei-"+S.user.id);
+    for(const t of ["items","progress","meta"]){
+      ch.on("postgres_changes", {event:"*", schema:"public", table:t}, p=>{
+        const n = p.new || {}, o = p.old || {};
+        if(p.eventType==="DELETE"){ if(t==="items") S.items.delete(o.id); if(t==="progress") S.progress.delete(o.id); later(); return; }
+        if(n.user_id && n.user_id!==S.user.id) return;
+        if(t==="items") S.items.set(n.id, Object.assign({}, n.data, {id:n.id}));
+        else if(t==="progress") S.progress.set(n.id, n.data);
+        else if(n.key==="settings") Object.assign(S.settings, n.data||{});
+        else if(n.key==="session"){ if(!session) loadSavedSess(n.data); }
+        else if(n.key==="abgefragt") mergeAbg(n.data);
+        else if(n.key==="log"){ const days = Object.assign({}, (n.data||{}).days||{}); for(const [k,v] of Object.entries(S.log.days)) days[k] = Math.max(days[k]||0, v); S.log = {days}; }
+        later();
+      });
+    }
+    ch.subscribe();
+  }catch(e){}
+}
+
+/* ---------- Claude über die Supabase-Funktion ---------- */
+async function aiCall(body, signal){
+  if(!navigator.onLine) throw {code:"offline"};
+  const {data} = await S.sb.auth.getSession();
+  const sess = data && data.session; if(!sess) throw {code:"auth"};
+  let r;
+  try{
+    r = await fetch(CFG.supabaseUrl.replace(/\/+$/,"")+"/functions/v1/"+(CFG.claudeFunction||"claude"), {
+      method:"POST", signal,
+      headers:{"Content-Type":"application/json", "Authorization":"Bearer "+sess.access_token, "apikey":CFG.supabaseKey},
+      body:JSON.stringify(body)});
+  }catch(e){ if(e && e.name==="AbortError") throw {code:"cancelled"}; throw {code:"network"}; }
+  if(!r.ok){
+    let d = {}; try{ d = await r.json(); }catch(e){}
+    const detail = String(d.detail||d.error||d.message||"");
+    const code = r.status===404 ? "no_function" : r.status===401 ? "auth" : r.status===403 ? "forbidden" : r.status===429 ? "rate_limited"
+      : d.error==="no_key" ? "no_key" : /credit|balance|billing/i.test(detail) ? "no_credit" : /authentication|api.key|x-api-key/i.test(detail) ? "bad_key" : "failed";
+    throw {code, status:r.status, detail};
+  }
+  return r;
+}
+function normTurns(turns){
+  const out = [];
+  for(const t of turns){ if(!t.content) continue; const last = out[out.length-1];
+    if(last && last.role===t.role) last.content += "\n\n"+t.content; else out.push({role:t.role, content:t.content}); }
+  while(out.length && out[0].role!=="user") out.shift();
+  return out;
+}
+/* Gespeicherte KI-Antworten (auf diesem Gerät): gleiche Frage zur unveränderten Karte kostet keinen neuen Aufruf */
+const AI_CACHE_KEY = "examenskartei-ki-cache", AI_CACHE_MAX = 400;
+function hashStr(t){ let h = 0x811c9dc5; for(let i=0;i<t.length;i++){ h ^= t.charCodeAt(i); h = Math.imul(h, 0x01000193); } return (h>>>0).toString(36)+t.length.toString(36); }
+const normQ = t => fold(t).replace(/[^\p{L}\p{N}§]+/gu," ").trim();
+function cacheGet(k){ try{ const m = JSON.parse(localStorage.getItem(AI_CACHE_KEY)||"{}"); return m[k] ? m[k].v : undefined; }catch(e){ return undefined; } }
+function cachePut(k, v){
+  try{ const m = JSON.parse(localStorage.getItem(AI_CACHE_KEY)||"{}"); m[k] = {v, t:Date.now()};
+    const ks = Object.keys(m); if(ks.length > AI_CACHE_MAX) ks.sort((a,b)=>m[a].t-m[b].t).slice(0, ks.length-AI_CACHE_MAX).forEach(x=>delete m[x]);
+    localStorage.setItem(AI_CACHE_KEY, JSON.stringify(m)); }catch(e){}
+}
+const CHAT_RULES = "Du bist Repetitor für das bayerische Erste Juristische Staatsexamen und hilfst beim Lernen mit einer Kartei. Antworte auf Deutsch, knapp (höchstens 6 Sätze, außer es wird ausdrücklich mehr verlangt) und examensnah. Nenne die einschlägigen Normen und bei Streitständen die herrschende Meinung. Ist die Karte fehlerhaft oder unvollständig, weise sachlich darauf hin.";
+const GRADE_RULES = 'Du wertest Antworten auf Karteikarten (Definitionen, Fragen, Schemata) für das bayerische Erste Juristische Staatsexamen aus. Bewerte wohlwollend, wie ein freundlicher Repetitor: Der Lernende antwortet frei aus dem Kopf, oft in Stichworten oder per Spracheingabe. Ein Kernmerkmal ist erfüllt, wenn der Gedanke sinngemäß erkennbar ist; Wortlaut, Reihenfolge, Synonyme, Abkürzungen, Tippfehler und fehlende Normzitate sind egal. Nebenpunkte, Beispiele und Streitstände, die nicht zum Kern gehören, nicht als Merkmal werten. Werte höchstens 2 bis 5 echte Kernmerkmale. gesamt: „vollständig“, wenn der Kern stimmt und höchstens Nebensächliches fehlt; „teilweise“, wenn ein Kernmerkmal fehlt; „unzureichend“ nur, wenn der Kern fehlt oder rechtlich falsch ist. empfehlung nach diesen Stufen: Leicht, wenn alle Kernmerkmale erfüllt sind und die Antwort sicher und treffend ist (auch in Stichworten; fehlende Normzitate oder ein fehlendes Detail ohne Kernbedeutung schaden nicht). Gut, wenn der Kern stimmt (gesamt „vollständig“), die Antwort aber unsicher, umständlich oder ungenau formuliert ist oder ein Nebenaspekt fehlt, auf den es in der Klausur ankommen kann. Schwer bei „teilweise“. Nochmal nur bei „unzureichend“. Im Zweifel zwischen Gut und Leicht: Sind alle Merkmale erfüllt, Leicht. Antworte ausschließlich mit JSON ohne weiteren Text: {"merkmale":[{"merkmal":"…","erfuellt":true,"hinweis":"nur wenn nicht erfüllt, höchstens 10 Wörter"}],"gesamt":"vollständig|teilweise|unzureichend","empfehlung":"Nochmal|Schwer|Gut|Leicht","kommentar":"ein ermutigender Satz, ggf. mit dem einen wichtigsten fehlenden Punkt"}';
+const CHECK_RULES = `Du bist Korrektor für das bayerische Erste Juristische Staatsexamen. Der Lernende skizziert in eigenen Worten das Kernproblem eines Übungsfalls. Prüfe die Skizze an der beigefügten Lösung; deren Rechtsauffassung gilt. Antworte auf Deutsch, knapp und konkret, in genau diesem Format (Abschnitte ohne Inhalt weglassen):
+Richtig erkannt: Stichpunkte, jeweils mit „– “ beginnend
+Fehlt oder ungenau: Stichpunkte mit „– “; nenne das fehlende Problem und die einschlägige Norm
+Richtigstellung: nur wenn etwas rechtlich falsch ist
+Tipp für die Klausur: ein Satz
+Empfehlung: Nochmal|Schwer|Gut|Leicht
+Bewerte wohlwollend: Eine Skizze in Stichworten oder per Spracheingabe genügt, Formulierung und Vollständigkeit der Details sind zweitrangig. Erkennt der Lernende das Hauptproblem und löst es im Ergebnis vertretbar, ist das mindestens „Gut“. Empfehlung: Leicht, wenn das Hauptproblem und alle für die Klausur wesentlichen Punkte richtig erfasst sind (unter „Fehlt oder ungenau“ steht dann nichts Wesentliches); Gut, wenn das Hauptproblem stimmt, aber ein wesentlicher Punkt fehlt oder ungenau ist; Schwer, wenn das Hauptproblem nur teilweise erkannt ist; Nochmal, wenn es verkannt oder falsch gelöst ist. Kritisiere nur, was für die Klausur wirklich zählt (verkanntes Hauptproblem, falsche Anspruchsgrundlage, rechtlich falsches Ergebnis), und nenne bei „Fehlt oder ungenau“ höchstens drei Punkte. Keine Einleitung, keine Wiederholung der Skizze.`;
+async function aiStream(system, turns, opts={}){
+  const r = await aiCall({kind:opts.kind||"chat", system, messages:normTurns(turns).slice(-8), stream:true, max_tokens:opts.max_tokens||2000}, opts.signal);
+  const reader = r.body.getReader(), dec = new TextDecoder(); let buf = "", text = "";
+  try{
+    for(;;){
+      const {value, done} = await reader.read(); if(done) break;
+      buf += dec.decode(value, {stream:true}).replace(/\r/g,"");
+      let i;
+      while((i = buf.indexOf("\n\n")) >= 0){
+        const evt = buf.slice(0,i); buf = buf.slice(i+2);
+        const line = evt.split("\n").find(l=>l.startsWith("data:")); if(!line) continue;
+        let d; try{ d = JSON.parse(line.slice(5).trim()); }catch(e){ continue; }
+        if(d.type==="content_block_delta" && d.delta && d.delta.type==="text_delta"){ text += d.delta.text; opts.onText && opts.onText(text); }
+        else if(d.type==="error"){ const er = d.error||{}; throw {code: er.type==="empty" ? "empty" : /overload/i.test(JSON.stringify(er)) ? "rate_limited" : "failed", stop:er.stop_reason}; }
+      }
+    }
+  }catch(e){
+    if(e && e.name==="AbortError") throw {code:"cancelled", text};
+    throw Object.assign({code:"failed"}, e && e.code ? e : {}, {text});
+  }
+  if(!text.trim()) throw {code:"empty", text:""};
+  return text;
+}
+async function aiJson(prompt){
+  const r = await aiCall({kind:"grade", system:[GRADE_RULES], messages:[{role:"user", content:prompt}], stream:false, max_tokens:1000});
+  const d = await r.json(); const t = String(d.text||"");
+  const a = t.indexOf("{"), b = t.lastIndexOf("}");
+  if(a<0 || b<a) throw {code:"invalid_json"};
+  try{ return JSON.parse(t.slice(a,b+1)); }catch(e){ throw {code:"invalid_json"}; }
+}
+
+/* ---------- Wiederholungssystem: FSRS (wie in Anki) mit Examensbremse ---------- */
+// Jede Karte hat eine Merkdauer S (Tage, bis die Erinnerung auf 90 % fällt) und eine Schwierigkeit D (1–10).
+// Knöpfe: 1 Nochmal = vergessen (gleich nochmal, dann morgen), 2 Schwer, 3 Gut, 4 Leicht (FSRS „Again/Hard/Good/Easy“),
+// 5 Sehr leicht = ausgliedern bis zum Endspurt.
+// Neue Karten (nie gelernt): bei Nochmal, Schwer oder Gut zuerst morgen und übermorgen, danach FSRS.
+// Gesichert: Reicht die Merkdauer bis zum Examen, fällt die Karte aus allen Abfragen heraus und kommt erst im
+// Endspurt (Standard: 21 Tage vor dem Examen) einmal zur Endwiederholung. Kein Abstand reicht über das Examen hinaus.
+const FSRS_W = [0.4872, 1.4003, 3.7145, 13.8206, 5.1618, 1.2298, 0.8975, 0.031, 1.6474, 0.1367, 1.0461, 2.1072, 0.0793, 0.3246, 1.587, 0.2272, 2.8755];
+const FSRS_DECAY = -0.5, FSRS_FACTOR = 19/81, FSRS_RET = 0.9;
+const EXAM_DEFAULT = "2027-03-01";
+const examDate = () => S.settings.examDate || EXAM_DEFAULT;
+const daysToExam = () => Math.max(0, diffDays(today(), examDate()));
+const endspurtStart = () => addDays(examDate(), -(S.settings.endspurt||21));
+const clampD = d => Math.min(10, Math.max(1, d));
+const fsrsR = (t, st) => Math.pow(1 + FSRS_FACTOR * Math.max(0,t) / st, FSRS_DECAY);
+const fsrsIvl = st => st / FSRS_FACTOR * (Math.pow(FSRS_RET, 1/FSRS_DECAY) - 1); // bei 90 % = S
+const fsrsD0 = g => clampD(FSRS_W[4] - (g-3) * FSRS_W[5]);
+function fsrsState(p){
+  if(!p) return null;
+  if(p.fs) return p.fs;
+  // ältere Lernstände übernehmen: bisheriger Abstand als Merkdauer, Fehler erhöhen die Schwierigkeit
+  return {s: Math.max(1, p.ivl||1), d: clampD(5 + Math.min(p.lapses||0, 5) * 0.8)};
+}
+function fsrsNext(st, g, t){
+  const w = FSRS_W;
+  if(!st) return {s: w[g-1], d: fsrsD0(g)};
+  const r = fsrsR(t, st.s);
+  let d = st.d - w[6] * (g-3); d = clampD(w[7] * fsrsD0(3) + (1 - w[7]) * d);
+  let s;
+  if(g===1) s = Math.min(st.s, w[11] * Math.pow(st.d, -w[12]) * (Math.pow(st.s+1, w[13]) - 1) * Math.exp(w[14] * (1-r)));
+  else s = st.s * (1 + Math.exp(w[8]) * (11 - st.d) * Math.pow(st.s, -w[9]) * (Math.exp(w[10] * (1-r)) - 1) * (g===2 ? w[15] : 1) * (g===4 ? w[16] : 1));
+  return {s: Math.max(0.1, s), d};
+}
+function stageOf(p){ return p && p.lastGrade ? p.lastGrade : 0; }
+const isGesichert = p => !!(p && p.gesichert && p.due > today());
+function schedule(prev, grade, tier, base){
+  base = base || today();
+  const p = Object.assign({ivl:0, reps:0, lapses:0}, prev||{});
+  // Heute schon mit derselben oder besseren Bewertung gelernt (z. B. Abfrage zweimal gestartet): Plan nicht doppelt weiterschieben
+  if(grade>=3 && grade<5 && prev && prev.last===today() && prev.lastGrade>=grade && prev.due>today()){ return Object.assign({}, prev, {reps:(prev.reps||0)+1}); }
+  const isNewCard = !prev || !prev.reps;
+  const g4 = Math.min(grade, 4);
+  const old = fsrsState(prev);
+  const t = old && prev.last ? diffDays(prev.last, base) : 0;
+  const fs = fsrsNext(old, g4, t);
+  if(grade===1) p.lapses++;
+  const daysLeft = Math.max(1, diffDays(base, examDate()) - 2);
+  let ivl = Math.max(1, Math.round(fsrsIvl(fs.s)));
+  if(grade===1) ivl = 1;                                   // vergessen: gleich nochmal, dann morgen
+  if(isNewCard && grade<=3) ivl = 1;                        // neue Karte: morgen …
+  p.follow = isNewCard && grade<=3 ? addDays(base, 2) : null; // … und übermorgen
+  // Gesichert: „Sehr leicht“ oder Merkdauer reicht bis zum Examen → bis zum Endspurt ausgliedern
+  const es = endspurtStart();
+  p.gesichert = false;
+  if((grade===5 || fs.s >= diffDays(base, examDate())) && base < es){
+    if(grade===5) fs.s = Math.max(fs.s, diffDays(base, examDate()));
+    p.gesichert = true; ivl = diffDays(base, es);
+  } else ivl = Math.min(daysLeft, ivl);
+  let due = addDays(base, ivl);
+  if(due <= today() && grade>=2) due = addDays(today(), 1);
+  if(prev && prev.follow && grade>=2 && grade<=3 && prev.follow > today() && due > prev.follow && !p.gesichert) due = prev.follow; // „Leicht“ überspringt den Übermorgen-Termin
+  if(grade>=3 && !p.sure) p.sure = today();
+  p.fs = {s: Math.round(fs.s*100)/100, d: Math.round(fs.d*100)/100};
+  p.stage = grade; p.ivl = diffDays(today(), due); p.reps++; p.due = due; p.last = today(); p.lastGrade = grade;
+  p.leech = p.lapses >= 3;
+  return p;
+}
+const GRADE_INFO = {
+  1:"Die Karte kommt gleich nochmal in derselben Abfrage, dann morgen. Ihre Merkdauer sinkt stark.",
+  2:"FSRS berechnet den Abstand. Sichere Karten rücken schnell weit nach hinten, wackelige bleiben eng getaktet.",
+  3:"FSRS berechnet den Abstand. Sichere Karten rücken schnell weit nach hinten, wackelige bleiben eng getaktet.",
+  4:"FSRS berechnet den Abstand. Sichere Karten rücken schnell weit nach hinten, wackelige bleiben eng getaktet.",
+  5:"Die Karte wird bis zum Endspurt ausgegliedert."};
+const g2txt = g => g+" "+GRADE_TXT[g]+":";
+let gradeInfo = 0;
+const GRADE_HINT = (p, g) => { if(g===1) return "gleich nochmal, dann morgen"; const n = schedule(p, g); return n.gesichert ? "gesichert bis Endspurt" : fmtIvl(Math.max(1, diffDays(today(), n.due))); };
+const TIER_W = {1:8, 2:6, 3:3, 4:1};
+function priority(it){
+  const p = S.progress.get(it.id), w = TIER_W[tierOf(it)];
+  if(!p) return w + 0.5;
+  const st = fsrsState(p), risk = p.last ? 1 - fsrsR(diffDays(p.last, today()), st.s) : 0.5;
+  return w + risk*20 + Math.min(p.lapses,5) + (st.d>7 ? 1.5 : 0);
+}
+const isDue = it => { const p = S.progress.get(it.id); return !p || p.due <= today(); };
+const isNew = it => !S.progress.get(it.id);
+/* Schon abgefragt: Je Abfrage in „Aktuell“ (Tagesabfrage eines Datums, Fall, Pensum) merkt sich die App, welche Karten
+   im laufenden Durchgang bewertet wurden. Beim erneuten Start kommen nur die übrigen – auch über Mitternacht und Geräte hinweg.
+   Ist der Durchgang fertig, gilt die Liste noch bis Tagesende; ein nicht beendeter Durchgang verfällt nach 36 Stunden. */
+const ABG_KEY = "juragarage-abgefragt", ABG_TTL = 36*3600e3;
+let abgTimer = null;
+try{ S.abg = JSON.parse(localStorage.getItem(ABG_KEY)||"{}") || {}; }catch(e){ S.abg = {}; }
+const abgKeyOf = s => s && !s.exam && s.kind ? s.kind+":"+(s.key||"") : "";
+function abgLive(e){ return !!e && (e.fin ? e.fin===today() : Date.now()-(e.t||0) < ABG_TTL); }
+function abgDone(key){ const e = S.abg[key]; return abgLive(e) ? new Set(e.ids||[]) : new Set(); }
+function isOpenIn(key){ const d = abgDone(key); return it => isDue(it) && !d.has(it.id); }
+function saveAbg(){
+  for(const [k,e] of Object.entries(S.abg)) if(!abgLive(e)) delete S.abg[k];
+  try{ localStorage.setItem(ABG_KEY, JSON.stringify(S.abg)); }catch(e){}
+  clearTimeout(abgTimer); abgTimer = setTimeout(()=>{ putMeta("abgefragt", S.abg).catch(()=>{}); }, 1200);
+}
+function markAbg(key, id){
+  if(!key) return; let e = S.abg[key];
+  if(!abgLive(e)) e = S.abg[key] = {ids:[], t:0, fin:null};
+  e.fin = null; // neue Karten nach Abschluss (z. B. 22-Uhr-Lauf): Durchgang läuft weiter, Bisheriges bleibt ausgeschlossen
+  if(!e.ids.includes(id)) e.ids.push(id); e.t = Date.now(); saveAbg();
+}
+function unmarkAbg(key, id){ const e = S.abg[key]; if(!e) return; e.ids = (e.ids||[]).filter(x=>x!==id); e.fin = null; e.t = Date.now(); saveAbg(); }
+function finishAbg(key){ const e = S.abg[key]; if(key && e){ e.fin = today(); e.t = Date.now(); saveAbg(); } }
+/* Tagesabfrage: jede Karte wird darin genau einmal abgefragt. Erledigt ist sie, sobald sie am oder nach dem Tag
+   dieser Tagesabfrage bewertet wurde – auch nach 0 Uhr. Eine abgeschlossene Tagesabfrage startet nicht neu. */
+const taPending = it => { const p = S.progress.get(it.id); return !p || !p.last || p.last < it.tagesabfrage || (p.lastGrade===1 && isDue(it)); };
+function mergeAbg(remote){
+  if(!remote || typeof remote!=="object") return;
+  for(const [k,r] of Object.entries(remote)){
+    if(!r || !Array.isArray(r.ids)) continue;
+    const l = S.abg[k];
+    if(!l || (r.t||0) > (l.t||0)){
+      // gleicher, noch offener Durchgang auf zwei Geräten: Listen zusammenführen
+      const ids = l && !l.fin && !r.fin && abgLive(l) ? [...new Set([...(l.ids||[]), ...r.ids])] : r.ids;
+      S.abg[k] = Object.assign({}, r, {ids});
+    }
+  }
+  try{ localStorage.setItem(ABG_KEY, JSON.stringify(S.abg)); }catch(e){}
+}
+function todayTarget(){ return S.settings.todayDate===today() && S.settings.todayN!=null ? S.settings.todayN : S.settings.base; }
+const doneToday = () => S.log.days[today()]||0;
+function fmtIvl(n){ return n===1 ? "morgen" : n===7 ? "in 1 Woche" : n<=45 ? "in "+n+" Tagen" : n<365 ? "in "+n+" Tagen (~"+(Math.round(n/3.044)/10).toLocaleString("de-DE")+" Mon.)" : "in "+n+" Tagen"; }
+
+/* ---------- Hilfsfunktionen Einträge ---------- */
+const titleOf = it => it.type==="card" ? it.front : it.type==="def" ? it.term : it.title;
+const stepsText = it => (it.steps||[]).map(x=>x.replace(/^\s+/,"")).join(" ");
+function bodyText(it){
+  if(it.type==="card") return it.back||"";
+  if(it.type==="def") return it.definition||"";
+  if(it.type==="schema") return stepsText(it);
+  return [it.sachverhalt, (it.kern||[]).join(" "), (it.problems||[]).map(p=>p.frage+" "+p.antwort).join(" ")].join(" ");
+}
+function hay(it){ return fold([titleOf(it), bodyText(it), (it.merkmale||[]).join(" "), (it.tags||[]).join(" "), (it.norms||[]).join(" "), it.source, it.area].join(" ")); }
+function linksOf(id){
+  const it = S.items.get(id); const out = new Set(it ? (it.links||[]) : []);
+  for(const o of S.items.values()) if((o.links||[]).includes(id)) out.add(o.id);
+  out.delete(id); return [...out].map(x=>S.items.get(x)).filter(Boolean);
+}
+function normIndex(){
+  const m = new Map();
+  for(const it of S.items.values()) for(const n of (it.norms||[])){ const k = n.trim(); if(!k) continue; if(!m.has(k)) m.set(k,[]); m.get(k).push(it); }
+  return m;
+}
+const areas = () => [...new Set([...S.items.values()].map(i=>i.area).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"de"));
+
+/* ---------- Rückseiten-Formatierung (nur Anzeige, DB bleibt unverändert) ---------- */
+const FMT_LS = "ek-fmt";
+let fmtOn = (()=>{ try{ return localStorage.getItem(FMT_LS)!=="0"; }catch(e){ return true; } })();
+function setFmt(on){ fmtOn = !!on; try{ localStorage.setItem(FMT_LS, on?"1":"0"); }catch(e){} }
+/* eigene Markierungen: **fett** und ==markiert== (auf bereits escaptem Text) */
+const ownMarks = h => String(h)
+  .replace(/\*\*(?=\S)([^\n]*?\S)\*\*/g, '<strong class="own-b">$1</strong>')
+  .replace(/==(?=\S)([^\n]*?\S)==/g, '<mark class="own-m">$1</mark>');
+const stripMarks = t => String(t||"").replace(/\*\*(?=\S)([^\n]*?\S)\*\*/g,"$1").replace(/==(?=\S)([^\n]*?\S)==/g,"$1");
+const FMT_B = '(^|[\\s(„"/–-])', FMT_E = '(?=[\\s,;:.)“"/]|$)';
+const RE_HM = new RegExp(FMT_B+'((?:ganz |wohl |noch )?h\\.\\s?M\\.|h\\.\\s?L\\.|(?:st\\.\\s?)?Rspr\\.|BGH|BVerfG|BVerwG|BayVGH|BayObLG|BAG|EuGH|herrschende Meinung|ständige Rechtsprechung)'+FMT_E, "g");
+const RE_AA = new RegExp(FMT_B+'(a\\.\\s?A\\.|e\\.\\s?A\\.|M\\.\\s?M\\.|m\\.\\s?M\\.|Mindermeinung|Gegenansicht|andere Ansicht|Teile der Literatur|Lit\\.|str\\.)'+FMT_E, "g");
+const LABELS = "Grund|Gründe|Arg\\.|Argument|Argumente|Begründung|Beispiele?|Bsp\\.|Standardbeispiel|Folge|Rechtsfolge|Besondere Voraussetzungen|Voraussetzungen?|Problem|Abgrenzung|Ausnahmen?|Grundsatz|Zweck|Sinn und Zweck|Früher|Heute|Def\\.|Definition|Streitstand|Stellungnahme|Konsequenz|Anwendungsfälle?|Aufbau|Vorteile?|Nachteile?|Merke|Achtung|Beachte|Wichtig|Hinweis|Klausurhinweis|Klausurtipp|Examenstipp|Tipp|Ergebnis|Zwischenergebnis|Anm\\.|Prüfung|Lösung|Pro|Contra|Kontra|Dafür|Dagegen";
+const RE_LBL_MID = new RegExp('(^|[.!?“")]\\s+)('+LABELS+')(\\s?:)', "g");
+const RE_LBL_START = /^([^:\n]{1,34}?)(\s?:)(\s|$)/;
+const RE_TIP = /^(Merke|Achtung|Beachte|Wichtig|Hinweis|Klausurhinweis|Klausurtipp|Examenstipp|Tipp|Vorsicht|Aufbauhinweis)\b\s*[:!]?/;
+const RE_EX = /^(Standardbeispiel|Beispiele?|Bsp\.|Bspe?\.|Etwa|z\.\s?B\.)\s*:/;
+const RE_RES = /^(Ergebnis|Im Ergebnis|Zwischenergebnis|Endergebnis|Ergo)\b/;
+const RE_RES_END = /^(Somit|Folglich|Mithin|Im Ergebnis|Ergebnis|Damit|Also|Daher|Deshalb|Demnach)\b/;
+const RE_OPN_HM = /^(Nach (?:der )?(?:ganz )?(?:h\.\s?M\.|h\.\s?L\.|herrschender Meinung|st\.\s?Rspr\.|Rspr\.|(?:ständiger )?Rechtsprechung)|Die (?:ganz )?(?:h\.\s?M\.|h\.\s?L\.|Rspr\.|Rechtsprechung|herrschende Meinung)|(?:Ganz )?h\.\s?M\.|h\.\s?L\.|(?:St\.\s?)?Rspr\.|Rechtsprechung und|Der BGH|Das BVerfG|Das BVerwG|Der BayVGH|BGH|BVerfG|BVerwG)/;
+const RE_OPN_AA = /^(Nach (?:einer |der |anderer )?(?:a\.\s?A\.|e\.\s?A\.|M\.\s?M\.|Mindermeinung|Gegenansicht|(?:anderer |vermittelnder |einer |weiterer )?Ansicht|Teilen der Literatur)|Eine (?:andere |weitere |vermittelnde |früher vertretene |starke )?(?:Ansicht|Auffassung|Meinung|Mindermeinung)|Die Gegenansicht|Die (?:Mindermeinung|Literatur)|Teile der Literatur|Teilweise wird|Andere (?:halten|meinen|vertreten|wollen)|a\.\s?A\.|e\.\s?A\.|M\.\s?M\.|m\.\s?M\.|Ansicht \d|\d\.\s?Ansicht|Vermittelnde Ansicht|Gegenansicht)/;
+const RE_STN = /^(Stellungnahme|Streitentscheid|Streitentscheidung|Entscheidung des Streits)\b/;
+const RE_SPLIT_BEFORE = /([.!?“"])\s+(?=(?:Eine (?:andere |weitere |vermittelnde )?(?:Ansicht|Auffassung|Meinung)|Nach (?:einer |der |anderer )?(?:Ansicht|a\.\s?A\.|e\.\s?A\.|h\.\s?M\.|st\.\s?Rspr|Rspr|Rechtsprechung|herrschender)|Die (?:ganz )?(?:h\.\s?M\.|Rspr\.|Rechtsprechung|Gegenansicht|Literatur|herrschende)|Rechtsprechung und|Rspr\. und|Teile der Literatur|Teilweise wird|Andere (?:halten|meinen|vertreten)|Stellungnahme|Streitentscheid|Im Ergebnis|Ergebnis\s?:|Zwischenergebnis|Merke|Achtung\s?:|Beachte\s?:|Hinweis\s?:|Klausurtipp|Klausurhinweis|Standardbeispiel|Beispiel\s?:|Bsp\.\s?:|Grund\s?:|Arg\.\s?:|Folge\s?:|Rechtsfolge\s?:|Früher\s?:|Heute\s?:))/g;
+/* Gliederungsmarken */
+const GL = [
+  {re:/^([A-H])\.\s+(?=\S)/, lv:0},
+  {re:/^((?:X{0,3})(?:IX|IV|V?I{0,3}))\.\s+(?=\S)/, lv:1, ok:m=>m[1].length>0},
+  {re:/^(\d{1,2})\.\s+(?=[^\d\s])/, lv:2},
+  {re:/^([a-h])\)\s+/, lv:3},
+  {re:/^((?:aa|bb|cc|dd|ee|ff|gg|hh))\)\s+/, lv:4},
+  {re:/^\((\d{1,2})\)\s+/, lv:5},
+  {re:/^\(([a-h])\)\s+/, lv:6}
+];
+const INL_ENUM = [
+  {re:/(^|\s)([a-h])\)\s+(?=\S)/g, key:m=>m.charCodeAt(0)},
+  {re:/(^|\s)(aa|bb|cc|dd|ee|ff|gg|hh)\)\s+(?=\S)/g, key:m=>m.charCodeAt(0)},
+  {re:/(^|\s)\((\d{1,2})\)\s+(?=\S)/g, key:m=>+m},
+  {re:/(^|[\s:])(\d)\.\s+(?=[A-ZÄÖÜ])/g, key:m=>+m}
+];
+/* eine Zeile mit "a) … b) … c) …" in Zeilen zerlegen (nur bei fortlaufender Folge) */
+function splitInlineEnum(line){
+  for(const E of INL_ENUM){
+    const hits = []; let m; E.re.lastIndex = 0;
+    while((m = E.re.exec(line))){ hits.push({pos:m.index+m[1].length, k:E.key(m[2])}); }
+    if(hits.length<2) continue;
+    // längste fortlaufende Kette
+    let best = [], cur = [hits[0]];
+    for(let i=1;i<hits.length;i++){ if(hits[i].k===cur[cur.length-1].k+1) cur.push(hits[i]); else { if(cur.length>best.length) best = cur; cur = [hits[i]]; } }
+    if(cur.length>best.length) best = cur;
+    if(best.length<2) continue;
+    const out = []; let last = 0;
+    best.forEach(h=>{ const s = line.slice(last, h.pos).trim(); if(s) out.push(s); last = h.pos; });
+    out.push(line.slice(last).trim());
+    return out.flatMap(splitInlineEnum2);
+  }
+  return [line];
+}
+function splitInlineEnum2(l){ // eine Ebene tiefer (z. B. aa) bb) innerhalb von a))
+  const m = l.match(/^(\S+\)\s+)([\s\S]*)$/);
+  if(!m) return [l];
+  const inner = splitInlineEnum(m[2]);
+  if(inner.length<2) return [l];
+  return [m[1]+inner[0], ...inner.slice(1)];
+}
+function fmtInline(raw){
+  let h = ownMarks(esc(raw));
+  h = h.replace(/\((\+|-|–|−)\)/g, (m,s)=> s==="+" ? '<span class="pm pm-p">(+)</span>' : '<span class="pm pm-m">(–)</span>');
+  h = h.replace(/\(([+][/][-–]|[-–][/][+]|\+\s?\/\s?-|str\.)\)/g, '<span class="pm pm-o">($1)</span>');
+  h = h.replace(RE_HM, '$1<span class="op op-hm">$2</span>');
+  h = h.replace(RE_AA, '$1<span class="op op-aa">$2</span>');
+  h = h.replace(RE_LBL_MID, '$1<b class="lbl">$2$3</b>');
+  return linkNorms(h);
+}
+function fmtLabelStart(raw){ // „Label: Rest“ am Zeilenanfang → Label fett
+  const m = raw.match(RE_LBL_START);
+  if(!m || /[.!?]\s+[A-ZÄÖÜ][a-zäöü]{2,}/.test(m[1]) || /^\d+$/.test(m[1].trim()) || /\*\*|==/.test(m[1])) return null;
+  if(new RegExp('^(?:'+LABELS+')$').test(m[1].trim())) return null; // übernimmt RE_LBL_MID
+  return {lbl:m[1]+m[2], rest:raw.slice(m[0].length - m[3].length)};
+}
+function fmtLine(raw){
+  const ls = fmtLabelStart(raw);
+  return ls ? `<b class="lbl">${fmtInline(ls.lbl)}</b>${fmtInline(ls.rest)}` : fmtInline(raw);
+}
+function fmtBack(t){
+  t = String(t||"").replace(/\r/g,"");
+  if(!t.trim()) return "";
+  if(!fmtOn) return paras(t);
+  // 1. Zeilen bilden
+  let lines = [];
+  t.split("\n").forEach(l=>{
+    if(!l.trim()){ lines.push(""); return; }
+    const ind = (l.match(/^\s*/)[0].replace(/\t/g,"  ").length);
+    let s = l.trim();
+    if(s.length>200 && !/^(?:[-–•*]|->|→|=>|⇒)\s/.test(s)) s = s.replace(RE_SPLIT_BEFORE, "$1\n");
+    s.split("\n").forEach(x=> splitInlineEnum(x).forEach(y=> lines.push(ind ? " ".repeat(ind)+y : y)));
+  });
+  // 2. klassifizieren
+  const B = [];
+  lines.forEach(l=>{
+    if(!l.trim()){ B.push({k:"gap"}); return; }
+    const ind = Math.min(3, Math.floor(l.match(/^\s*/)[0].length/2)); const s = l.trim();
+    let m;
+    if((m = s.match(/^(->|→|=>|⇒|>)\s*(.*)$/))) { B.push({k:"li", ar:true, ind, html:fmtLine(m[2])}); return; }
+    if((m = s.match(/^([-–•*·])\s+(.*)$/))) { B.push({k:"li", ind, html:fmtLine(m[2])}); return; }
+    for(const g of GL){ const mm = s.match(g.re); if(mm && (!g.ok || g.ok(mm)) && s.length>mm[0].length){ B.push({k:"gl", lv:g.lv, ind, mk:mm[0].trim(), html:fmtLine(s.slice(mm[0].length))}); return; } }
+    if(s.length<=70 && /:$/.test(s) && !/[.!?]\s/.test(s)) { B.push({k:"h", html:fmtInline(s)}); return; }
+    if((m = s.match(RE_TIP))) { B.push({k:"box", cls:"tip", lbl:m[1], html:fmtInline(s.slice(m[0].length).trim())}); return; }
+    if((m = s.match(RE_EX))) { B.push({k:"box", cls:"ex", lbl:m[1], html:fmtInline(s.slice(m[0].length).trim())}); return; }
+    if(RE_RES.test(s)) { B.push({k:"box", cls:"res", html:fmtLine(s)}); return; }
+    if(RE_STN.test(s)) { B.push({k:"opn", cls:"stl", html:fmtLine(s)}); return; }
+    if(RE_OPN_HM.test(s)) { B.push({k:"opn", cls:"hm", html:fmtLine(s)}); return; }
+    if(RE_OPN_AA.test(s)) { B.push({k:"opn", cls:"aa", html:fmtLine(s)}); return; }
+    B.push({k:"p", s, html:fmtLine(s)});
+  });
+  // Ja/Nein-Antwort am Anfang hervorheben
+  const first = B.find(b=>b.k!=="gap");
+  if(first && first.k==="p"){
+    first.html = first.html.replace(/^((?:Grds\.\s|Grundsätzlich\s|Im Grundsatz\s)?(?:Ja|Nein|Jein)|\(\+\)|\(–\))(?=[.,:;!]|\s[–—-]\s)/, '<strong class="lead">$1</strong>');
+  }
+  // Schlusssatz als Ergebnis
+  const real = B.filter(b=>b.k!=="gap");
+  const last = real[real.length-1];
+  if(real.length>=2 && last.k==="p" && RE_RES_END.test(last.s)) { last.k = "box"; last.cls = "res"; }
+  // Gliederungsebenen normalisieren
+  const gls = B.filter(b=>b.k==="gl"); const minLv = gls.length ? Math.min(...gls.map(b=>b.lv)) : 0;
+  // 3. ausgeben
+  let out = "", inList = false;
+  const closeList = ()=>{ if(inList){ out += "</div>"; inList = false; } };
+  B.forEach(b=>{
+    if(b.k==="li"){ if(!inList){ out += '<div class="fl">'; inList = true; } out += `<div class="fli${b.ar?" ar":""}" style="--i:${b.ind}">${b.html}</div>`; return; }
+    closeList();
+    if(b.k==="gap") return;
+    if(b.k==="gl"){ const lv = Math.min(4, b.lv-minLv + b.ind); out += `<div class="fgl" style="--lv:${lv}"><b class="gm">${esc(b.mk)}</b><span>${b.html}</span></div>`; return; }
+    if(b.k==="h"){ out += `<p class="fh">${b.html}</p>`; return; }
+    if(b.k==="box"){
+      const lab = b.lbl ? `<b class="flab">${esc(b.lbl)}</b> ` : "";
+      out += `<div class="fbox ${b.cls}">${lab}${b.html}</div>`; return; }
+    if(b.k==="opn"){ out += `<p class="fopn ${b.cls}">${b.html}</p>`; return; }
+    out += `<p>${b.html}</p>`;
+  });
+  closeList();
+  return `<div class="fmt">${out}</div>`;
+}
+
+function paras(t){ return String(t||"").split(/\n{2,}|\n/).filter(x=>x.trim()).map(x=>"<p>"+nl(x)+"</p>").join(""); }
+function hl(text, toks){
+  text = stripMarks(text);
+  let h = esc(text); if(!toks.length) return h;
+  const f = fold(text); const marks = [];
+  toks.forEach(t=>{ let i = f.indexOf(t); while(i>=0 && t){ marks.push([i,i+t.length]); i = f.indexOf(t,i+t.length); } });
+  if(!marks.length) return h;
+  marks.sort((a,b)=>a[0]-b[0]); const merged=[]; marks.forEach(m=>{ const l=merged[merged.length-1]; if(l && m[0]<=l[1]) l[1]=Math.max(l[1],m[1]); else merged.push(m.slice()); });
+  let out="", pos=0; merged.forEach(([a,b])=>{ out+=esc(text.slice(pos,a))+"<mark>"+esc(text.slice(a,b))+"</mark>"; pos=b; }); return out+esc(text.slice(pos));
+}
+function snippet(text, toks, len=160){
+  text = stripMarks(text);
+  const f = fold(text); let i = -1; for(const t of toks){ const j=f.indexOf(t); if(j>=0 && (i<0||j<i)) i=j; }
+  if(i<0 || text.length<=len) return text.length>len ? text.slice(0,len)+" …" : text;
+  const s = Math.max(0, i-50); return (s>0?"… ":"")+text.slice(s, s+len)+(s+len<text.length?" …":"");
+}
+function itemRow(it, toks=[]){
+  const p = S.progress.get(it.id);
+  const due = !p ? "neu" : p.due<=today() ? "fällig" : "fällig "+fmtIvl(diffDays(today(),p.due)).replace("in ","in ");
+  const sub = snippet(bodyText(it).replace(/\s+/g," "), toks);
+  return `<a class="item t-${it.type}" href="#e-${esc(it.id)}"><span class="k">${TYPES[it.type]}</span>
+    <span><div class="t">${it.star?'<span class="starmark">★</span> ':""}${hl(titleOf(it)||"(ohne Titel)", toks)}</div><div class="s">${hl(sub,toks)}</div></span>
+    <span class="r">${esc(it.area||"")}<br>${tierTag(it)} ${p&&p.leech?'<b style="color:var(--g1)">Problemkarte</b>':esc(due)}</span></a>`;
+}
+
+/* ---------- Routing ---------- */
+const ROUTES = ["aktuell","suche","bibliothek","normen","problemkarten","pruefung","statistik","daten","lernen","neu"];
+function route(){ const h = decodeURIComponent(location.hash.slice(1)); return !h || h==="heute" ? "aktuell" : h; }
+function go(h){ if(location.hash.slice(1)===h) render(); else location.hash = h; }
+window.addEventListener("hashchange", ()=>{ editing = editNext; editNext = null; draftLinksInit = false; render(); window.scrollTo(0,0); });
+let editNext = null, backToSession = false;
+function setNav(r){
+  const base = r.startsWith("e-") ? "bibliothek" : r.startsWith("n-") ? "normen" : r==="lernen" ? (session&&session.exam?"pruefung":"aktuell") : r==="neu" ? "bibliothek" : r;
+  document.querySelectorAll("#tabs a").forEach(a=>{ if(a.getAttribute("href")==="#"+base) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current"); });
+}
+function render(){
+  const r = route(); setNav(r); const M = $("#main");
+  document.body.classList.toggle("locked", !!S.needLogin);
+  if(S.needLogin){ M.innerHTML = vLogin(); const m = $("#l-mail"); if(m && !m.value) m.focus(); return; }
+  if(!S.ready){ M.innerHTML = '<p class="muted">Lade Kartei …</p>'; return; }
+  if(r==="aktuell") M.innerHTML = vAktuell();
+  else if(r==="suche") { M.innerHTML = vSuche(); const i=$("#bigq"); i.value = searchQ; i.focus(); runSearch(); }
+  else if(r==="bibliothek") M.innerHTML = vBib();
+  else if(r==="normen") M.innerHTML = vNormen();
+  else if(r==="problemkarten") M.innerHTML = vProblem();
+  else if(r==="pruefung") M.innerHTML = vPruefung();
+  else if(r==="statistik") M.innerHTML = vStats();
+  else if(r==="daten") M.innerHTML = vDaten();
+  else if(r==="lernen") M.innerHTML = vLernen();
+  else if(r==="neu") M.innerHTML = vEdit(null);
+  else if(r.startsWith("e-")) M.innerHTML = editing===r.slice(2) ? vEdit(S.items.get(r.slice(2))) : vDetail(r.slice(2));
+  else if(r.startsWith("n-")) M.innerHTML = vNorm(r);
+  else M.innerHTML = vAktuell();
+  afterRender();
+}
+function refresh(){
+  const a = document.activeElement;
+  if(a && /INPUT|TEXTAREA|SELECT/.test(a.tagName) && $("#main").contains(a)) return;
+  const r = route();
+  if(r==="lernen" || r==="neu" || (r.startsWith("e-") && editing)) return;
+  render();
+}
+function afterRender(){
+  document.querySelectorAll(".msgs").forEach(m=>m.scrollTop=m.scrollHeight);
+}
+
+/* ---------- Ansicht: Anmeldung ---------- */
+function vLogin(){
+  return `<section class="panel" style="max-width:420px;margin:32px auto">
+    <h1 style="font-size:26px">Anmelden</h1>
+    <p class="sub">Mit der E-Mail-Adresse und dem Passwort, die du in Supabase angelegt hast. Die Anmeldung bleibt auf diesem Gerät gespeichert.</p>
+    <form id="loginform" class="form">
+      <div class="field"><label for="l-mail">E-Mail</label><input id="l-mail" type="email" autocomplete="username" required></div>
+      <div class="field"><label for="l-pw">Passwort</label><input id="l-pw" type="password" autocomplete="current-password" required></div>
+      <div class="row"><button class="btn primary" type="submit" id="l-go">Anmelden</button></div>
+      <p id="loginerr" class="small" style="color:var(--g1);margin:0"></p>
+    </form></section>`;
+}
+document.addEventListener("submit", async e=>{
+  if(e.target.id!=="loginform") return;
+  e.preventDefault();
+  const btn = $("#l-go"), err = $("#loginerr"); btn.disabled = true; err.textContent = "";
+  const {data, error} = await S.sb.auth.signInWithPassword({email:$("#l-mail").value.trim(), password:$("#l-pw").value});
+  btn.disabled = false;
+  if(error || !data.session){ err.textContent = !navigator.onLine ? "Keine Internetverbindung." : /confirm/i.test(error&&error.message||"") ? "Die E-Mail-Adresse ist noch nicht bestätigt." : "E-Mail oder Passwort stimmt nicht."; return; }
+  startData(data.session);
+});
+
+/* ---------- Illustrationen (handgezeichnet, folgen dem Farbschema) ---------- */
+const fl = c => `style="fill:var(--${c})"`;
+const ILL = {
+  hero: () => `<svg class="ill" viewBox="0 0 260 180" aria-hidden="true" style="color:var(--ink)">
+    <path d="M38 40c30-30 110-34 160-14s66 74 40 108-104 46-150 30S8 70 38 40z" ${fl("acc-soft")}/>
+    <path d="M200 30c10-6 26 0 26 12s-14 18-24 12-12-18-2-24z" ${fl("moss-soft")}/>
+    <g stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M52 132l92-6 2 18-92 6z" ${fl("sky")}/>
+      <path d="M58 113l84-3 1 16-84 3z" ${fl("clay")}/>
+      <path d="M66 96l70 1-1 15-70-1z" ${fl("moss")}/>
+      <path d="M62 140l70-5M66 120l66-2" fill="none" opacity=".45"/>
+      <path d="M150 64l58-14 14 52-58 14z" ${fl("paper")}/>
+      <path d="M162 74l38-9M165 84l38-9M168 94l24-6" fill="none" opacity=".5"/>
+      <path d="M184 140h40l-5 26h-30z" ${fl("clay-soft")}/>
+      <path d="M204 140c-2-16-14-24-26-26 6 10 14 18 26 26zM204 140c2-18 12-30 26-32-4 14-12 24-26 32zM204 140c0-14 2-28 8-38" ${fl("moss")}/>
+    </g>
+    <text x="177" y="109" font-family="Fraunces, Georgia, serif" font-size="20" font-weight="600" style="fill:var(--acc-ink)" transform="rotate(-14 177 109)">§</text>
+    <circle cx="36" cy="150" r="4" ${fl("acc")}/><circle cx="236" cy="70" r="3" ${fl("clay")}/><circle cx="120" cy="30" r="3" ${fl("moss")}/>
+  </svg>`,
+  pensum: () => `<svg class="ill" viewBox="0 0 64 64" aria-hidden="true" style="color:var(--ink)">
+    <g stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M12 22l34-6 5 28-34 6z" ${fl("acc-soft")}/>
+      <path d="M9 27l34-4 3 28-34 4z" ${fl("paper")}/>
+      <path d="M16 36l8 7 14-16" fill="none" style="stroke:var(--moss)" stroke-width="2.6"/>
+    </g></svg>`,
+  tages: () => `<svg class="ill" viewBox="0 0 64 64" aria-hidden="true" style="color:var(--ink)">
+    <g stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M8 18c8-3 16-3 24 2v32c-8-5-16-5-24-2z" ${fl("paper")}/>
+      <path d="M32 20c8-5 16-5 24-2v32c-8-3-16-3-24 2z" ${fl("moss-soft")}/>
+      <path d="M13 26c5-1 10-1 14 1M13 33c5-1 10-1 14 1M37 27c4-2 9-2 14-1M37 34c4-2 9-2 14-1" fill="none" opacity=".5"/>
+      <path d="M44 46l12-18 4 3-12 18-5 2z" ${fl("acc")}/>
+    </g>
+    <path d="M50 8l1.5 4 4 1.5-4 1.5-1.5 4-1.5-4-4-1.5 4-1.5z" ${fl("acc")}/></svg>`,
+  fall: () => `<svg class="ill" viewBox="0 0 64 64" aria-hidden="true" style="color:var(--ink)">
+    <g stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M12 8h28l8 8v38H12z" ${fl("paper")}/>
+      <path d="M40 8v8h8" fill="none"/>
+      <path d="M18 22h18M18 29h22M18 36h12" fill="none" opacity=".5"/>
+      <circle cx="40" cy="42" r="10" ${fl("clay-soft")}/>
+      <path d="M47 49l9 9" stroke-width="3.2"/>
+    </g>
+    <text x="40" y="47" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-size="14" font-weight="600" style="fill:var(--clay)">§</text></svg>`,
+  done: () => `<svg class="ill" viewBox="0 0 150 110" aria-hidden="true" style="color:var(--ink)">
+    <path d="M20 60c4-30 40-50 74-44s50 40 36 64-62 28-90 14S18 76 20 60z" ${fl("moss-soft")}/>
+    <g stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M58 92h34l-4 14H62z" ${fl("clay-soft")}/>
+      <path d="M75 92V56" fill="none"/>
+      <path d="M75 70c-14-2-22-12-24-24 12 2 22 10 24 24zM75 62c2-16 12-26 26-28-2 14-12 24-26 28z" ${fl("moss")}/>
+    </g>
+    <circle cx="34" cy="34" r="4" ${fl("acc")}/><circle cx="120" cy="30" r="3" ${fl("clay")}/><circle cx="126" cy="74" r="4" ${fl("sky")}/><circle cx="26" cy="84" r="3" ${fl("plum")}/></svg>`,
+  chat: () => `<svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true" style="color:var(--chat-ink)"><path d="M5 8c0-3 3-5 6-5h10c3 0 6 2 6 5v8c0 3-3 5-6 5h-7l-6 5v-5c-2-1-3-3-3-5z" ${fl("bubble")} stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="11" cy="12.5" r="1.4" fill="currentColor"/><circle cx="16" cy="12.5" r="1.4" fill="currentColor"/><circle cx="21" cy="12.5" r="1.4" fill="currentColor"/></svg>`,
+  idee: () => `<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a6 6 0 0 0-3.5 10.9V17h7v-3.1A6 6 0 0 0 12 3z" ${fl("acc-soft")} stroke="var(--acc-ink)" stroke-width="1.5" stroke-linejoin="round"/><path d="M9.5 20h5" stroke="var(--acc-ink)" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+};
+
+/* ---------- Fallabfrage: Gruppen ---------- */
+const FALL_TAGE = 28;
+function fallGroups(){
+  const m = new Map();
+  for(const it of S.items.values()){
+    if(!it.fall || !it.fallabfrage) continue;
+    const k = it.fall.key || it.fall.ordner || it.fall.name;
+    if(!m.has(k)) m.set(k, {key:k, fall:it.fall, datum:it.fallabfrage, items:[]});
+    const g = m.get(k); g.items.push(it); if(it.fallabfrage > g.datum) g.datum = it.fallabfrage;
+  }
+  for(const g of m.values()){
+    g.summary = g.items.find(i=>i.fallsumme) || g.items.find(i=>i.type==="case");
+    g.items.sort((a,b)=>(b.fallsumme?1:0)-(a.fallsumme?1:0) || String(a.id).localeCompare(String(b.id)));
+  }
+  return [...m.values()].sort((a,b)=>b.datum.localeCompare(a.datum) || (b.fall.nr||0)-(a.fall.nr||0));
+}
+const fallAge = g => diffDays(g.datum, today());
+const fallTitle = g => (g.summary && g.summary.title) || g.fall.titel || g.fall.name;
+function startFall(key){
+  const g = fallGroups().find(x=>x.key===key); if(!g) return;
+  const k = "fall:"+key, open = g.items.filter(isOpenIn(k));
+  if(!open.length){ toast("Für heute erledigt. Fällige Karten kommen an ihrem Tag wieder."); return; }
+  startSession(open.map(i=>i.id), {label:"Fallabfrage "+(g.fall.name||""), kind:"fall", key});
+}
+
+/* ---------- Ansicht: Aktuell ---------- */
+function vAktuell(){
+  const all = [...S.items.values()];
+  const cats = S.settings.cats, pool = S.settings.pool||"";
+  const pOpen = isOpenIn("pensum:"+today());
+  const dueBy = t => all.filter(i=>i.type===t && inPool(pool,i) && pOpen(i)).length;
+  const target = todayTarget(), done = doneToday();
+  const avail = all.filter(i=>cats.includes(i.type) && inPool(pool,i) && pOpen(i)).length;
+  const n = Math.min(Math.max(0,target-done), avail);
+  const leech = all.filter(i=>(S.progress.get(i.id)||{}).leech).length;
+  const fixes = all.filter(i=>i.suggestion && i.suggestion.status==="offen").length;
+  const example = all.some(i=>i.example);
+  const datum = new Date().toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long"});
+  if(!all.length) return `<div class="hero"><div><h1>Deine Kartei ist leer</h1><p class="sub">Lege den ersten Eintrag an, lade unter „Daten“ eine Sicherung oder importiere deine Quizlet-Sets.</p>
+    <div class="row"><a class="btn primary" href="#neu">Eintrag anlegen</a><a class="btn" href="#daten">Daten importieren</a></div></div>${ILL.hero()}</div>`;
+
+  // 1) Tägliches Pensum
+  const pensum = `<section class="zone z-pensum">
+    <header>${ILL.pensum()}<div><h2>Tägliches Pensum</h2><p>Ausgewählt nach Fälligkeit, Tier (1 bis 4) und deinem Lernstand.</p></div></header>
+    ${poolTabs(pool, "pool", k=>all.filter(i=>inPool(k,i) && cats.includes(i.type) && pOpen(i)).length+" fällig")}
+    <h3>Was möchtest du abfragen?</h3>
+    <div class="cats">${TKEYS.map(t=>`<button class="chip t-${t}" data-act="cat" data-t="${t}" aria-pressed="${cats.includes(t)}"><i class="dot"></i>${TYPES_PL[t]} <span class="n">${dueBy(t)}</span></button>`).join("")}</div>
+    <h3>Wie viele heute?</h3>
+    <div class="slider"><input id="daily" type="range" min="0" max="200" step="5" value="${target}" aria-label="Karten heute"><output id="dailyOut">${target}</output></div>
+    <p class="small muted" style="margin:0 0 16px">Grundpensum ${S.settings.base} pro Tag, der Regler gilt nur für heute. Erledigt: ${done}. Höchstens ${S.settings.newMax!=null?S.settings.newMax:20} neue Karten am Tag.${(()=>{ const g=[...S.progress.values()].filter(isGesichert).length; return g ? ` ${g} ${g===1?"Karte ist":"Karten sind"} gesichert und kommen ab ${toDate(endspurtStart()).toLocaleDateString("de-DE")} zur Endwiederholung.` : ""; })()}</p>
+    ${(()=>{ const d = pendSess(), ps = d && d.kind==="pensum" && sessPool(d)===pool ? d : null, extra = ps && ps.label==="Zusätzliche Runde";
+      if(ps && !extra) return `<div class="row">${resBtn(ps, true)}<span class="stpill part">${esc(ps.label)} nicht fertig</span></div>`;
+      return `<div class="row">${n ? `<button class="btn big st-open" data-act="start">${n} Karten abfragen</button><span class="stpill open">offen</span>`
+      : done>=target && done>0 ? (extra ? `<button class="btn big st-done" disabled>✓ Tagespensum geschafft</button>` : `<button class="btn big st-done" data-act="${avail?"more":"noop"}" title="${avail?"Noch 10 weitere abfragen":"Alles erledigt"}">✓ Tagespensum geschafft</button>`)
+      : `<button class="btn big st-done" disabled>✓ Nichts fällig</button>`}
+    ${extra ? `${resBtn(ps)}<span class="stpill part">Zusätzliche Runde nicht fertig</span>` : !n && avail ? `<button class="btn" data-act="more">10 weitere</button>`:""}</div>`; })()}
+    <p class="small muted" style="margin:14px 0 0"><kbd>Leertaste</kbd> Antwort zeigen, <kbd>1</kbd>–<kbd>5</kbd> bewerten, <kbd>?</kbd> alle Tastenkürzel</p>
+  </section>`;
+
+  // 2) Tagesabfrage
+  const taDates = [...new Set(all.filter(i=>i.tagesabfrage).map(i=>i.tagesabfrage))].sort().reverse();
+  const taCount = d => all.filter(i=>i.tagesabfrage===d).length;
+  const taNew = d => all.filter(i=>i.tagesabfrage===d && isNew(i)).length;
+  const taOpen = d => all.filter(i=>i.tagesabfrage===d && taPending(i)).length;
+  const taRow = d => { const o = taOpen(d), c = taCount(d);
+    return `<div class="zrow"><div><div class="t">${d===today()?"Heute":d===addDays(today(),-1)?"Gestern":toDate(d).toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long"})}</div><div class="s">${c} ${c===1?"Karte":"Karten"}${taNew(d)?", "+taNew(d)+" noch nie gelernt":""}</div></div><span class="spacer"></span>${(()=>{ const ps = pendSess(); return ps && ps.kind==="tages" && ps.key===d; })() ? resBtn(pendSess()) : o ? `<button class="btn st-open" data-act="tagesabfrage" data-d="${esc(d)}" title="${o} von ${c} noch nicht abgefragt">Abfragen <span class="stn">${o}</span></button>` : `<button class="btn st-done" data-act="tagesabfrage" data-d="${esc(d)}" title="Alle Karten dieser Tagesabfrage sind abgefragt">✓ Erledigt</button>`}</div>`; };
+  const taShown = taHist ? taDates : taDates.slice(0,3);
+  const tages = `<section class="zone z-tages">
+    <header>${ILL.tages()}<div><h2>Tagesabfrage</h2><p>Claude schaut dreimal täglich (16, 19 und 22 Uhr) in deinen Lernordner und fragt dich nur das ab, was neu oder geändert ist.</p></div></header>
+    <div class="zlist">${taDates.length ? taShown.map(taRow).join("") : `<div class="zempty">Noch nichts da. Sobald Claude deine Änderungen ausgewertet hat, erscheint die Abfrage hier.</div>`}
+    ${taDates.length>3 ? `<div style="border-top:1px dashed var(--line);padding-top:10px"><button class="linkbtn" data-act="tahist">${taHist?"Verlauf ausblenden":"Verlauf anzeigen ("+(taDates.length-3)+" ältere)"}</button></div>`:""}</div>
+  </section>`;
+
+  // 3) Fallabfrage
+  const groups = fallGroups().filter(g=>fallAge(g) < FALL_TAGE);
+  const fallRow = (g,i) => {
+    const sp = g.summary && S.progress.get(g.summary.id);
+    const left = FALL_TAGE - fallAge(g);
+    const status = !sp ? "Kernproblem noch nicht skizziert" : "Zuletzt: "+GRADE_TXT[sp.lastGrade];
+    return `<div class="zrow"><div style="min-width:0"><div class="row" style="gap:8px"><span class="tag-reihe">${esc(g.fall.reihe||"Fall")} ${esc(g.fall.name||"")}</span></div>
+      <div class="t" style="margin-top:6px">${esc(fallTitle(g))}</div>
+      <div class="s">${g.items.length} ${g.items.length===1?"Eintrag":"Einträge"} · ${esc(status)} · noch ${left} ${left===1?"Tag":"Tage"} hier</div></div>
+      <span class="spacer"></span>${(()=>{ const ps = pendSess(); return ps && ps.kind==="fall" && ps.key===g.key; })() ? resBtn(pendSess()) : g.items.some(isOpenIn("fall:"+g.key)) ? `<button class="btn st-open" data-act="fall" data-k="${esc(g.key)}">Abfragen <span class="stn">${g.items.filter(isOpenIn("fall:"+g.key)).length}</span></button>` : `<button class="btn st-done" data-act="fall" data-k="${esc(g.key)}" title="Für heute erledigt">✓ Erledigt</button>`}</div>`;
+  };
+  const fall = `<section class="zone z-fall">
+    <header>${ILL.fall()}<div><h2>Fallabfrage</h2><p>Neue Klausuren aus UKK, KLK und der Klausurenbesprechung. Du skizzierst das Kernproblem, Claude prüft es gegen die Lösung.</p></div></header>
+    <div class="zlist">${groups.length ? groups.map(fallRow).join("") : `<div class="zempty">Gerade kein Fall aus den letzten vier Wochen. Liegt ein neuer Klausur-Ordner bereit, erstellt Claude einmal am Tag Fallzusammenfassung und Karten.</div>`}</div>
+    <p class="small muted" style="margin:12px 0 0">Nach vier Wochen verschwinden die Fälle von hier und laufen im normalen Pensum weiter.</p>
+  </section>`;
+
+  return `<div class="hero"><div>
+      <h1>Aktuell</h1>
+      <p class="sub" style="margin-bottom:6px">${datum}${S.mode==="lokal"?". Noch nicht mit Supabase verbunden: Deine Einträge liegen nur in diesem Browser.":""}</p>
+      <div class="pebbles">
+        <div class="pebble"><b>${streak()}</b><span>${streak()===1?"Tag":"Tage"} Lernserie</span></div>
+        <div class="pebble"><b>${done}</b><span>heute erledigt</span></div>
+        <div class="pebble"><b>${avail}</b><span>fällig in deiner Auswahl</span></div>
+        <div class="pebble"><b>${all.filter(isNew).length}</b><span>noch nie gelernt</span></div>
+      </div>
+    </div>${ILL.hero()}</div>
+    ${(()=>{ const d = session && session.idx<session.ids.length ? {label:session.label, idx:session.idx, ids:session.ids, kind:session.kind, live:true} : S.savedSess; if(!d || ["pensum","tages","fall"].includes(d.kind)) return "";
+      return `<div class="hint resume">${ILL.idee()}<span><b>Angefangene Abfrage:</b> ${esc(d.label)}, ${d.idx} von ${d.ids.length} erledigt. Dein Stand ist gespeichert.</span><span class="spacer"></span><button class="btn st-part" data-act="${d.live?"tosession":"resume"}">Fortsetzen</button>${d.live?"":`<button class="btn ghost small" data-act="dropsess">Verwerfen</button>`}</div>`; })()}
+    ${example?`<div class="hint">${ILL.idee()}<span>Die Kartei enthält noch Beispielinhalte zum Ausprobieren. Du kannst sie unter „Daten“ löschen.</span></div>`:""}
+    ${leech?`<div class="hint">${ILL.idee()}<span><b>${leech} Problemkarte${leech>1?"n":""}:</b> Karten, die du immer wieder vergisst. <a href="#problemkarten" class="linkbtn">Ansehen</a></span></div>`:""}
+    ${fixes?`<div class="hint">${ILL.idee()}<span><b>${fixes} Korrekturvorschl${fixes>1?"äge":"ag"}</b> von Claude warten. Sie erscheinen, wenn du die Karte lernst. <a class="linkbtn" href="#bibliothek" data-act="fixfilter">Alle zeigen</a></span></div>`:""}
+    <div class="zones">${pensum}${tages}${fall}</div>`;
+}
+
+function streak(){
+  let d = today(), n = 0;
+  if(!S.log.days[d]) d = addDays(d,-1);
+  while(S.log.days[d]){ n++; d = addDays(d,-1); }
+  return n;
+}
+function buildQueue(cats, n){
+  const pool = S.settings.pool||"";
+  const open = isOpenIn("pensum:"+today()), newMax = S.settings.newMax!=null ? S.settings.newMax : 20;
+  const newToday = [...S.progress.values()].filter(p=>p.reps===1 && p.last===today()).length;
+  let newLeft = Math.max(0, newMax - newToday);
+  const list = [...S.items.values()].filter(i=>cats.includes(i.type) && inPool(pool,i) && open(i)).sort((a,b)=>priority(b)-priority(a));
+  const out = [];
+  for(const i of list){ if(out.length>=n) break; if(isNew(i) && !i.tagesabfrage && !i.fallabfrage){ if(!newLeft) continue; newLeft--; } out.push(i.id); }
+  return out;
+}
+function startSession(ids, opts={}){
+  if(!ids.length){ toast("Keine passenden Karten gefunden."); return; }
+  session = {ids, idx:0, revealed:false, exam:!!opts.exam, label:opts.label||"Abfrage", kind:opts.kind||"", key:opts.key||"", results:{1:0,2:0,3:0,4:0,5:0}, counted:new Set(), total:ids.length, history:[], started:today()};
+  saveSess(); go("lernen");
+}
+/* Zwischenspeicher: eine angefangene Abfrage wird nach jeder Karte gesichert (Gerät + Konto) und lässt sich später fortsetzen */
+const SESS_KEY = "juragarage-abfrage";
+let sessTimer = null;
+function sessPayload(){ return session && session.idx < session.ids.length ? {ids:session.ids, idx:session.idx, exam:session.exam, label:session.label, kind:session.kind, key:session.key, results:session.results, counted:[...session.counted], total:session.total, history:(session.history||[]).slice(-30), started:session.started, t:Date.now()} : null; }
+function saveSess(){
+  const d = sessPayload(); S.savedSess = d;
+  try{ if(d) localStorage.setItem(SESS_KEY, JSON.stringify(d)); else localStorage.removeItem(SESS_KEY); }catch(e){}
+  clearTimeout(sessTimer); sessTimer = setTimeout(()=>{ putMeta("session", d || {cleared:Date.now()}).catch(()=>{}); }, 1200);
+}
+function clearSess(){ session = null; saveSess(); }
+function loadSavedSess(metaVal){
+  let loc = null; try{ loc = JSON.parse(localStorage.getItem(SESS_KEY)||"null"); }catch(e){}
+  const m = metaVal && metaVal.ids ? metaVal : null;
+  const cleared = metaVal && metaVal.cleared || 0;
+  let best = [m, loc].filter(Boolean).sort((a,b)=>(b.t||0)-(a.t||0))[0] || null;
+  if(best && cleared > (best.t||0)) best = null;
+  S.savedSess = best;
+}
+function resumeSess(){
+  const d = S.savedSess; if(!d) return;
+  const ids = d.ids.filter(x=>S.items.has(x)); if(d.idx >= ids.length){ S.savedSess = null; saveSess(); toast("Diese Abfrage war schon fertig."); render(); return; }
+  session = {ids, idx:Math.min(d.idx, ids.length), revealed:false, exam:!!d.exam, label:d.label||"Abfrage", kind:d.kind||"", key:d.key||"", results:d.results||{1:0,2:0,3:0,4:0,5:0}, counted:new Set(d.counted||[]), total:d.total||ids.length, history:d.history||[], started:d.started||today()};
+  go("lernen");
+}
+
+/* ---------- Ansicht: Lernen ---------- */
+function vLernen(){
+  if(!session) return S.savedSess ? `<h1>Abfrage pausiert</h1><p class="sub">${esc(S.savedSess.label)}: ${S.savedSess.idx} von ${S.savedSess.ids.length} erledigt.</p><div class="row"><button class="btn primary" data-act="resume">Fortsetzen</button><a class="btn" href="#aktuell">Zu „Aktuell“</a></div>` : `<h1>Keine laufende Abfrage</h1><p class="sub">Starte eine Abfrage unter „Aktuell“.</p><a class="btn primary" href="#aktuell">Zu „Aktuell“</a>`;
+  if(session.idx >= session.ids.length){
+    const r = session.results, tot = r[1]+r[2]+r[3]+r[4]+r[5];
+    return `<div class="panel done">${ILL.done()}<b>${tot}</b><p>${session.exam?"Prüfungsfragen beantwortet":"Karten wiederholt"}</p>
+      <p class="muted">Nochmal ${r[1]}, schwer ${r[2]}, gut ${r[3]}, leicht ${r[4]}, sehr leicht ${r[5]}${session.exam&&tot?". Quote: "+Math.round((r[3]+r[4]+r[5])/tot*100)+" % sicher":""}</p>
+      <div class="row" style="justify-content:center;margin-top:16px">${session.history&&session.history.length?`<button class="btn" data-act="backcard">← Zurück</button>`:""}<a class="btn primary" href="#aktuell" data-act="endsession">Fertig</a><a class="btn" href="#statistik" data-act="endsession">Statistik ansehen</a></div></div>`;
+  }
+  const id = session.ids[session.idx], it = S.items.get(id);
+  if(!it){ session.idx++; return vLernen(); }
+  const pos = session.idx+1, tot = session.ids.length;
+  return `<div class="row"><b>${esc(session.label)}</b><span class="muted">${pos} von ${tot}</span><span class="spacer"></span>
+    ${session.history&&session.history.length?`<button class="btn ghost" data-act="backcard" title="Zur vorherigen Karte (Taste B oder ←)">← Zurück</button>`:""}<button class="btn ghost" data-act="endsession">Beenden</button></div>
+  <div class="bar"><i style="width:${(session.idx/tot*100).toFixed(1)}%"></i></div>
+  <div class="study">
+    <div>${fixNotice(it)}${sheet(it, session.revealed, true)}</div>
+    ${chatPanel(it)}
+  </div>`;
+}
+function fixNotice(it){
+  const s = it.suggestion; if(!s || s.status!=="offen") return "";
+  return `<div class="notice fix"><h4>Korrekturvorschlag von Claude</h4><div class="prose" style="font-size:15px">${paras(s.text)}</div>
+    ${s.patch ? `<details class="small" style="margin-top:6px"><summary>Neue Fassung ansehen</summary><div class="prose" style="font-size:14.5px;margin-top:6px">${Object.entries(s.patch).map(([k,v])=>`<p><b>${esc(fieldName(k))}:</b> ${esc(Array.isArray(v)?v.map(x=>typeof x==="object"?x.frage+" ⇒ "+x.antwort:x).join("; "):v)}</p>`).join("")}</div></details>`:""}
+    <div class="row">${s.patch?`<button class="btn primary" data-act="fixok" data-id="${esc(it.id)}">Übernehmen</button>`:`<button class="btn primary" data-act="fixok" data-id="${esc(it.id)}">Zur Kenntnis genommen</button>`}<button class="btn" data-act="fixno" data-id="${esc(it.id)}">Verwerfen</button></div></div>`;
+}
+const fieldName = k => ({steps:"Prüfungspunkte",hinweis:"Hinweise",front:"Vorderseite",back:"Rückseite",term:"Begriff",definition:"Definition",merkmale:"Kernmerkmale",title:"Titel",sachverhalt:"Sachverhalt",kern:"Wesentliche Bestandteile",problems:"Probleme",norms:"Normen"}[k]||k);
+
+function sheet(it, revealed, study){
+  const p = S.progress.get(it.id);
+  const meta = `<div class="meta"><button class="starbtn ${it.star?"on":""}" data-act="star" data-id="${esc(it.id)}" title="${it.star?"Stern entfernen":"Mit Stern markieren"}" aria-label="Stern" aria-pressed="${it.star?"true":"false"}">${it.star?"★":"☆"}</button><span class="typetag">${it.fallsumme?"Fallzusammenfassung":TYPES[it.type]}</span>${it.fall?`<span class="fallchip">${esc([it.fall.reihe,it.fall.name].filter(Boolean).join(" "))}</span>`:""}<span>${esc(it.area||"")}</span>${tierTag(it)}<span>${esc(it.source||"")}</span>
+    <span class="spacer"></span><button class="btn ghost small" style="padding:4px 10px" data-act="change" data-id="${esc(it.id)}" title="Karte selbst bearbeiten oder Claude eine Änderung vorschlagen lassen">✎ Ändern</button>${study?`<a href="#e-${esc(it.id)}" class="small muted" data-act="peek">Eintrag öffnen</a>`:""}</div>`;
+  let q="", a="";
+  if(it.type==="card"){
+    q = `<p class="q">${nl(it.front)}</p>`;
+    a = `<div class="prose">${fmtBack(it.back)}</div>`;
+  } else if(it.type==="def"){
+    q = `<p class="small muted" style="margin:0 0 4px">Definiere</p><p class="q">${esc(it.term)}</p>`;
+    a = `<div class="prose">${fmtBack(it.definition)}</div>${(it.merkmale||[]).length?`<h3>Kernmerkmale</h3><ul class="kern">${it.merkmale.map(m=>"<li>"+nl(m)+"</li>").join("")}</ul>`:""}`;
+  } else if(it.type==="schema"){
+    q = `<p class="small muted" style="margin:0 0 4px">Gib das Prüfungsschema wieder</p><p class="q">${esc(it.title)}</p>`;
+    a = schemaList(it.steps)+(it.hinweis?`<div class="prose small" style="margin-top:10px">${fmtBack(it.hinweis)}</div>`:"");
+  } else {
+    q = `<p class="q">${esc(it.title)}</p>${it.sachverhalt?`<div class="prose" style="color:var(--muted);font-size:15.5px">${paras(it.sachverhalt)}</div>`:""}
+      ${study && !it.fall?`<p style="margin:14px 0 0;font-weight:600">Was sind die wesentlichen Bestandteile und die Probleme dieses Falls?</p>`:""}`;
+    a = `${(it.kern||[]).length?`<h3 style="margin-top:0">Wesentliche Bestandteile</h3><ul class="kern prose" style="font-size:16px">${it.kern.map(k=>"<li>"+nl(k)+"</li>").join("")}</ul>`:""}
+      ${(it.problems||[]).length?`<h3>Problemschwerpunkte</h3><ol class="probs prose" style="font-size:16px">${it.problems.map(pr=>`<li><b>${nl(pr.frage)}</b>${fmtBack(pr.antwort)}</li>`).join("")}</ol>`:""}
+      ${(it.gliederung||[]).length?`<h3>Lösungsaufbau</h3>${schemaList(it.gliederung)}`:""}`;
+  }
+  const norms = (it.norms||[]).length ? `<div class="margin-norms">${it.norms.map(normChip).join("")}</div>` : "";
+  if(!study) return `<article class="sheet t-${it.type}">${meta}${q}<div class="answer">${a}</div>${it.mnemonic?`<div class="mnemo"><h4>Eselsbrücke</h4><div class="txt">${esc(it.mnemonic)}</div></div>`:""}${norms}</article>`;
+  // Lernansicht
+  let write = "";
+  const hasOwn = it.type!=="case";
+  const myText = own.get(it.id)||"";
+  if(hasOwn && !revealed){
+    const v = verdicts.get(it.id);
+    write = `<div class="own"><label for="wtext">In eigenen Worten antworten</label><textarea id="wtext" placeholder="Schreib auf, wie du antworten würdest …">${esc(myText)}</textarea>
+      ${S.ai?`<div class="row" style="margin-top:8px"><button class="btn" data-act="judge" data-id="${esc(it.id)}" ${v&&v.busy?"disabled":""}>${v&&v.busy?"Claude wertet aus …":"Von Claude auswerten lassen"}</button></div>`:""}</div>`;
+  } else if(hasOwn && myText.trim()){
+    write = `<div class="ownshow"><h4>Deine Antwort</h4><div>${esc(myText)}</div></div>`;
+  }
+  const v = verdicts.get(it.id);
+  const verdictHtml = v && v.result ? verdictBox(v.result) : v && v.error ? `<div class="verdict small">${esc(v.error)}</div>` : "";
+  const ck = it.type==="case" ? checks.get(it.id) : null;
+  const rec = v && v.result ? ({"Nochmal":1,"Schwer":2,"Gut":3,"Leicht":4,"Sehr leicht":5}[v.result.empfehlung]||0) : ck && ck.rec ? ck.rec : 0;
+  const gradeBtns = [1,2,3,4,5].map(g=>{
+    return `<button data-act="grade" data-g="${g}" class="${rec===g?"rec":""}">${session.exam ? "" : `<i class="ginfo" data-act="gradeinfo" data-g="${g}" title="Was bewirkt „${GRADE_TXT[g]}“?" role="button" aria-label="Info zu ${GRADE_TXT[g]}">i</i>`}<b>${GRADE_TXT[g]}<kbd>${g}</kbd></b><span>${session.exam ? "" : GRADE_HINT(p, g)}</span></button>`;
+  }).join("") ;
+  const gInfo = gradeInfo && !session.exam ? `<div class="ginfo-box"><p><b>${g2txt(gradeInfo)}</b> ${GRADE_INFO[gradeInfo]}</p>${gradeInfo<=3?`<p class="muted">Neue Karten: Bei Nochmal, Schwer oder Gut kommen sie zuerst morgen und übermorgen, danach rechnet FSRS.</p>`:""}</div>` : "";
+  const sketch = it.type==="case" ? sketchBox(it, revealed) : "";
+  return `<article class="sheet t-${it.type}">${meta}${q}${!revealed?norms:""}${write}${verdictHtml}${sketch}
+    ${revealed ? `<div class="answer">${it.type==="case"?'<h3 style="margin-top:0">Lösung</h3>':""}${a}</div>${mnemoBox(it)}${norms}<div class="grades">${gradeBtns}</div>${gInfo}${linkedLine(it)}`
+      : it.type==="case" ? "" : `<div class="reveal"><button class="btn primary big" data-act="reveal">Antwort zeigen <kbd style="margin-left:6px">Leertaste</kbd></button></div>`}
+  </article>`;
+}
+function mnemoBox(it){
+  if(mnemoEdit===it.id) return `<div class="mnemo"><h4>Eselsbrücke</h4><textarea id="mtext" placeholder="Dein Merkhinweis …">${esc(it.mnemonic||"")}</textarea>
+    <div class="act"><button class="btn primary" data-act="mnemosave" data-id="${esc(it.id)}">Speichern</button><button class="btn ghost" data-act="mnemocancel">Abbrechen</button></div></div>`;
+  if(it.mnemonic) return `<div class="mnemo"><h4>Deine Eselsbrücke</h4><div class="txt">${esc(it.mnemonic)}</div><div class="act"><button class="linkbtn small" data-act="mnemoedit" data-id="${esc(it.id)}">Ändern</button></div></div>`;
+  return `<div class="addmnemo"><button class="linkbtn small" data-act="mnemoedit" data-id="${esc(it.id)}">+ Eselsbrücke notieren</button></div>`;
+}
+function splitTop(str, sepRe){
+  const out=[]; let depth=0, cur="";
+  for(let k=0;k<str.length;k++){
+    const c=str[k];
+    if(c==="(") depth++; else if(c===")") depth=Math.max(0,depth-1);
+    if(depth===0){
+      if(c===";"){ out.push(cur.trim()); cur=""; continue; }
+      if(c==="," && sepRe.test(str.slice(k+1))){ out.push(cur.trim()); cur=""; continue; }
+    }
+    cur+=c;
+  }
+  if(cur.trim()) out.push(cur.trim());
+  return out.filter(Boolean);
+}
+function stepHtml(t){
+  const m = t.match(/^((?:[IVX]+|[A-Z]|\d+|[a-z])[.)]\s+)?([^:]{2,80}):\s+(.+)$/);
+  const ITEM = /^\s*(Nr\.|Alt\.|Var\.|Fall|Fallgruppe|Abs\.|S\.)\s*\d*/;
+  if(m && t.length>90){
+    let items = splitTop(m[3], ITEM);
+    if(items.length===1){ const c = splitTop(m[3].replace(/;/g,"\u0001"), /^/).map(x=>x.replace(/\u0001/g,";")); if(c.length>=3 && c.every(x=>x.length<=95)) items = c; }
+    return `<span class="sh">${nl((m[1]||"")+m[2])}:</span><ul class="sub">${items.map(x=>`<li>${nl(x)}</li>`).join("")}</ul>`;
+  }
+  if(t.length>110 && t.includes(";")){
+    const items = splitTop(t, /^$/);
+    if(items.length>1) return `<span class="sh">${nl(items[0])}</span><ul class="sub">${items.slice(1).map(x=>`<li>${nl(x)}</li>`).join("")}</ul>`;
+  }
+  return nl(t);
+}
+function schemaList(steps){
+  return `<ol class="schema prose" style="font-size:16px">${(steps||[]).map(l=>{ const lv = Math.min(4, Math.floor((l.match(/^\s*/)[0].replace(/\t/g,"  ").length)/2)); return `<li class="l${lv}" style="--lv:${lv}">${stepHtml(l.trim())}</li>`; }).join("")}</ol>`;
+}
+function verdictBox(r){
+  return `<div class="verdict"><b>${esc(r.gesamt==="vollständig"?"Vollständig erfasst":r.gesamt==="teilweise"?"Teilweise erfasst":"Wesentliches fehlt")}</b>${r.empfehlung?` <span class="small muted">Vorschlag: ${esc(r.empfehlung)}</span>`:""}
+    <ul>${(r.merkmale||[]).map(m=>`<li class="${m.erfuellt?"y":"n"}">${esc(m.merkmal)}${m.hinweis?` <span class="muted small">${esc(m.hinweis)}</span>`:""}</li>`).join("")}</ul>
+    ${r.kommentar?`<p class="small" style="margin:8px 0 0">${esc(r.kommentar)}</p>`:""}</div>`;
+}
+/* Fallabfrage: Skizze des Kernproblems, Prüfung durch Claude */
+function fbHtml(t){ return esc(t).replace(/^(Richtig erkannt|Fehlt oder ungenau|Richtigstellung|Tipp für die Klausur|Empfehlung):/gm, "<b>$1:</b>"); }
+function recFrom(t){ const m = String(t||"").match(/Empfehlung:\s*\**\s*(Nochmal|Schwer|Gut|Leicht)/i); return m ? ({nochmal:1,schwer:2,gut:3,leicht:4}[m[1].toLowerCase()]||0) : 0; }
+function sketchBox(it, revealed){
+  const c = checks.get(it.id);
+  if(c && (c.busy || c.text || c.error)){
+    return `<div class="sketch"><h3>Deine Skizze</h3><div class="mysketch">${esc(c.input)}</div>
+      <h3 style="margin-top:14px">Claudes Prüfung</h3>
+      <div class="feedback ${c.busy && !c.text ? "busy" : ""}" id="fbstream">${c.text ? fbHtml(c.text) : c.busy ? "Claude vergleicht deine Skizze mit der Lösung …" : ""}</div>
+      ${c.error?`<p class="small" style="color:var(--g1);margin:8px 0 0">${esc(c.error)}</p>`:""}
+      <div class="row" style="margin-top:10px">${c.busy?`<button class="btn" data-act="stopcheck" data-id="${esc(it.id)}">Stopp</button>`:`${!revealed?`<button class="btn primary" data-act="reveal">Lösung zeigen</button>`:""}<button class="btn ghost" data-act="recheck" data-id="${esc(it.id)}">Neue Skizze</button>`}</div></div>`;
+  }
+  if(revealed) return "";
+  return `<div class="sketch"><h3>${ILL.idee()} Skizziere das Kernproblem</h3>
+    <p class="small muted" style="margin:0">Ein paar Sätze reichen: Worum geht es, welche Anspruchsgrundlagen oder Delikte, welche Hauptprobleme und wie löst du sie? Claude prüft das gegen die Lösung.</p>
+    <textarea id="sktext" placeholder="Kernproblem: …">${esc(c&&c.input||"")}</textarea>
+    <div class="row" style="margin-top:10px"><button class="btn clay" data-act="check" data-id="${esc(it.id)}" ${S.ai?"":"disabled"}>Von Claude prüfen lassen</button>
+    <button class="btn ghost" data-act="reveal">Lösung ohne Prüfung zeigen</button>
+    ${S.ai?"":'<span class="small muted">Die Prüfung braucht die Verbindung zu Supabase.</span>'}</div></div>`;
+}
+async function checkCase(id){
+  const it = S.items.get(id); const ta = $("#sktext"); const input = (ta && ta.value || "").trim();
+  if(!input){ toast("Skizziere zuerst kurz das Kernproblem."); return; }
+  if(!S.ai){ toast("Die Prüfung braucht die Verbindung zu Supabase."); return; }
+  const c = {input, busy:true, text:"", error:null, ctl:new AbortController()}; checks.set(id, c); render();
+  try{
+    c.text = await aiStream([CHECK_RULES, "Der Fall und seine Lösung:\n"+itemContext(it)], [{role:"user", content:"Meine Skizze des Kernproblems:\n"+input}],
+      {kind:"check", max_tokens:2500, signal:c.ctl.signal, onText:t=>{ c.text = t; const el = $("#fbstream"); if(el){ el.innerHTML = fbHtml(t); el.classList.remove("busy"); } }});
+  }catch(e){ if(e && e.text) c.text = e.text; if(!(e && e.code==="cancelled")) c.error = errText(e); }
+  c.busy = false; c.rec = recFrom(c.text);
+  if(c.text && session && session.ids[session.idx]===id) session.revealed = true;
+  if(route()==="lernen" || route().startsWith("e-")) render();
+}
+function linkedLine(it){
+  const l = linksOf(it.id); if(!l.length) return "";
+  return `<div class="links-line"><span class="small muted">Verknüpft:</span>${l.slice(0,8).map(o=>`<a class="lchip t-${esc(o.type)}" href="#e-${esc(o.id)}" data-act="peek" title="${esc(TYPES[o.type])}: ${esc(titleOf(o))}"><i class="dot"></i><span class="lt">${esc(titleOf(o))}</span></a>`).join("")}${l.length>8?`<span class="small muted">und ${l.length-8} weitere</span>`:""}</div>`;
+}
+async function grade(g){
+  if(!session || !session.revealed) return;
+  const id = session.ids[session.idx], it = S.items.get(id);
+  session.results[g]++;
+  const hist = {id, g, prev: S.progress.has(id) ? clean(S.progress.get(id)) : null, inserted: null};
+  if(!session.history) session.history = [];
+  session.history.push(hist);
+  if(!session.exam){
+    // Abfrage vom Vortag nach 0 Uhr fortgesetzt: Abstände zählen ab dem Tag dieser Abfrage („morgen“ = heute, aber in einer neuen Abfrage)
+    const base = session.kind && session.started && session.started < today() ? session.started : today();
+    const p = schedule(S.progress.get(id), g, tierOf(it), base);
+    putProgress(id, p);
+    if(!session.counted.has(id)){ session.counted.add(id); bumpLog(); }
+    if(g>=2) markAbg(abgKeyOf(session), id);
+    if(g===1){ const at = Math.min(session.ids.length, session.idx+4); session.ids.splice(at,0,id); hist.inserted = at; }
+  }
+  verdicts.delete(id); checks.delete(id); own.delete(id); mnemoEdit = null; gradeInfo = 0;
+  session.idx++; session.revealed = false;
+  saveSess();
+  if(session.idx >= session.ids.length){ finishAbg(abgKeyOf(session)); toast("✓ "+session.label+" abgeschlossen"); }
+  render();
+}
+
+async function backCard(){
+  if(!session || !session.history || !session.history.length) return;
+  const h = session.history.pop();
+  if(h.inserted!=null && session.ids[h.inserted]===h.id) session.ids.splice(h.inserted,1);
+  session.results[h.g] = Math.max(0, session.results[h.g]-1);
+  session.idx = Math.max(0, session.idx-1);
+  session.revealed = true;
+  verdicts.delete(h.id); checks.delete(h.id); own.delete(h.id); mnemoEdit = null;
+  saveSess(); render();
+  if(!session.exam){ if(!session.ids.slice(session.idx+1).includes(h.id)) unmarkAbg(abgKeyOf(session), h.id); if(h.prev) await putProgress(h.id, h.prev); else await deleteProgress(h.id); }
+}
+
+/* ---------- KI: Auswertung & Chat ---------- */
+function itemContext(it){
+  const L = [`Typ: ${TYPES[it.type]}`, `Rechtsgebiet: ${it.area||"-"}`, `Quelle: ${it.source||"-"}`, `Normen: ${(it.norms||[]).join(", ")||"-"}`];
+  if(it.type==="card") L.push("Frage (Vorderseite): "+it.front, "Antwort (Rückseite): "+it.back);
+  if(it.type==="def") L.push("Begriff: "+it.term, "Definition: "+it.definition, "Kernmerkmale: "+(it.merkmale||[]).join("; "));
+  if(it.type==="schema") L.push("Schema: "+it.title, "Prüfungspunkte:\n"+(it.steps||[]).join("\n"), "Hinweise: "+(it.hinweis||"-"));
+  if(it.type==="case") L.push("Fall: "+it.title, "Sachverhalt: "+(it.sachverhalt||"-"), "Wesentliche Bestandteile: "+(it.kern||[]).join("; "), "Probleme: "+(it.problems||[]).map(p=>p.frage+" => "+p.antwort).join(" | "), ...((it.gliederung||[]).length ? ["Lösungsaufbau:\n"+it.gliederung.join("\n")] : []));
+  if(it.fall) L.push("Aus der Klausur: "+[it.fall.reihe, it.fall.name, it.fall.titel].filter(Boolean).join(" "));
+  return L.join("\n");
+}
+const jTerm = it => it.type==="def" ? it.term : it.type==="schema" ? it.title : it.front;
+const jDef = it => it.type==="def" ? it.definition : it.type==="schema" ? (it.steps||[]).join("\n") : it.back;
+async function judge(id){
+  const it = S.items.get(id); const ta = $("#wtext"); const input = (ta && ta.value || "").trim();
+  if(!input){ toast("Schreib zuerst deine Antwort."); return; }
+  if(!S.ai){ toast("Die Auswertung braucht die Verbindung zu Supabase."); return; }
+  own.set(id, input);
+  verdicts.set(id, {input, busy:true}); render();
+  const merk = (it.merkmale||[]).join("; ") || "(aus der Musterantwort ableiten, 2 bis 5 Kernpunkte)";
+  const prompt = `Frage/Begriff: ${jTerm(it)}
+Musterantwort: ${jDef(it)}
+Kernmerkmale: ${merk}
+Antwort: ${input}`;
+  const key = "g3:"+hashStr(jTerm(it)+"|"+jDef(it)+"|"+merk)+":"+hashStr(normQ(input));
+  const hit = cacheGet(key);
+  if(hit){ verdicts.set(id, {input, result:hit}); }
+  else try{
+    const r = await aiJson(prompt);
+    verdicts.set(id, {input, result:r}); cachePut(key, r);
+  }catch(e){
+    verdicts.set(id, {input, error: errText(e)});
+  }
+  if(session && session.ids[session.idx]===id){ session.revealed = true; }
+  if(route()==="lernen") render();
+}
+function errText(e){
+  const c = e && e.code;
+  if(c==="offline" || c==="network") return "Keine Verbindung. Prüfe dein Internet und versuch es noch einmal.";
+  if(c==="auth") return "Deine Anmeldung ist abgelaufen. Lade die Seite neu und melde dich an.";
+  if(c==="forbidden") return "Dieses Konto darf Claude nicht nutzen (ALLOWED_EMAIL in Supabase prüfen).";
+  if(c==="no_function") return "Die Claude-Funktion ist in Supabase noch nicht eingerichtet (Anleitung, Schritt 4).";
+  if(c==="no_key") return "In Supabase fehlt noch der Anthropic-API-Schlüssel (Secret ANTHROPIC_API_KEY).";
+  if(c==="bad_key") return "Der Anthropic-API-Schlüssel wird nicht akzeptiert. Prüf das Secret in Supabase.";
+  if(c==="no_credit") return "Dein API-Guthaben ist aufgebraucht. Lade es in der Anthropic-Konsole auf.";
+  if(c==="rate_limited") return "Gerade zu viele Anfragen. Warte einen Moment und versuch es dann erneut.";
+  if(c==="cancelled") return "Abgebrochen.";
+  if(c==="invalid_json") return "Die Auswertung kam unvollständig zurück. Versuch es noch einmal.";
+  if(c==="empty") return "Claude hat diesmal keinen Text geliefert"+(e.stop?" (Grund: "+e.stop+")":"")+". Versuch es bitte noch einmal.";
+  return "Claude hat nicht geantwortet. Versuch es noch einmal.";
+}
+function chatPanel(it){
+  const c = chats.get(it.id) || {turns:[]};
+  const msgs = c.turns.filter(t=>t.content && t.content.trim()).map(t=>`<div class="msg ${t.role==="user"?"u":"a"}">${esc(t.content)}</div>`).join("")
+    + (c.busy ? `<div class="msg a ${c.partial?"":"think"}" id="streaming">${esc(c.partial||"Claude denkt nach …")}</div>` : "")
+    + (c.error ? `<div class="msg err">${esc(c.error)}</div>` : "");
+  const starters = !c.turns.length && !c.busy ? `<div class="starters">
+      <button data-act="ask" data-q="Erklär mir das an einem kurzen Beispiel.">Beispiel</button>
+      <button data-act="ask" data-q="Wie baue ich das in der Klausur ein, und wo liegen typische Fehler?">Klausuraufbau</button>
+      <button data-act="ask" data-q="Welche Streitstände gibt es hierzu, kurz mit herrschender Meinung?">Streitstände</button>
+      <button data-act="ask" data-q="Stell mir eine Anschlussfrage zum Thema.">Anschlussfrage</button></div>` : "";
+  return `<aside class="chat" data-chat="${esc(it.id)}">
+    <header>${ILL.chat()}<div><b>Nachfragen bei Claude</b><span>Claude kennt den Inhalt ${({def:"dieser Definition",card:"dieser Karteikarte",schema:"dieses Schemas",case:"dieses Falls"})[it.type]}. ${S.ai?"":"Erst nach der Anmeldung verfügbar."}</span></div></header>
+    <div class="msgs">${msgs || ""}${starters}${!c.turns.length&&!c.busy?'<p class="small" style="opacity:.7;margin:0">Frag nach, wenn etwas unklar ist. Claude bekommt die Karte und deine letzten Nachrichten; gleiche Fragen beantwortet die App aus dem Speicher.</p>':""}</div>
+    <div class="compose"><textarea id="chatin" rows="1" placeholder="Frage zur Karte …" ${S.ai?"":"disabled"}></textarea>
+      ${c.busy?`<button class="btn" data-act="stop">Stopp</button>`:`<button class="btn" data-act="send" ${S.ai?"":"disabled"}>Senden</button>`}</div>
+  </aside>`;
+}
+function rerenderChat(id){
+  const el = document.querySelector(`.chat[data-chat="${CSS.escape(id)}"]`); if(!el) return;
+  const typed = ($("#chatin")||{}).value || ""; const focused = document.activeElement && document.activeElement.id==="chatin";
+  const tmp = document.createElement("div"); tmp.innerHTML = chatPanel(S.items.get(id)); el.replaceWith(tmp.firstElementChild);
+  const ta = $("#chatin"); if(ta){ ta.value = typed; if(focused) ta.focus(); }
+  afterRender();
+}
+async function sendChat(id, text){
+  text = (text||"").trim(); if(!text || !S.ai) return;
+  const it = S.items.get(id); const c = chats.get(id) || {turns:[]}; chats.set(id,c);
+  if(c.busy) return;
+  c.turns.push({role:"user", content:text}); c.busy = true; c.partial = ""; c.error = null; c.ctl = new AbortController();
+  const ta = $("#chatin"); if(ta) ta.value = "";
+  rerenderChat(id);
+  const ck = checks.get(id);
+  const ctx = "Die Karte, um die es geht:\n"+itemContext(it) + (ck && ck.text ? "\n\nSkizze des Lernenden:\n"+ck.input+"\n\nDeine Prüfung der Skizze:\n"+ck.text : "");
+  const first = c.turns.length===1;
+  const key = first ? "c:"+hashStr(ctx)+":"+hashStr(normQ(text)) : null;
+  const hit = key && cacheGet(key);
+  if(hit){ c.turns.push({role:"assistant", content:hit}); }
+  else try{
+    const res = await aiStream([CHAT_RULES, ctx], c.turns, {signal:c.ctl.signal,
+      onText:text=>{ c.partial = text; const s = $("#streaming"); if(s){ s.textContent = text; s.classList.remove("think"); const m=s.parentElement; m.scrollTop=m.scrollHeight; } }});
+    c.turns.push({role:"assistant", content:res});
+    if(key && res) cachePut(key, res);
+  }catch(e){
+    if(e && e.text) c.turns.push({role:"assistant", content:e.text});
+    if(!(e && e.code==="cancelled")) c.error = errText(e);
+  }
+  c.busy = false; c.partial = "";
+  rerenderChat(id);
+}
+
+/* ---------- Ansicht: Suche ---------- */
+let searchQ = "";
+function vSuche(){
+  return `<h1>Suche</h1><p class="sub">Durchsucht Begriffe, Inhalte, Schlagwörter und Normen aller Definitionen, Karteikarten, Schemata und Fälle.</p>
+    <input id="bigq" class="bigsearch" type="search" placeholder="z. B. Außenbereich, Art. 3 GG, Störer" aria-label="Suchbegriff">
+    <div id="results"></div>`;
+}
+function runSearch(){
+  const box = $("#results"); if(!box) return;
+  const toks = fold(searchQ).split(/\s+/).filter(Boolean);
+  if(!toks.length){ box.innerHTML = `<p class="muted">Tipp ein Wort ein. Mehrere Wörter müssen alle vorkommen.</p>${tagCloud()}`; return; }
+  const hits = [...S.items.values()].filter(it=>{ const h = hay(it); return toks.every(t=>h.includes(t)); })
+    .sort((a,b)=>{ const ta=fold(titleOf(a)), tb=fold(titleOf(b)); const sa=toks.some(t=>ta.includes(t))?1:0, sb=toks.some(t=>tb.includes(t))?1:0; return sb-sa || tierOf(a)-tierOf(b); });
+  if(!hits.length){ box.innerHTML = `<div class="panel empty">Kein Treffer für „${esc(searchQ)}“. Prüf die Schreibweise oder such nach einer Norm.</div>`; return; }
+  box.innerHTML = TKEYS.map(t=>{ const h = hits.filter(i=>i.type===t); if(!h.length) return "";
+    return `<h3>${TYPES_PL[t]} <span class="muted">${h.length}</span></h3><div class="list">${h.slice(0,80).map(i=>itemRow(i,toks)).join("")}</div>`; }).join("");
+}
+function tagCloud(){
+  const m = new Map(); for(const it of S.items.values()) for(const t of (it.tags||[])) m.set(t,(m.get(t)||0)+1);
+  if(!m.size) return "";
+  return `<h3>Schlagwörter</h3><div class="row" style="gap:6px">${[...m.entries()].sort((a,b)=>b[1]-a[1]).slice(0,40).map(([t,n])=>`<button class="tag" data-act="tag" data-t="${esc(t)}">${esc(t)} ${n}</button>`).join("")}</div>`;
+}
+
+/* ---------- Ansicht: Bibliothek ---------- */
+const bib = {type:"", area:"", cat:"", q:"", fix:false, star:false, sort:"rel"};
+const isHemmer = i => /hemmer/i.test(i.source||"") || (i.tags||[]).some(t=>/^hemmer$/i.test(t));
+const isZusatz = i => (i.tags||[]).some(t=>/^(wiederholungsfrage|zusatzfrage|sonderheft)$/i.test(t)) || /wiederholungs|zusatzfrage|sonderheft/i.test(i.source||"");
+const POOLS = {"":["Alle", ()=>true], "zusatz":["Hemmer-Zusatzfragen", i=>isZusatz(i)]};
+const inPool = (pool, i) => (POOLS[pool||""]||POOLS[""])[1](i);
+/* angefangene Abfrage (laufend oder pausiert) → am passenden Knopf statt als Banner */
+function pendSess(){ return session && !session.exam && session.idx<session.ids.length ? {label:session.label, idx:session.idx, ids:session.ids, kind:session.kind, key:session.key, live:true} : S.savedSess && !S.savedSess.exam ? S.savedSess : null; }
+const sessPool = d => /Zusatzfragen/.test(d.label||"") ? "zusatz" : "";
+function resBtn(d, big){ return `<button class="btn ${big?"big ":""}st-part" data-act="${d.live?"tosession":"resume"}" title="${esc(d.label)}: ${d.idx} von ${d.ids.length} erledigt – noch nicht fertig">⏸ Weiter: noch ${d.ids.length-d.idx} von ${d.ids.length}</button>${d.live?"":`<button class="btn ghost small" data-act="dropsess" title="Angefangene Abfrage verwerfen">Verwerfen</button>`}`; }
+function poolTabs(cur, act, countFn){ return `<div class="subtabs" role="tablist">${Object.entries(POOLS).map(([k,[l]])=>`<button role="tab" class="tab ${(cur||"")===k?"on":""}" aria-selected="${(cur||"")===k}" data-act="${act}" data-t="${k}">${l}${countFn?` <span class="muted">${countFn(k)}</span>`:""}${act==="pool" && (()=>{ const d = pendSess(); return d && d.kind==="pensum" && sessPool(d)===k; })() ? ` <span class="stpill part">nicht fertig</span>`:""}</button>`).join("")}</div>`; }
+const CATS = {"hemmer-zusatz":["Hemmer-Zusatzfragen", i=>i.type==="card"&&isZusatz(i)], "hemmer-faelle":["Hemmer-Fälle", i=>i.type==="case"&&isHemmer(i)], "hemmer-karten":["Hemmer-Karteikarten", i=>i.type==="card"&&isHemmer(i)], "hemmer-alle":["Alles von Hemmer", isHemmer]};
+function vBib(){
+  const ar = areas();
+  let list = [...S.items.values()].filter(i=>(!bib.type||i.type===bib.type)&&(!bib.cat||CATS[bib.cat][1](i))&&(!bib.area||i.area===bib.area)&&(!bib.fix||(i.suggestion&&i.suggestion.status==="offen"))&&(!bib.star||i.star));
+  const toks = fold(bib.q).split(/\s+/).filter(Boolean);
+  if(toks.length) list = list.filter(i=>{ const h=hay(i); return toks.every(t=>h.includes(t)); });
+  list.sort(bib.sort==="rel" ? (a,b)=>tierOf(a)-tierOf(b)||titleOf(a).localeCompare(titleOf(b),"de") : bib.sort==="due" ? (a,b)=>((S.progress.get(a.id)||{}).due||"0").localeCompare((S.progress.get(b.id)||{}).due||"0") : (a,b)=>titleOf(a).localeCompare(titleOf(b),"de"));
+  return `<div class="row"><h1>Bibliothek</h1><span class="spacer"></span>${list.some(i=>i.star)?`<button class="btn" data-act="learnstar">★ ${list.filter(i=>i.star).length} Sternkarten abfragen</button>`:""}<a class="btn primary" href="#neu">Eintrag anlegen</a></div>
+  <p class="sub">${S.items.size} Einträge: ${TKEYS.map(t=>[...S.items.values()].filter(i=>i.type===t).length+" "+TYPES_PL[t]).join(", ")}.</p>
+  <div class="subtabs" role="tablist">${[["", "Alle Einträge", S.items.size], ["hemmer-zusatz", "Hemmer-Zusatzfragen", [...S.items.values()].filter(CATS["hemmer-zusatz"][1]).length]].map(([k,l,n])=>`<button role="tab" class="tab ${bib.cat===k?"on":""}" aria-selected="${bib.cat===k}" data-act="bibtab" data-t="${k}">${l} <span class="muted">${n}</span></button>`).join("")}</div>
+  <div class="filters">
+    <select data-bib="type" aria-label="Art"><option value="">Alle Arten</option>${TKEYS.map(t=>`<option value="${t}" ${bib.type===t?"selected":""}>${TYPES_PL[t]}</option>`).join("")}</select>
+    <select data-bib="cat" aria-label="Kategorie"><option value="">Alle Kategorien</option>${Object.entries(CATS).map(([k,v])=>`<option value="${k}" ${bib.cat===k?"selected":""}>${v[0]} (${[...S.items.values()].filter(v[1]).length})</option>`).join("")}</select>
+    <select data-bib="area" aria-label="Rechtsgebiet"><option value="">Alle Rechtsgebiete</option>${ar.map(a=>`<option ${bib.area===a?"selected":""}>${esc(a)}</option>`).join("")}</select>
+    <select data-bib="sort" aria-label="Sortierung"><option value="rel" ${bib.sort==="rel"?"selected":""}>Nach Tier</option><option value="due" ${bib.sort==="due"?"selected":""}>Nach Fälligkeit</option><option value="abc" ${bib.sort==="abc"?"selected":""}>Alphabetisch</option></select>
+    <input data-bib="q" type="search" placeholder="Filtern" value="${esc(bib.q)}" aria-label="Filtern">
+    <label class="switch"><input type="checkbox" data-bib="star" ${bib.star?"checked":""}> nur ★ Sterne (${[...S.items.values()].filter(i=>i.star).length})</label>
+    <label class="switch"><input type="checkbox" data-bib="fix" ${bib.fix?"checked":""}> nur mit Korrekturvorschlag</label>
+  </div>
+  ${list.length ? `<div class="list">${list.slice(0,400).map(i=>itemRow(i,toks)).join("")}</div>${list.length>400?`<p class="small muted">Die ersten 400 von ${list.length} angezeigt. Grenze die Auswahl mit den Filtern ein.</p>`:""}` : `<div class="panel empty">Keine Einträge für diese Auswahl.</div>`}`;
+}
+
+/* ---------- Ansicht: Detail ---------- */
+let editing = null;
+function vDetail(id){
+  const it = S.items.get(id);
+  if(!it) return `<h1>Eintrag nicht gefunden</h1><p class="sub">Er wurde gelöscht oder der Link ist veraltet.</p><a class="btn" href="#bibliothek">Zur Bibliothek</a>`;
+  const p = S.progress.get(id);
+  const linked = linksOf(id);
+  const sameNorm = [...new Map((it.norms||[]).flatMap(n=>(normIndex().get(n.trim())||[])).filter(o=>o.id!==id && !linked.includes(o)).map(o=>[o.id,o])).values()];
+  return `<div class="crumbs"><a href="#bibliothek">Bibliothek</a> / ${TYPES[it.type]}${session && session.idx<session.ids.length?` <button class="btn small" style="margin-left:10px;padding:4px 12px" data-act="tosession">← Zurück zur Abfrage</button>`:""}</div>
+  <div class="detail">
+    <div>
+      ${fixNotice(it)}
+      ${sheet(it, true, false)}
+      ${(it.tags||[]).length?`<div class="row" style="gap:6px;margin-top:14px">${it.tags.map(t=>`<button class="tag" data-act="tag" data-t="${esc(t)}">${esc(t)}</button>`).join("")}</div>`:""}
+      <h2>Verknüpft</h2>
+      ${linked.length?`<div class="list">${linked.map(o=>itemRow(o)).join("")}</div>`:`<p class="muted">Noch keine direkten Verweise. Du kannst sie über „Bearbeiten“ setzen.</p>`}
+      ${sameNorm.length?`<h2>Über dieselben Normen</h2><div class="list">${sameNorm.map(o=>itemRow(o)).join("")}</div>`:""}
+      <h2>Lernstand</h2>
+      <dl class="kv">
+        <dt>Tier</dt><dd>${tierTag(it)} ${TIER_TXT[tierOf(it)]}</dd>
+        <dt>Nächste Abfrage</dt><dd>${!p?"noch nie gelernt":p.due<=today()?"heute fällig":toDate(p.due).toLocaleDateString("de-DE")+" ("+fmtIvl(diffDays(today(),p.due))+")"}</dd>
+        ${p?`<dt>Wiederholungen</dt><dd>${p.reps}, davon ${p.lapses}× vergessen${p.leech?" (Problemkarte)":""}</dd><dt>Letzte Bewertung</dt><dd>${GRADE_TXT[p.lastGrade]||"-"} am ${toDate(p.last).toLocaleDateString("de-DE")}</dd>`:""}
+      </dl>
+      <div class="row" style="margin-top:22px">
+        <button class="btn primary" data-act="learnone" data-id="${esc(id)}">Jetzt abfragen</button>
+        <button class="btn" data-act="edit" data-id="${esc(id)}">Bearbeiten</button>
+        ${p?`<button class="btn ghost" data-act="resetp" data-id="${esc(id)}">Lernstand zurücksetzen</button>`:""}
+        <span class="spacer"></span><button class="btn ghost" data-act="del" data-id="${esc(id)}">Löschen</button>
+      </div>
+    </div>
+    ${chatPanel(it)}
+  </div>`;
+}
+
+/* ---------- Ansicht: Bearbeiten / Anlegen ---------- */
+let draftLinks = [];
+function vEdit(it){
+  const isNewItem = !it;
+  const t = it ? it.type : (editType||"card");
+  if(!draftLinksInit){ draftLinks = it ? [...(it.links||[])] : []; draftLinksInit = true; }
+  const v = (k,d="") => esc(it && it[k]!=null ? it[k] : d);
+  const ar = areas();
+  return `<div class="crumbs"><a href="#bibliothek">Bibliothek</a> / ${isNewItem?"Neuer Eintrag":"Bearbeiten"}</div>
+  <h1>${isNewItem?"Eintrag anlegen":esc(titleOf(it))}</h1>
+  <div class="form" id="editform" data-id="${it?esc(it.id):""}">
+    ${isNewItem?`<div class="field"><label>Art</label><div class="cats" style="margin:0">${TKEYS.map(x=>`<button class="chip t-${x}" data-act="etype" data-t="${x}" aria-pressed="${t===x}"><i class="dot"></i>${TYPES[x]}</button>`).join("")}</div></div>`:""}
+    ${t==="card"?`<div class="field"><label for="f-front">Vorderseite (Frage)</label><div class="mdbar"><button type="button" data-act="md" data-for="f-front" data-m="**" title="Auswahl fett">B</button><button type="button" class="mk" data-act="md" data-for="f-front" data-m="==" title="Auswahl markieren">Markieren</button><small>**fett** · ==markiert==</small></div><textarea id="f-front">${v("front")}</textarea></div>
+      <div class="field"><label for="f-back">Rückseite (Antwort)</label><div class="mdbar"><button type="button" data-act="md" data-for="f-back" data-m="**" title="Auswahl fett">B</button><button type="button" class="mk" data-act="md" data-for="f-back" data-m="==" title="Auswahl markieren">Markieren</button><small>**fett** · ==markiert==</small></div><textarea id="f-back" style="min-height:140px">${v("back")}</textarea></div>`:""}
+    ${t==="def"?`<div class="field"><label for="f-term">Begriff</label><input id="f-term" value="${v("term")}"></div>
+      <div class="field"><label for="f-definition">Definition</label><div class="mdbar"><button type="button" data-act="md" data-for="f-definition" data-m="**" title="Auswahl fett">B</button><button type="button" class="mk" data-act="md" data-for="f-definition" data-m="==" title="Auswahl markieren">Markieren</button><small>**fett** · ==markiert==</small></div><textarea id="f-definition">${v("definition")}</textarea></div>
+      <div class="field"><label for="f-merkmale">Kernmerkmale</label><textarea id="f-merkmale" placeholder="Ein Merkmal pro Zeile">${esc((it&&it.merkmale||[]).join("\n"))}</textarea><small>Maßstab für die Auswertung im Schreibmodus. Ein Merkmal pro Zeile.</small></div>`:""}
+    ${t==="schema"?`<div class="field"><label for="f-title">Titel</label><input id="f-title" value="${v("title")}" placeholder="z. B. Begründetheit der Anfechtungsklage"></div>
+      <div class="field"><label for="f-steps">Prüfungspunkte</label><textarea id="f-steps" style="min-height:220px;font-family:var(--sans);font-size:14.5px" placeholder="A. Zulässigkeit&#10;  I. Verwaltungsrechtsweg&#10;  II. Statthafte Klageart">${esc((it&&it.steps||[]).join("\n"))}</textarea><small>Ein Punkt pro Zeile. Mit zwei Leerzeichen am Zeilenanfang rückst du einen Unterpunkt ein.</small></div>
+      <div class="field"><label for="f-hinweis">Hinweise (optional)</label><div class="mdbar"><button type="button" data-act="md" data-for="f-hinweis" data-m="**" title="Auswahl fett">B</button><button type="button" class="mk" data-act="md" data-for="f-hinweis" data-m="==" title="Auswahl markieren">Markieren</button><small>**fett** · ==markiert==</small></div><textarea id="f-hinweis">${v("hinweis")}</textarea></div>`:""}
+    ${t==="case"?`<div class="field"><label for="f-title">Titel</label><input id="f-title" value="${v("title")}"></div>
+      <div class="field"><label for="f-sachverhalt">Sachverhalt (kurz)</label><textarea id="f-sachverhalt">${v("sachverhalt")}</textarea></div>
+      <div class="field"><label for="f-kern">Wesentliche Bestandteile</label><textarea id="f-kern" placeholder="Ein Punkt pro Zeile">${esc((it&&it.kern||[]).join("\n"))}</textarea></div>
+      <div class="field"><label for="f-problems">Problemschwerpunkte</label><textarea id="f-problems" style="min-height:150px" placeholder="Problem => Lösung (eine Zeile pro Problem)">${esc((it&&it.problems||[]).map(p=>p.frage+" => "+p.antwort).join("\n"))}</textarea><small>Je Zeile: Frage, dann „=>“, dann die Lösung.</small></div>`:""}
+    <div class="two">
+      <div class="field"><label for="f-area">Rechtsgebiet</label><input id="f-area" list="arealist" value="${v("area")}"><datalist id="arealist">${ar.map(a=>`<option value="${esc(a)}">`).join("")}</datalist></div>
+      <div class="field"><label for="f-source">Quelle</label><input id="f-source" value="${v("source", t==="case"?"":"analog")}" placeholder="Quizlet, analog, Hemmer 2163 …"></div>
+    </div>
+    <div class="two">
+      <div class="field"><label for="f-norms">Normen</label><input id="f-norms" value="${esc((it&&it.norms||[]).join(", "))}" placeholder="§ 35 BauGB, Art. 3 GG"><small>Mit Komma trennen. Ohne Absatz angeben, damit sie gebündelt werden.</small></div>
+      <div class="field"><label for="f-rel">Tier</label><select id="f-rel">${[1,2,3,4].map(r=>`<option value="${r}" ${(it?tierOf(it):3)===r?"selected":""}>${TIER_TXT[r]}</option>`).join("")}</select></div>
+    </div>
+    <div class="field"><label for="f-mnemo">Eselsbrücke</label><textarea id="f-mnemo" placeholder="Dein eigener Merkhinweis zu dieser Karte">${esc(it&&it.mnemonic||"")}</textarea><small>Erscheint bei jeder Abfrage unter der Antwort.</small></div>
+    <div class="field"><label for="f-tags">Schlagwörter</label><input id="f-tags" value="${esc((it&&it.tags||[]).join(", "))}" placeholder="Außenbereich, Privilegierung"></div>
+    <div class="field picker"><label for="f-link">Verknüpfen mit</label><input id="f-link" placeholder="Eintrag suchen und hinzufügen" autocomplete="off"><div class="drop" id="linkdrop" hidden></div>
+      <div class="chips" id="linkchips">${linkChips()}</div></div>
+    <div class="row"><button class="btn primary" data-act="save">${isNewItem?"Anlegen":"Änderungen speichern"}</button><button class="btn" data-act="canceledit">Abbrechen</button></div>
+  </div>`;
+}
+let editType = "card", draftLinksInit = false;
+function linkChips(){ return draftLinks.map(id=>{ const o=S.items.get(id); return o?`<span>${esc(TYPES[o.type])}: ${esc(titleOf(o).slice(0,50))}<button data-act="unlink" data-id="${esc(id)}" aria-label="Entfernen">×</button></span>`:""; }).join(""); }
+const lines = id => ($("#"+id)?.value||"").split("\n").map(s=>s.trim()).filter(Boolean);
+const csv = id => ($("#"+id)?.value||"").split(",").map(s=>s.trim()).filter(Boolean);
+async function saveEdit(){
+  const f = $("#editform"); const id = f.dataset.id; const old = id ? S.items.get(id) : null;
+  const type = old ? old.type : editType;
+  const it = old ? clean(old) : {id: uid({def:"d",case:"f",schema:"s",card:"k"}[type]), type, created:new Date().toISOString()};
+  if(type==="card"){ it.front = $("#f-front").value.trim(); it.back = $("#f-back").value.trim(); if(!it.front){ toast("Die Vorderseite fehlt."); return; } }
+  if(type==="def"){ it.term = $("#f-term").value.trim(); it.definition = $("#f-definition").value.trim(); it.merkmale = lines("f-merkmale"); if(!it.term){ toast("Der Begriff fehlt."); return; } }
+  if(type==="schema"){ it.title = $("#f-title").value.trim(); it.steps = ($("#f-steps").value||"").split("\n").map(l=>l.replace(/\s+$/,"")).filter(l=>l.trim()); it.hinweis = $("#f-hinweis").value.trim(); if(!it.title){ toast("Der Titel fehlt."); return; } }
+  if(type==="case"){ it.title = $("#f-title").value.trim(); it.sachverhalt = $("#f-sachverhalt").value.trim(); it.kern = lines("f-kern");
+    it.problems = lines("f-problems").map(l=>{ const i=l.indexOf("=>"); return i<0?{frage:l,antwort:""}:{frage:l.slice(0,i).trim(),antwort:l.slice(i+2).trim()}; });
+    if(!it.title){ toast("Der Titel fehlt."); return; } }
+  it.area = $("#f-area").value.trim(); it.source = $("#f-source").value.trim(); it.norms = csv("f-norms"); it.tags = csv("f-tags");
+  it.tier = Number($("#f-rel").value)||3; delete it.relevance; it.mnemonic = ($("#f-mnemo").value||"").trim(); it.links = [...new Set(draftLinks)].filter(x=>x!==it.id);
+  await putItem(it);
+  // Verweise beidseitig halten
+  const prevLinks = old ? (old.links||[]) : [];
+  for(const lid of it.links){ const o = S.items.get(lid); if(o && !(o.links||[]).includes(it.id)){ o.links = [...(o.links||[]), it.id]; await putItem(o); } }
+  for(const lid of prevLinks.filter(x=>!it.links.includes(x))){ const o = S.items.get(lid); if(o && (o.links||[]).includes(it.id)){ o.links = o.links.filter(x=>x!==it.id); await putItem(o); } }
+  editing = null; draftLinksInit = false; toast(old?"Gespeichert":"Angelegt"); if(backToSession && session){ backToSession = false; go("lernen"); } else go("e-"+it.id);
+}
+
+/* ---------- Ansicht: Normen ---------- */
+function vNormen(){
+  const idx = normIndex();
+  const groups = new Map();
+  for(const [n,list] of idx){ const law = (n.match(/([A-ZÄÖÜ][A-Za-zÄÖÜäöü]*)\s*$/)||[,"Sonstige"])[1]; if(!groups.has(law)) groups.set(law,[]); groups.get(law).push([n,list]); }
+  const num = n => parseFloat((n.match(/\d+[a-z]?/)||["0"])[0]) || 0;
+  return `<h1>Normen</h1><p class="sub">Jede Norm bündelt alle Definitionen, Karteikarten, Schemata und Fälle, in denen sie vorkommt.</p>
+  ${idx.size ? [...groups.entries()].sort((a,b)=>a[0].localeCompare(b[0],"de")).map(([law,arr])=>`<h2>${esc(law)}</h2><div class="row" style="gap:8px">${arr.sort((a,b)=>num(a[0])-num(b[0])).map(([n,l])=>`<a class="norm" style="font-size:14px;padding:7px 10px" href="#${normSlug(n)}">${esc(n)} <span style="opacity:.6">${l.length}</span></a>`).join("")}</div>`).join("") : `<div class="panel empty">Noch keine Normen hinterlegt.</div>`}`;
+}
+function vNorm(slug){
+  const idx = normIndex(); let name = null, list = [];
+  for(const [n,l] of idx) if(normSlug(n)===slug){ name = n; list = l; break; }
+  if(!name) return `<h1>Norm nicht gefunden</h1><a class="btn" href="#normen">Alle Normen</a>`;
+  const by = t => list.filter(i=>i.type===t);
+  return `<div class="crumbs"><a href="#normen">Normen</a></div><div class="row"><h1>${esc(name)}</h1><span class="spacer"></span>${normUrl(name)?`<a class="btn" href="${normUrl(name)}" target="_blank" rel="noopener noreferrer">Gesetzestext ↗</a>`:""}<button class="btn primary" data-act="learnnorm" data-n="${esc(slug)}">Alles zu dieser Norm abfragen</button></div>
+  <p class="sub">${list.length} Einträge</p>
+  ${TKEYS.map(t=>by(t).length?`<h3>${TYPES_PL[t]}</h3><div class="list">${by(t).map(i=>itemRow(i)).join("")}</div>`:"").join("")}`;
+}
+
+/* ---------- Ansicht: Problemkarten ---------- */
+let leechPool = "";
+function vProblem(){
+  const isLeech = i=>(S.progress.get(i.id)||{}).leech;
+  const list = [...S.items.values()].filter(i=>isLeech(i) && inPool(leechPool,i)).sort((a,b)=>(S.progress.get(b.id).lapses)-(S.progress.get(a.id).lapses));
+  return `<div class="row"><h1>Problemkarten</h1><span class="spacer"></span>${list.length?`<button class="btn primary" data-act="learnleech">Alle ${list.length} abfragen</button>`:""}</div>
+  ${poolTabs(leechPool, "lpool", k=>[...S.items.values()].filter(i=>isLeech(i) && inPool(k,i)).length)}
+  <p class="sub">Karten, die du dreimal oder öfter mit „Nochmal“ bewertet hast. Sie werden automatisch gesammelt. Oft hilft es, sie umzuformulieren oder Claude nach einer Eselsbrücke zu fragen.</p>
+  ${list.length?`<div class="list">${list.map(i=>itemRow(i)).join("")}</div>`:`<div class="panel empty">Keine Problemkarten. Gut so.</div>`}`;
+}
+
+/* ---------- Ansicht: Prüfungsmodus ---------- */
+const exam = {cats:[...TKEYS], area:"", n:30, maxTier:3, pool:""};
+function vPruefung(){
+  const pool = examPool();
+  return `<h1>Prüfungsmodus</h1><p class="sub">Gemischte Abfrage unabhängig von der Fälligkeit, wie in einer Prüfungssituation. Dein Wiederholungsplan bleibt dabei unverändert; am Ende siehst du deine Quote.</p>
+  ${poolTabs(exam.pool, "expool", k=>[...S.items.values()].filter(i=>inPool(k,i)).length)}
+  <section class="panel" style="max-width:720px">
+    <h3 style="margin-top:0">Kategorien</h3>
+    <div class="cats">${TKEYS.map(t=>`<button class="chip t-${t}" data-act="excat" data-t="${t}" aria-pressed="${exam.cats.includes(t)}"><i class="dot"></i>${TYPES_PL[t]}</button>`).join("")}</div>
+    <div class="two">
+      <div class="field"><label for="ex-area">Rechtsgebiet</label><select id="ex-area" data-ex="area"><option value="">Alle</option>${areas().map(a=>`<option ${exam.area===a?"selected":""}>${esc(a)}</option>`).join("")}</select></div>
+      <div class="field"><label for="ex-rel">Tiers einbeziehen</label><select id="ex-rel" data-ex="maxTier">${[1,2,3,4].map(r=>`<option value="${r}" ${exam.maxTier===r?"selected":""}>${r===1?"Nur Tier 1":"Tier 1 bis "+r}</option>`).join("")}</select></div>
+    </div>
+    <h3>Anzahl</h3>
+    <div class="slider"><input type="range" min="5" max="100" step="5" value="${exam.n}" data-ex="n" aria-label="Anzahl Fragen"><output id="exOut">${exam.n}</output></div>
+    <div class="row" style="margin-top:12px"><button class="btn primary big" data-act="startexam" ${pool.length?"":"disabled"}>Prüfung starten</button><span class="muted small">${pool.length} passende Einträge</span></div>
+  </section>`;
+}
+function examPool(){ return [...S.items.values()].filter(i=>inPool(exam.pool,i) && exam.cats.includes(i.type) && (!exam.area||i.area===exam.area) && tierOf(i)<=exam.maxTier); }
+
+/* ---------- Ansicht: Statistik ---------- */
+function sureOf(it){ const p = S.progress.get(it.id); return !!(p && p.lastGrade>=3 && !p.leech); }
+function tierStats(){
+  const all = [...S.items.values()].filter(i=>!i.fallsumme || true);
+  const out = {};
+  for(const t of [1,2,3,4]){ const l = all.filter(i=>tierOf(i)===t); out[t] = {n:l.length, sure:l.filter(sureOf).length, seen:l.filter(i=>S.progress.has(i.id)).length}; }
+  return out;
+}
+function projection(){
+  const all = [...S.items.values()].filter(i=>tierOf(i)<=2);
+  const n = all.length, sure = all.filter(sureOf).length, left = daysToExam();
+  const t = today(), d14 = addDays(t,-14);
+  const recent = all.filter(i=>{ const p=S.progress.get(i.id); return p && p.sure && p.sure>=d14; }).length;
+  const first = all.map(i=>(S.progress.get(i.id)||{}).sure).filter(Boolean).sort()[0];
+  const span = first ? Math.min(14, Math.max(3, diffDays(first, t)+1)) : 0;
+  let rate = span && recent ? recent/span : 0, basis = "gemessen";
+  if(!rate){
+    const rev = Object.entries(S.log.days).filter(([d])=>d>=d14).reduce((a,[,v])=>a+v,0);
+    rate = (rev/14)*0.35*(n? (n-sure)/n : 0); basis = "geschätzt aus deinem Tagespensum";
+  }
+  const proj = n ? Math.min(100, (sure + rate*left)/n*100) : 0;
+  const need = left>0 ? Math.max(0, (0.9*n - sure)/left) : 0;
+  return {n, sure, left, rate, basis, pct: n?sure/n*100:0, proj, need};
+}
+function projChart(P){
+  const W=640,H=210,L=40,R=14,T=14,B=26;
+  const x = f => L+(W-L-R)*f, y = v => T+(H-T-B)*(1-v/100);
+  const line = `M${x(0)},${y(P.pct)} L${x(1)},${y(P.proj)}`;
+  const tick = [0,25,50,75,100].map(v=>`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="var(--muted)">${v}</text>`).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Hochrechnung Wissensstand Tier 1 und 2 bis zum Examen">${tick}
+    <line x1="${L}" x2="${W-R}" y1="${y(90)}" y2="${y(90)}" stroke="var(--g3)" stroke-width="2" stroke-dasharray="6 5"/>
+    <text x="${L+8}" y="${y(90)-6}" font-size="12" font-weight="600" fill="var(--g3)">Ziel 90 %</text>
+    <path d="${line}" stroke="var(--acc-ink)" stroke-width="3" fill="none" stroke-linecap="round" stroke-dasharray="1 7"/>
+    <circle cx="${x(0)}" cy="${y(P.pct)}" r="5" fill="var(--acc-ink)"/><circle cx="${x(1)}" cy="${y(P.proj)}" r="5" fill="none" stroke="var(--acc-ink)" stroke-width="2.5"/>
+    <text x="${x(0)+8}" y="${y(P.pct)-8}" font-size="12" fill="var(--ink)" font-weight="600" stroke="var(--paper)" stroke-width="4" paint-order="stroke">heute ${Math.round(P.pct)} %</text>
+    <text x="${x(1)-10}" y="${P.proj>80?y(P.proj)+22:y(P.proj)-10}" text-anchor="end" font-size="12" fill="var(--ink)" font-weight="600" stroke="var(--paper)" stroke-width="4" paint-order="stroke">Examen ${Math.round(P.proj)} %</text>
+    <text x="${L}" y="${H-6}" font-size="11" fill="var(--muted)">heute</text><text x="${W-R}" y="${H-6}" text-anchor="end" font-size="11" fill="var(--muted)">${toDate(examDate()).toLocaleDateString("de-DE",{day:"numeric",month:"long",year:"numeric"})}</text></svg>`;
+}
+function vWissen(){
+  const T = tierStats(), P = projection();
+  const goalOk = P.pct>=90;
+  const tc = t => { const x=T[t], pc = x.n? x.sure/x.n*100 : 0, goal = t<=2;
+    return `<div class="tcard"><span class="tier t${t}">T${t}</span> <span class="small muted">${TIER_TXT[t].split(" · ")[1]}</span>
+      <b class="big">${Math.round(pc)} %</b>
+      <div class="goalbar"><i style="width:${pc}%;background:${goal?(pc>=90?"var(--g3)":"var(--acc)"):"var(--g4)"}"></i>${goal?`<span class="goalmark" style="left:90%" title="Ziel 90 %"></span>`:""}</div>
+      <p class="small muted" style="margin:8px 0 0">${x.sure} von ${x.n} sicher, ${x.seen} schon gelernt${goal?". Ziel: 90 %":""}</p></div>`; };
+  const ar = areas().map(a=>{ const l=[...S.items.values()].filter(i=>i.area===a && tierOf(i)<=2); return {a, n:l.length, s:l.filter(sureOf).length}; }).filter(x=>x.n).sort((p,q)=>p.s/p.n - q.s/q.n);
+  const exp = toDate(examDate()).toLocaleDateString("de-DE",{day:"numeric",month:"long",year:"numeric"});
+  return `<h2>Wissensstand und Hochrechnung</h2>
+  <section class="panel proj">
+    <div class="bigstat"><div><b>${Math.round(P.pct)} %</b><span>Tier 1 und 2 sicher (Ziel 90 %)</span></div>
+      <div><b style="color:${P.proj>=90?"var(--g3)":"var(--g1)"}">${Math.round(P.proj)} %</b><span>Hochrechnung zum Examen</span></div>
+      <div><b>${P.left}</b><span>Tage bis ${esc(exp)}</span></div>
+      <div><b>${P.need>0?P.need.toFixed(1):"0"}</b><span>neue sichere Karten pro Tag nötig</span></div></div>
+    ${projChart(P)}
+    <p class="small muted" style="margin:10px 0 0">${goalOk?"Das Ziel von 90 % ist erreicht, jetzt gilt es, es zu halten. ":""}Dein Tempo: ${P.rate.toFixed(1)} neue sichere Karten aus Tier 1 und 2 pro Tag (${P.basis}). „Sicher“ heißt: zuletzt mit Gut, Leicht oder Sehr leicht bewertet und keine Problemkarte. Die Linie rechnet bei gleichbleibendem Tempo und ohne Vergessen, ist also eine Orientierung und keine Garantie.</p>
+    <div class="row" style="margin-top:10px"><label class="small muted" for="examdate">Examenstermin</label><input type="date" id="examdate" value="${esc(examDate())}" style="padding:6px 10px;border:1px solid var(--line);border-radius:10px;background:var(--soft);color:var(--ink)"></div>
+  </section>
+  <h3 style="margin-top:22px">Wissensstand nach Tier</h3>
+  <div class="tiers4">${[1,2,3,4].map(tc).join("")}</div>
+  ${ar.length?`<h3 style="margin-top:22px">Tier 1 und 2 nach Rechtsgebiet (schwächste zuerst)</h3><section class="panel"><div class="areas">${ar.map(x=>{ const pc=x.s/x.n*100; return `<div class="area"><div class="row"><b>${esc(x.a)}</b><span class="small muted">${x.s} von ${x.n}, ${Math.round(pc)} %</span></div><div class="goalbar"><i style="width:${pc}%;background:${pc>=90?"var(--g3)":"var(--acc)"}"></i><span class="goalmark" style="left:90%"></span></div></div>`; }).join("")}</div></section>`:""}`;
+}
+function vStats(){
+  const all = [...S.items.values()];
+  const ar = areas(); if(all.some(i=>!i.area)) ar.push("");
+  const t = today();
+  const fc = []; for(let d=0; d<14; d++){ const day = addDays(t,d); fc.push(all.filter(i=>{ const p=S.progress.get(i.id); return d===0 ? (!p || p.due<=t) : p && p.due===day; }).length); }
+  const max = Math.max(1,...fc);
+  const reviews = Object.values(S.log.days).reduce((a,b)=>a+b,0);
+  const last30 = []; for(let d=29; d>=0; d--) last30.push(S.log.days[addDays(t,-d)]||0);
+  const max30 = Math.max(1,...last30);
+  return `<h1>Statistik</h1><p class="sub">${reviews} Wiederholungen insgesamt. Lernserie: ${streak()} ${streak()===1?"Tag":"Tage"}.</p>
+  ${vWissen()}
+  <h2>Aktivität</h2>
+  <div class="grid2">
+    <section class="panel"><h3 style="margin-top:0">Fällig in den nächsten 14 Tagen</h3>
+      <div class="forecast">${fc.map((n,d)=>`<div><em>${n}</em><i style="height:${(n/max*100).toFixed(0)}%"></i><span>${d===0?"heute":toDate(addDays(t,d)).toLocaleDateString("de-DE",{weekday:"short"}).replace(".","")}</span></div>`).join("")}</div>
+      <p class="small muted" style="margin:10px 0 0">Die Spalte „heute“ enthält alle noch nie gelernten Einträge.</p></section>
+    <section class="panel"><h3 style="margin-top:0">Gelernt in den letzten 30 Tagen</h3>
+      <div class="forecast" style="gap:2px">${last30.map((n,i)=>`<div title="${n}"><i style="height:${(n/max30*100).toFixed(0)}%;max-width:14px;background:var(--acc-ink)"></i></div>`).join("")}</div></section>
+  </div>
+  <h2>Fortschritt nach Rechtsgebiet</h2>
+  <section class="panel"><div class="areas">${ar.map(a=>{
+    const l = all.filter(i=>(i.area||"")===a); const n = l.length||1;
+    const neu = l.filter(isNew).length, sicher = l.filter(i=>{const p=S.progress.get(i.id); return p && p.ivl>=21;}).length, prob = l.filter(i=>(S.progress.get(i.id)||{}).leech).length;
+    const lern = l.length-neu-sicher-prob;
+    return `<div class="area"><div class="row"><b>${esc(a||"Ohne Rechtsgebiet")}</b><span class="small muted">${l.length} ${l.length===1?"Eintrag":"Einträge"}, ${Math.round(sicher/n*100)} % sicher</span></div>
+      <div class="stack"><i style="width:${sicher/n*100}%;background:var(--g3)"></i><i style="width:${lern/n*100}%;background:var(--g4)"></i><i style="width:${prob/n*100}%;background:var(--g1)"></i></div></div>`; }).join("")}</div>
+    <div class="legend"><span><i style="background:var(--g3)"></i>sicher (Abstand ab 3 Wochen)</span><span><i style="background:var(--g4)"></i>in Arbeit</span><span><i style="background:var(--g1)"></i>Problemkarten</span><span><i style="background:var(--line)"></i>neu</span></div></section>`;
+}
+
+/* ---------- Ansicht: Daten ---------- */
+function vDaten(){
+  const ex = [...S.items.values()].filter(i=>i.example).length;
+  return `<h1>Daten</h1><p class="sub">${S.mode==="konto" ? "Deine Kartei liegt in deiner Supabase-Datenbank und ist auf allen deinen Geräten gleich. Sichere sie trotzdem ab und zu als Datei." : "Noch nicht mit Supabase verbunden: Die Kartei liegt nur in diesem Browser. Trag deine Zugangsdaten in config.js ein (Anleitung, Schritt 5)."}${S.stale?" Die Verbindung zur Datenbank hakt gerade; Angezeigtes ist eventuell nicht aktuell.":""}</p>
+  <div class="grid2">
+    ${S.user?`<section class="panel"><h3 style="margin-top:0">Konto</h3><p class="small muted">Angemeldet als ${esc(S.user.email||"")}.</p>
+      <div class="row"><button class="btn" data-act="reload">Neu laden</button><button class="btn ghost" data-act="logout">Abmelden</button></div></section>`:""}
+    <section class="panel"><h3 style="margin-top:0">Sichern</h3><p class="small muted">Lädt Karten, Lernstand und Einstellungen als JSON-Datei herunter.</p>
+      <button class="btn" data-act="export">Als Datei sichern</button><div id="exportbox"></div></section>
+    <section class="panel"><h3 style="margin-top:0">Sicherung laden</h3><p class="small muted">Gleiche Einträge werden überschrieben, alle anderen bleiben erhalten.</p>
+      <input type="file" id="importfile" accept=".json,application/json"></section>
+    <section class="panel"><h3 style="margin-top:0">Darstellung der Antworten</h3><p class="small muted">Gliedert Rückseiten automatisch (a), b), 1., Spiegelstriche), hebt Ergebnis, Merke, h.M./a.A. und (+)/(–) hervor. Nur Anzeige – der gespeicherte Text bleibt unverändert. Eigene Markierungen: **fett** und ==markiert==.</p>
+      <label class="row" style="gap:8px;cursor:pointer"><input type="checkbox" data-act="fmt" ${fmtOn?"checked":""}> Automatisch formatieren</label></section>
+    <section class="panel"><h3 style="margin-top:0">Grundpensum</h3><p class="small muted">So viele Karten schlägt „Aktuell“ jeden Tag vor.</p>
+      <div class="slider"><input type="range" min="10" max="200" step="5" value="${S.settings.base}" data-act="base" aria-label="Grundpensum"><output id="baseOut">${S.settings.base}</output></div>
+      <div class="row" style="margin-top:10px;gap:18px;flex-wrap:wrap"><label class="small muted">Neue Karten pro Tag (Pensum) <input type="number" id="newmax" min="0" max="200" value="${S.settings.newMax!=null?S.settings.newMax:20}" style="width:70px;padding:6px 8px;border:1px solid var(--line);border-radius:10px;background:var(--soft);color:var(--ink)"></label>
+      <label class="small muted">Endspurt: Tage vor dem Examen <input type="number" id="endspurt" min="7" max="60" value="${S.settings.endspurt||21}" style="width:70px;padding:6px 8px;border:1px solid var(--line);border-radius:10px;background:var(--soft);color:var(--ink)"></label></div>
+      <p class="small muted" style="margin:8px 0 0">Karten, deren Merkdauer bis zum Examen reicht oder die du mit „Sehr leicht“ bewertest, sind gesichert: Sie fallen aus allen Abfragen heraus und kommen im Endspurt einmal zur Endwiederholung.</p></section>
+    ${ex?`<section class="panel"><h3 style="margin-top:0">Beispielinhalte</h3><p class="small muted">${ex} Einträge sind nur zum Ausprobieren da. Lösch sie, bevor du deine eigenen Karten importierst.</p><button class="btn" data-act="delexamples">Beispielinhalte löschen</button></section>`:""}
+  </div>
+  <h2>Quizlet-Text einfügen</h2>
+  <section class="panel" style="max-width:820px">
+    <p class="small muted" style="margin-top:0">In Quizlet: Set öffnen, „Exportieren“, Trennung Begriff/Definition „Tab“, zwischen Karten „Neue Zeile“. Den Text hier einfügen.</p>
+    <div class="field"><textarea id="qz" style="min-height:160px;font-family:var(--sans);font-size:14px" placeholder="Begriff	Definition"></textarea></div>
+    <div class="two" style="margin-top:10px">
+      <div class="field"><label for="qz-type">Anlegen als</label><select id="qz-type"><option value="card">Karteikarten</option><option value="def">Definitionen</option></select></div>
+      <div class="field"><label for="qz-area">Rechtsgebiet</label><input id="qz-area" list="arealist2"><datalist id="arealist2">${areas().map(a=>`<option value="${esc(a)}">`).join("")}</datalist></div>
+    </div>
+    <div class="row" style="margin-top:12px"><button class="btn primary" data-act="quizlet">Importieren</button><span class="small muted">Tier, Normen und Verknüpfungen ergänzt Claude später beim Import im Chat.</span></div>
+  </section>`;
+}
+async function doExport(){
+  const data = JSON.stringify({app:"examenskartei", version:1, exported:now(), items:[...S.items.values()], progress:Object.fromEntries(S.progress), settings:S.settings, log:S.log}, null, 1);
+  const name = "examenskartei-"+today()+".json";
+  const mobile = /iPhone|iPad|Android/i.test(navigator.userAgent) || (navigator.maxTouchPoints>1 && /Mac/.test(navigator.platform||""));
+  try{
+    const file = new File([data], name, {type:"application/json"});
+    if(mobile && navigator.canShare && navigator.canShare({files:[file]})){
+      try{ await navigator.share({files:[file], title:name}); return; }catch(e){ if(e && e.name==="AbortError") return; }
+    }
+    const url = URL.createObjectURL(file); const a = document.createElement("a");
+    a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 5000); toast("Gesichert"); return;
+  }catch(e){}
+  $("#exportbox").innerHTML = `<p class="small muted">Das Herunterladen ist hier nicht möglich. Kopiere den Text und speichere ihn als „${name}“.</p><textarea style="width:100%;min-height:120px;font-size:12px" readonly>${esc(data)}</textarea>`;
+}
+async function doImport(file, noStart){
+  let d;
+  try{ d = JSON.parse(await file.text()); if(!Array.isArray(d.items)) throw 0; }
+  catch(e){ toast("Die Datei ist keine Sicherung der Examenskartei."); return; }
+  try{
+    toast("Importiere "+d.items.length+" Einträge …");
+    await putItems(d.items.filter(it=>it && it.id && it.type));
+    await putProgressMany(Object.entries(d.progress||{}));
+    if(d.settings){ Object.assign(S.settings, d.settings); await saveSettings(); }
+    if(d.log && d.log.days){ Object.entries(d.log.days).forEach(([k,v])=>S.log.days[k]=Math.max(S.log.days[k]||0,v)); await putMeta("log", S.log); }
+    if(d.tagesabfrage && d.tagesabfrage.datum){
+      const ids = d.items.filter(it=>it && it.id && it.type).map(it=>it.id);
+      toast(ids.length+" Karten der Tagesabfrage übernommen");
+      if(noStart){ render(); return; }
+      const rest = ids.filter(x=>{ const it = S.items.get(x); return it && taPending(it); });
+      if(!rest.length){ render(); return; }
+      startSession(rest, {kind:"tages", key:d.tagesabfrage.datum, label:"Tagesabfrage "+toDate(d.tagesabfrage.datum).toLocaleDateString("de-DE",{day:"numeric",month:"long"})});
+      return;
+    }
+    toast(d.items.length+" Einträge geladen"); render();
+  }catch(e){ render(); }
+}
+async function doQuizlet(){
+  const txt = $("#qz").value; const type = $("#qz-type").value; const area = $("#qz-area").value.trim();
+  const rows = txt.split(/\r?\n/).map(l=>l.split("\t")).filter(r=>r.length>=2 && r[0].trim());
+  if(!rows.length){ toast("Keine Karten erkannt. Zwischen Begriff und Definition muss ein Tab stehen."); return; }
+  const list = rows.map(([a,...b])=>{
+    const back = b.join(" ").trim();
+    const it = type==="def" ? {id:uid("d"), type, term:a.trim(), definition:back, merkmale:[]} : {id:uid("k"), type, front:a.trim(), back};
+    return Object.assign(it, {area, source:"Quizlet", tier:3, norms:[], tags:[], links:[], created:now()});
+  });
+  try{ await putItems(list); $("#qz").value = ""; toast(rows.length+" Karten importiert"); }catch(e){}
+  render();
+}
+
+/* ---------- Ereignisse ---------- */
+document.addEventListener("click", async e=>{
+  const b = e.target.closest("[data-act]"); if(!b) return;
+  const a = b.dataset.act, id = b.dataset.id;
+  if(a==="gradeinfo"){ e.preventDefault(); e.stopPropagation(); const g = Number(b.dataset.g); gradeInfo = gradeInfo===g ? 0 : g; render(); return; }
+  if(a==="cat"){ const t=b.dataset.t, c=S.settings.cats; S.settings.cats = c.includes(t) ? c.filter(x=>x!==t) : [...c,t]; saveSettings(); render(); }
+  else if(a==="start"){ const n = Math.max(0, todayTarget()-doneToday()); startSession(buildQueue(S.settings.cats, n), {label:S.settings.pool==="zusatz"?"Hemmer-Zusatzfragen":"Heutige Abfrage", kind:"pensum", key:today()}); }
+  else if(a==="more"){ startSession(buildQueue(S.settings.cats, 10), {label:"Zusätzliche Runde", kind:"pensum", key:today()}); }
+  else if(a==="pool"){ S.settings.pool = b.dataset.t; saveSettings(); render(); }
+  else if(a==="expool"){ exam.pool = b.dataset.t; render(); }
+  else if(a==="lpool"){ leechPool = b.dataset.t; render(); }
+  else if(a==="tahist"){ taHist = !taHist; render(); }
+  else if(a==="fall"){ startFall(b.dataset.k); }
+  else if(a==="check"){ checkCase(id); }
+  else if(a==="stopcheck"){ const c = checks.get(id); if(c&&c.ctl) c.ctl.abort(); }
+  else if(a==="recheck"){ const c = checks.get(id); checks.set(id, {input:c?c.input:""}); if(session) session.revealed = false; render(); const t=$("#sktext"); if(t) t.focus(); }
+  else if(a==="tagesabfrage"){ const d = b.dataset.d; const allD = [...S.items.values()].filter(i=>i.tagesabfrage===d); const open = allD.filter(taPending); if(!open.length){ toast("Diese Tagesabfrage ist abgeschlossen."); return; } startSession(open.sort((x,y)=>priority(y)-priority(x)).map(i=>i.id), {label:"Tagesabfrage "+toDate(d).toLocaleDateString("de-DE",{day:"numeric",month:"long"}), kind:"tages", key:d}); }
+  else if(a==="noop"){ }
+  else if(a==="reveal"){ if(session){ session.revealed = true; render(); } }
+  else if(a==="grade"){ grade(Number(b.dataset.g)); }
+  else if(a==="bibtab"){ bib.cat = b.dataset.t; render(); }
+  else if(a==="backcard"){ await backCard(); }
+  else if(a==="endsession"){ if(session && session.idx < session.ids.length){ saveSess(); toast("Abfrage pausiert – unter „Aktuell“ kannst du weitermachen"); } else saveSess(); session = null; if(b.tagName!=="A") go("aktuell"); }
+  else if(a==="resume"){ resumeSess(); }
+  else if(a==="dropsess"){ if(confirm("Angefangene Abfrage verwerfen? Bereits bewertete Karten bleiben gespeichert.")){ session = null; S.savedSess = null; saveSess(); render(); } }
+  else if(a==="writemode"){ S.settings.write = b.checked; saveSettings(); render(); }
+  else if(a==="judge"){ judge(id); }
+  else if(a==="mnemoedit"){ mnemoEdit = id; render(); setTimeout(()=>{ const m=$("#mtext"); if(m){ m.focus(); m.setSelectionRange(m.value.length,m.value.length); } },30); }
+  else if(a==="mnemocancel"){ mnemoEdit = null; render(); }
+  else if(a==="mnemosave"){ const it = S.items.get(id); const v = ($("#mtext").value||"").trim(); const n = Object.assign({}, it); if(v) n.mnemonic = v; else delete n.mnemonic; mnemoEdit = null; await putItem(n); toast(v?"Eselsbrücke gespeichert":"Eselsbrücke entfernt"); render(); }
+  else if(a==="examdate"){ }
+  else if(a==="fixok"||a==="fixno"){ const it = S.items.get(id); if(!it||!it.suggestion) return;
+    const c = clean(it); if(a==="fixok" && c.suggestion.patch) Object.assign(c, c.suggestion.patch);
+    c.suggestion.status = a==="fixok" ? "übernommen" : "verworfen"; c.suggestion.decided = today(); await putItem(c); toast(a==="fixok"?"Vorschlag übernommen":"Vorschlag verworfen"); render(); }
+  else if(a==="send"){ const box = e.target.closest(".chat"); sendChat(box.dataset.chat, $("#chatin").value); }
+  else if(a==="ask"){ const box = e.target.closest(".chat"); sendChat(box.dataset.chat, b.dataset.q); }
+  else if(a==="stop"){ const box = e.target.closest(".chat"); const c = chats.get(box.dataset.chat); if(c&&c.ctl) c.ctl.abort(); }
+  else if(a==="tag"){ searchQ = b.dataset.t; go("suche"); }
+  else if(a==="fixfilter"){ bib.fix = true; }
+  else if(a==="learnone"){ const it = S.items.get(id); startSession([id], {label:TYPES[it.type]+" abfragen"}); }
+  else if(a==="star"){ const it = S.items.get(id); if(!it) return; const c = clean(it); if(c.star) delete c.star; else c.star = true; await putItem(c); toast(c.star?"Mit Stern markiert":"Stern entfernt"); render(); }
+  else if(a==="learnstar"){ startSession([...S.items.values()].filter(i=>i.star).sort((x,y)=>priority(y)-priority(x)).map(i=>i.id), {label:"Sternkarten"}); }
+  else if(a==="learnleech"){ startSession([...S.items.values()].filter(i=>(S.progress.get(i.id)||{}).leech && inPool(leechPool,i)).map(i=>i.id), {label:"Problemkarten"}); }
+  else if(a==="learnnorm"){ const slug = b.dataset.n; let list=[]; for(const [n,l] of normIndex()) if(normSlug(n)===slug) list=l; startSession(list.sort((x,y)=>priority(y)-priority(x)).map(i=>i.id), {label:"Norm abfragen"}); }
+  else if(a==="edit"){ editing = id; draftLinksInit = false; render(); }
+  else if(a==="canceledit"){ const was = editing; editing = null; draftLinksInit = false; if(backToSession && session){ backToSession = false; go("lernen"); } else if(was) render(); else history.length>1 ? history.back() : go("bibliothek"); }
+  else if(a==="change"){ changeDialog(id); }
+  else if(a==="selfedit"){ $("#layer").innerHTML=""; backToSession = route()==="lernen"; if(route()==="e-"+id){ editing = id; draftLinksInit = false; render(); } else { editNext = id; go("e-"+id); } }
+  else if(a==="aichange"){ aiChange(id); }
+  else if(a==="tosession"){ go("lernen"); }
+  else if(a==="save"){ saveEdit(); }
+  else if(a==="etype"){ editType = b.dataset.t; render(); }
+  else if(a==="unlink"){ draftLinks = draftLinks.filter(x=>x!==id); $("#linkchips").innerHTML = linkChips(); }
+  else if(a==="addlink"){ if(!draftLinks.includes(id)) draftLinks.push(id); $("#linkchips").innerHTML = linkChips(); $("#f-link").value=""; $("#linkdrop").hidden = true; $("#f-link").focus(); }
+  else if(a==="resetp"){ if(confirm("Lernstand dieses Eintrags zurücksetzen?")){ await deleteProgress(id); render(); } }
+  else if(a==="logout"){ if(confirm("Auf diesem Gerät abmelden?")){ await S.sb.auth.signOut(); } }
+  else if(a==="reload"){ try{ await loadAll(); toast("Aktualisiert"); }catch(e){ toast("Laden fehlgeschlagen."); } render(); }
+  else if(a==="del"){ const it=S.items.get(id); if(confirm("„"+titleOf(it)+"“ endgültig löschen?")){ await deleteItem(id); toast("Gelöscht"); go("bibliothek"); } }
+  else if(a==="excat"){ const t=b.dataset.t; exam.cats = exam.cats.includes(t)?exam.cats.filter(x=>x!==t):[...exam.cats,t]; render(); }
+  else if(a==="startexam"){ const pool = examPool().sort(()=>Math.random()-0.5).slice(0,exam.n); startSession(pool.map(i=>i.id), {exam:true, label:exam.pool==="zusatz"?"Prüfung: Hemmer-Zusatzfragen":"Prüfungsmodus"}); }
+  else if(a==="export"){ doExport(); }
+  else if(a==="quizlet"){ doQuizlet(); }
+  else if(a==="delexamples"){ const ex=[...S.items.values()].filter(i=>i.example); if(confirm(ex.length+" Beispielinhalte löschen? Dein Lernstand dazu wird ebenfalls entfernt.")){ for(const it of ex) await deleteItem(it.id); toast("Beispielinhalte gelöscht"); render(); } }
+  else if(a==="help"){ help(); }
+  else if(a==="theme"){ cycleTheme(); }
+  else if(a==="md"){ e.preventDefault(); const ta = document.getElementById(b.dataset.for); if(ta){ const m = b.dataset.m, s0 = ta.selectionStart, s1 = ta.selectionEnd, sel = ta.value.slice(s0,s1); const wrapped = sel.startsWith(m) && sel.endsWith(m) && sel.length>=2*m.length; const ins = wrapped ? sel.slice(m.length, -m.length) : m+(sel||"Text")+m; ta.setRangeText(ins, s0, s1, "end"); if(!sel) ta.setSelectionRange(s0+m.length, s0+m.length+4); ta.focus(); ta.dispatchEvent(new Event("input",{bubbles:true})); } }
+  else if(a==="fmt"){ setFmt(b.checked); toast(b.checked ? "Rückseiten werden formatiert" : "Rückseiten im Originaltext"); }
+  else if(a==="closehelp"){ if(b.classList.contains("overlay") && e.target!==b) return; $("#layer").innerHTML=""; }
+});
+document.addEventListener("input", e=>{
+  const t = e.target;
+  if(t.id==="wtext" && session){ own.set(session.ids[session.idx], t.value); return; }
+  if(t.id==="daily"){ $("#dailyOut").textContent = t.value; clearTimeout(t._tm); t._tm = setTimeout(()=>{ S.settings.todayDate = today(); S.settings.todayN = Number(t.value); saveSettings(); render(); }, 350); }
+  else if(t.dataset.act==="base"){ $("#baseOut").textContent = t.value; clearTimeout(t._tm); t._tm = setTimeout(()=>{ S.settings.base = Number(t.value); saveSettings(); }, 350); }
+  else if(t.id==="bigq"){ searchQ = t.value; runSearch(); }
+  else if(t.id==="quick"){ searchQ = t.value; if(route()!=="suche") go("suche"); else { const i=$("#bigq"); if(i) i.value=searchQ; runSearch(); } }
+  else if(t.dataset.bib==="q"){ bib.q = t.value; clearTimeout(t._tm); t._tm=setTimeout(()=>{ render(); const i=document.querySelector('[data-bib="q"]'); if(i){ i.focus(); i.setSelectionRange(i.value.length,i.value.length);} },250); }
+  else if(t.dataset.ex==="n"){ exam.n = Number(t.value); $("#exOut").textContent = t.value; }
+  else if(t.id==="f-link"){ const toks = fold(t.value).split(/\s+/).filter(Boolean); const d = $("#linkdrop");
+    if(!toks.length){ d.hidden = true; return; }
+    const hits = [...S.items.values()].filter(i=>{ const h=fold(titleOf(i)+" "+(i.norms||[]).join(" ")+" "+(i.tags||[]).join(" ")); return toks.every(x=>h.includes(x)) && !draftLinks.includes(i.id) && i.id!==$("#editform").dataset.id; }).slice(0,12);
+    d.innerHTML = hits.length ? hits.map(i=>`<button data-act="addlink" data-id="${esc(i.id)}">${esc(TYPES[i.type])}: ${esc(titleOf(i))}</button>`).join("") : '<div class="small muted" style="padding:8px 12px">Kein Treffer</div>'; d.hidden = false; }
+  else if(t.id==="chatin"){ t.style.height="auto"; t.style.height=Math.min(140,t.scrollHeight)+"px"; }
+});
+document.addEventListener("change", async e=>{
+  if(e.target.id==="newmax" || e.target.id==="endspurt"){ const v = Math.round(Number(e.target.value)); if(isFinite(v) && v>=0){ S.settings[e.target.id==="newmax"?"newMax":"endspurt"] = v; await saveSettings(); } return; }
+  if(e.target.id==="examdate"){ if(e.target.value){ S.settings.examDate = e.target.value; await saveSettings(); render(); } return; }
+  const t = e.target;
+  if(t.dataset.bib){ if(t.dataset.bib==="fix") bib.fix = t.checked; else if(t.dataset.bib==="star") bib.star = t.checked; else if(t.dataset.bib!=="q") bib[t.dataset.bib] = t.value; render(); }
+  else if(t.dataset.ex==="area"){ exam.area = t.value; render(); }
+  else if(t.dataset.ex==="maxTier"){ exam.maxTier = Number(t.value); render(); }
+  else if((t.id==="importfile") && t.files[0]){ for(const f of t.files){ await doImport(f); } }
+});
+document.addEventListener("keydown", e=>{
+  const ae = document.activeElement; const typing = ae && /INPUT|TEXTAREA|SELECT/.test(ae.tagName);
+  if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==="f"){ e.preventDefault(); if(route()!=="suche") go("suche"); else { const i=$("#bigq"); i&&i.focus(); i&&i.select(); } return; }
+  if(ae && ae.id==="sktext" && e.key==="Enter" && (e.ctrlKey||e.metaKey)){ e.preventDefault(); const cur = session && S.items.get(session.ids[session.idx]); if(cur) checkCase(cur.id); return; }
+  if(ae && ae.id==="chatin" && e.key==="Enter" && !e.shiftKey){ e.preventDefault(); const box = ae.closest(".chat"); sendChat(box.dataset.chat, ae.value); return; }
+  if(e.key==="Escape"){ if($("#layer").innerHTML){ $("#layer").innerHTML=""; return; } if(typing){ ae.blur(); return; } }
+  if(typing || e.ctrlKey || e.metaKey || e.altKey) return;
+  const r = route();
+  if(r==="lernen" && session && session.idx<session.ids.length){
+    if((e.key===" "||e.key==="Enter") && !session.revealed){ e.preventDefault(); const cur = S.items.get(session.ids[session.idx]); const sk = $("#sktext"); if(cur && cur.type==="case" && sk){ sk.focus(); return; } session.revealed=true; render(); return; }
+    if(session.revealed && /^[1-5]$/.test(e.key)){ e.preventDefault(); grade(Number(e.key)); return; }
+    if((e.key==="b"||e.key==="ArrowLeft") && session.history && session.history.length){ e.preventDefault(); backCard(); return; }
+    if(e.key==="w" && !session.revealed){ const ta=$("#wtext"); if(ta){ e.preventDefault(); ta.focus(); } return; }
+  }
+  if(e.key==="k"){ const c=$("#chatin"); if(c && !c.disabled){ e.preventDefault(); c.focus(); } return; }
+  if(e.key==="/"){ e.preventDefault(); go("suche"); return; }
+  if(e.key==="?"){ help(); return; }
+  if(e.key==="d"){ cycleTheme(); return; }
+  const nav = {a:"aktuell", h:"aktuell", b:"bibliothek", n:"normen", p:"pruefung", s:"statistik"}[e.key];
+  if(nav && r!=="lernen"){ go(nav); }
+});
+function help(){
+  $("#layer").innerHTML = `<div class="overlay" data-act="closehelp"><div class="panel"><div class="row"><h2 style="margin:0">Tastenkürzel</h2><span class="spacer"></span><button class="btn ghost" data-act="closehelp">Schließen</button></div>
+  <div class="keys" style="margin-top:14px">
+    <span><kbd>Leertaste</kbd> <kbd>Enter</kbd></span><span>Antwort zeigen</span>
+    <span><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> <kbd>5</kbd></span><span>Nochmal, Schwer, Gut, Leicht, Sehr leicht</span>
+    <span><kbd>W</kbd></span><span>ins Feld „In eigenen Worten“</span>
+    <span><kbd>Strg</kbd> <kbd>Enter</kbd></span><span>Fallskizze von Claude prüfen lassen</span>
+    <span><kbd>K</kbd></span><span>Frage an Claude schreiben</span>
+    <span><kbd>Strg F</kbd> <kbd>/</kbd></span><span>Suche</span>
+    <span><kbd>A</kbd> <kbd>B</kbd> <kbd>N</kbd> <kbd>P</kbd> <kbd>S</kbd></span><span>Aktuell, Bibliothek, Normen, Prüfung, Statistik</span>
+    <span><kbd>D</kbd></span><span>Darstellung wechseln: automatisch, Tag, Dunkel</span>
+    <span><kbd>Esc</kbd></span><span>Feld verlassen, Fenster schließen</span>
+  </div></div></div>`;
+}
+let toastT;
+function toast(msg){ let t = $(".toast"); if(!t){ t = document.createElement("div"); t.className="toast"; t.setAttribute("role","status"); document.body.appendChild(t); } t.textContent = msg; clearTimeout(toastT); toastT = setTimeout(()=>t.remove(), 2600); }
+
+
+
+/* ---------- Ändern in der App: selbst oder per Claude ---------- */
+const EDIT_FIELDS = {card:["front","back"], def:["term","definition","merkmale"], schema:["title","steps","hinweis"], case:["title","sachverhalt","kern","problems"]};
+const EDIT_RULES = `Du überarbeitest einen Eintrag einer Lernkartei für das bayerische Erste Juristische Staatsexamen nach der Anweisung des Lernenden. Ändere nur, was die Anweisung verlangt oder was dafür nötig ist; Stil und Aufbau des Originals bleiben erhalten. Rechtlich Unsicheres kennzeichnest du im Feld text, statt zu raten; keine erfundenen Aktenzeichen oder Fundstellen. Antworte ausschließlich mit JSON ohne weiteren Text: {"text":"1–3 Sätze: was du geändert hast und warum","patch":{ nur geänderte Felder }}. Erlaubte Felder: front, back (Text) bei Karteikarten; term, definition (Text), merkmale (Liste) bei Definitionen; title (Text), steps (Liste, Unterpunkte mit zwei Leerzeichen eingerückt), hinweis (Text) bei Schemata; title, sachverhalt (Text), kern (Liste), problems (Liste aus {"frage","antwort"}) bei Fällen; bei allen zusätzlich norms (Liste, z. B. "§ 35 BauGB") und tags (Liste). Gib geänderte Felder immer vollständig an, nicht nur den geänderten Teil.`;
+function changeDialog(id){
+  const it = S.items.get(id); if(!it) return;
+  $("#layer").innerHTML = `<div class="overlay" data-act="closehelp"><div class="panel" style="max-width:620px">
+    <div class="row"><h2 style="margin:0">Karte ändern</h2><span class="spacer"></span><button class="btn ghost" data-act="closehelp">Schließen</button></div>
+    <p class="small muted" style="margin:6px 0 14px">${esc(titleOf(it)).slice(0,140)}</p>
+    <div class="row"><button class="btn" data-act="selfedit" data-id="${esc(id)}">✎ Selbst bearbeiten</button></div>
+    ${S.ai?`<h3>Oder Claude sagen, was geändert werden soll</h3>
+    <div class="field"><textarea id="chgtext" style="min-height:90px" placeholder="z. B. „Ergänze die Gegenansicht“, „Rückseite kürzer, in Stichpunkten“, „Norm ist Art. 6 BayBO, nicht § 6“"></textarea></div>
+    <div class="row" style="margin-top:10px"><button class="btn primary" id="chggo" data-act="aichange" data-id="${esc(id)}">Vorschlag von Claude</button><span class="small muted" id="chgstate">Claude schreibt einen Korrekturvorschlag; du übernimmst ihn mit einem Klick.</span></div>`:`<p class="small muted">Änderungen über Claude brauchen die Verbindung zu Supabase.</p>`}
+  </div></div>`;
+  setTimeout(()=>{ const t=$("#chgtext"); if(t) t.focus(); }, 30);
+}
+async function aiChange(id){
+  const it = S.items.get(id); const ta = $("#chgtext"); const wish = (ta && ta.value || "").trim();
+  if(!wish){ toast("Schreib oder diktiere zuerst, was geändert werden soll."); return; }
+  const btn = $("#chggo"), st = $("#chgstate"); if(btn) btn.disabled = true; if(st) st.textContent = "Claude überarbeitet die Karte …";
+  const fields = EDIT_FIELDS[it.type].concat(["norms","tags"]);
+  const cur = {}; fields.forEach(k=>{ if(it[k]!=null) cur[k] = it[k]; });
+  try{
+    const txt = await aiStream([EDIT_RULES, "Typ: "+TYPES[it.type]+"\nRechtsgebiet: "+(it.area||"-")+"\nQuelle: "+(it.source||"-")+"\nAktueller Eintrag (JSON):\n"+JSON.stringify(cur)], [{role:"user", content:"Anweisung: "+wish}], {kind:"check", max_tokens:3000});
+    const a = txt.indexOf("{"), b = txt.lastIndexOf("}"); if(a<0 || b<a) throw {code:"invalid_json"};
+    let d; try{ d = JSON.parse(txt.slice(a,b+1)); }catch(e){ throw {code:"invalid_json"}; }
+    const patch = {}; for(const [k,v] of Object.entries(d.patch||{})) if(fields.includes(k)) patch[k] = v;
+    if(!Object.keys(patch).length){ if(st) st.textContent = d.text || "Claude hat nichts geändert."; if(btn) btn.disabled = false; return; }
+    const c = clean(it); c.suggestion = {status:"offen", text:(d.text||"Änderung nach deiner Anweisung.")+"\n\nDeine Anweisung: "+wish, patch, quelle:"Claude in der App, "+new Date().toLocaleDateString("de-DE"), art:"auftrag"};
+    await putItem(c); $("#layer").innerHTML = ""; toast("Vorschlag liegt oben auf der Karte"); render(); window.scrollTo({top:0, behavior:"smooth"});
+  }catch(e){ if(st) st.textContent = errText(e); if(btn) btn.disabled = false; }
+}
+
+/* ---------- Spracheingabe (an jedem Schreibfeld) ---------- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const MIC_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
+let rec = null, recEl = null, recBtn = null;
+const micTargets = el => el.matches('textarea, input[type="search"], input[type="text"], input:not([type])') && !el.disabled && !el.readOnly && el.id!=="quick" && el.id!=="f-link" && !el.closest(".nomic");
+function enhanceMics(root=document){
+  if(!SR) return;
+  root.querySelectorAll('textarea, input').forEach(el=>{
+    if(el.dataset.mic || !micTargets(el)) return;
+    el.dataset.mic = "1";
+    const wrap = document.createElement("span"); wrap.className = "micwrap" + (el.tagName==="TEXTAREA" ? " ta" : " in");
+    el.parentNode.insertBefore(wrap, el); wrap.appendChild(el);
+    const b = document.createElement("button"); b.type = "button"; b.className = "micbtn"; b.innerHTML = MIC_SVG;
+    b.title = "Spracheingabe (Diktat)"; b.setAttribute("aria-label", "Spracheingabe starten");
+    b.addEventListener("mousedown", ev=>ev.preventDefault());
+    b.addEventListener("click", ev=>{ ev.preventDefault(); ev.stopPropagation(); toggleMic(el, b); });
+    wrap.appendChild(b);
+  });
+}
+function stopMic(){ if(rec){ try{ rec.stop(); }catch(e){} } }
+function toggleMic(el, btn){
+  if(rec && recEl===el){ stopMic(); return; }
+  stopMic();
+  const r = new SR(); r.lang = "de-DE"; r.continuous = true; r.interimResults = true;
+  const start = el.selectionStart!=null ? el.selectionStart : el.value.length;
+  const before = el.value.slice(0, start), after = el.value.slice(el.selectionEnd!=null ? el.selectionEnd : start);
+  const sep = before && !/\s$/.test(before) ? " " : "";
+  let finalText = "";
+  r.onresult = e=>{
+    let interim = "";
+    for(let i=e.resultIndex; i<e.results.length; i++){ const t = e.results[i][0].transcript; if(e.results[i].isFinal) finalText += t; else interim += t; }
+    const spoken = (finalText + interim).replace(/\s+/g," ").trim();
+    if(!document.body.contains(el)) return;
+    el.value = before + sep + spoken + after;
+    const pos = (before + sep + spoken).length; try{ el.setSelectionRange(pos, pos); }catch(x){}
+    el.dispatchEvent(new Event("input", {bubbles:true}));
+  };
+  r.onerror = e=>{ if(e.error==="not-allowed" || e.error==="service-not-allowed") toast("Mikrofon nicht freigegeben. Erlaube den Zugriff in den Browser-Einstellungen."); else if(e.error!=="no-speech" && e.error!=="aborted") toast("Spracheingabe unterbrochen ("+e.error+")."); };
+  r.onend = ()=>{ if(recBtn) recBtn.classList.remove("on"); if(rec===r){ rec = null; recEl = null; recBtn = null; } };
+  rec = r; recEl = el; recBtn = btn; btn.classList.add("on"); btn.setAttribute("aria-label","Spracheingabe beenden");
+  try{ r.start(); el.focus(); }catch(e){ rec = null; btn.classList.remove("on"); toast("Spracheingabe konnte nicht starten."); }
+}
+new MutationObserver(muts=>{ if(!SR) return; for(const m of muts) for(const n of m.addedNodes) if(n.nodeType===1){ if(n.matches && n.matches("textarea,input")) enhanceMics(n.parentNode||document); else enhanceMics(n); } })
+  .observe(document.body, {childList:true, subtree:true});
+
+/* ---------- Start ---------- */
+async function startData(sess){
+  S.user = sess.user; S.needLogin = false; S.ready = false; render();
+  try{ await loadAll(); }
+  catch(e){ S.stale = true; toast(isAuthErr(e) ? "Deine Anmeldung ist abgelaufen. Bitte melde dich neu an." : "Die Kartei konnte nicht geladen werden. Prüfe die Internetverbindung."); }
+  S.ai = true; S.ready = true; render(); subscribe();
+}
+async function boot(){
+  render();
+  if(!CONFIGURED || !window.supabase){
+    S.mode = "lokal"; lsLoad(); loadSavedSess(null); S.ready = true; render();
+    if(CONFIGURED) toast("Die Datenbank-Bibliothek konnte nicht geladen werden. Prüfe die Internetverbindung.");
+    return;
+  }
+  S.mode = "konto";
+  S.sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey, {auth:{persistSession:true, autoRefreshToken:true, detectSessionInUrl:false}});
+  S.sb.auth.onAuthStateChange((ev)=>{
+    if(ev==="SIGNED_OUT"){ S.user = null; S.ai = false; S.items = new Map(); S.progress = new Map(); session = null; S.needLogin = true; S.ready = true; render(); }
+  });
+  const {data} = await S.sb.auth.getSession();
+  if(!data || !data.session){ S.needLogin = true; S.ready = true; render(); return; }
+  await startData(data.session);
+  document.addEventListener("visibilitychange", async ()=>{
+    if(document.visibilityState!=="visible" || !S.user || Date.now()-lastLoad < 30000) return;
+    try{ await loadAll(); refresh(); }catch(e){}
+  });
+}
+boot();
+</script>
+</body>
+</html>
