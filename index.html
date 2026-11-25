@@ -190,6 +190,12 @@ kbd{font:600 10px/1 var(--sans);letter-spacing:.02em;border:0;border-radius:4px;
 .norm.norm-inline{display:inline;background:none;padding:0;border-radius:0;font:inherit;font-weight:inherit;color:inherit;text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px;white-space:normal}.norm.norm-inline:hover{color:var(--acc-ink)}
 ol.schema .sh{font-weight:inherit}ol.schema ul.sub{list-style:none;margin:3px 0 0;padding:0 0 0 4px;font-size:15px}ol.schema ul.sub li{margin:0 0 3px;padding:0 0 0 16px;position:relative;line-height:1.45}ol.schema ul.sub li::before{content:"–";position:absolute;left:2px;color:var(--muted)}
 .subtabs{display:flex;gap:4px;margin:6px 0 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}.tab{border:0;background:transparent;padding:8px 14px;border-radius:10px 10px 0 0;cursor:pointer;font:inherit;color:var(--muted)}.tab:hover{color:var(--ink);background:var(--soft)}.tab.on{color:var(--ink);font-weight:600;box-shadow:inset 0 -2px 0 var(--acc-ink)}.tab .muted{font-weight:400}
+.segtabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:4px;margin:10px 0 4px;background:var(--soft);border:1px solid var(--line);border-radius:12px}
+.segtabs .seg{position:relative;border:0;background:transparent;border-radius:9px;padding:9px 4px;font:600 13.5px/1.1 var(--sans);color:var(--muted);cursor:pointer;white-space:nowrap;overflow:visible}
+.segtabs .seg:hover{color:var(--ink)}
+.segtabs .seg.on{background:var(--paper);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.14)}
+.segtabs .seg .stn{position:absolute;top:-7px;right:-3px;min-width:17px;padding:0 5px;font-size:11px;line-height:17px}
+.segtabs .seg .segdot{position:absolute;top:-3px;right:1px;width:9px;height:9px;border-radius:50%;background:var(--acc);border:2px solid var(--paper)}
 .zone .subtabs{margin:2px 0 10px}.zone .tab{padding:6px 11px;font-size:14.5px}
 .typetag{font-weight:600;color:var(--tc);background:color-mix(in srgb,var(--tc) 14%,transparent);padding:3px 10px;border-radius:999px}
 .fallchip{font-weight:600;color:var(--clay);background:var(--clay-soft);padding:3px 10px;border-radius:999px;text-decoration:none}
@@ -397,7 +403,7 @@ body.locked nav.tabs, body.locked .qs{display:none}
 :root[data-theme="dark"] .btn.st-done{color:#1A1813}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.st-done{color:#1A1813}}
 .stn{display:inline-block;min-width:20px;padding:1px 7px;border-radius:999px;background:var(--muted);color:var(--paper);font-size:12.5px;line-height:1.4;text-align:center}
-.stpill{font-size:12.5px;font-weight:600;padding:3px 10px;border-radius:999px}.stpill.open{background:color-mix(in srgb,var(--muted) 16%,transparent);color:var(--muted)}
+.stpill{font-size:12.5px;font-weight:600;padding:3px 10px;border-radius:999px}.stpill.part{background:color-mix(in srgb,var(--acc) 22%,transparent);color:var(--acc-ink)}.stpill.open{background:color-mix(in srgb,var(--muted) 16%,transparent);color:var(--muted)}
 .hint.resume{align-items:center;border-style:solid;border-color:var(--acc);background:color-mix(in srgb,var(--acc-soft) 70%,transparent)}
 /* Rückseiten-Formatierung */
 .fmt p{margin:0 0 .6em}
@@ -421,7 +427,7 @@ body.locked nav.tabs, body.locked .qs{display:none}
 .fmt .fopn{border-left:3px solid var(--line);padding:2px 0 2px 11px}
 .fmt .fopn.hm{border-left-color:var(--ok)}
 .fmt .fopn.aa{border-left-color:var(--muted)}
-.fmt .fopn.stn{border-left-color:var(--acc)}
+.fmt .fopn.stl{border-left-color:var(--acc)}
 .op{font-weight:700;white-space:nowrap}
 .op-hm{color:var(--ok)}
 .op-aa{color:var(--muted)}
@@ -543,7 +549,7 @@ const LS_KEY = "examenskartei-v1";
 function lsLoad(){
   try{ const raw = localStorage.getItem(LS_KEY); if(!raw) return;
     const d = JSON.parse(raw);
-    (d.items||[]).forEach(it=>S.items.set(it.id,it));
+    (d.items||[]).forEach(it=>{ if(!ohneLoesung(it)) S.items.set(it.id,it); });
     Object.entries(d.progress||{}).forEach(([k,v])=>S.progress.set(k,v));
     Object.assign(S.settings, d.settings||{}); S.log = d.log||{days:{}};
   }catch(e){}
@@ -620,7 +626,7 @@ let lastLoad = 0;
 async function loadAll(){
   let sessMeta = null;
   const [items, prog, meta] = await Promise.all([fetchAll("items"), fetchAll("progress"), fetchAll("meta")]);
-  S.items = new Map(items.map(r=>[r.id, Object.assign({}, r.data, {id:r.id})]));
+  S.items = new Map(items.filter(r=>!ohneLoesung(r.data)).map(r=>[r.id, Object.assign({}, r.data, {id:r.id})]));
   S.progress = new Map(prog.map(r=>[r.id, r.data]));
   meta.forEach(r=>{
     if(r.key==="settings") Object.assign(S.settings, r.data||{});
@@ -641,7 +647,7 @@ function subscribe(){
         const n = p.new || {}, o = p.old || {};
         if(p.eventType==="DELETE"){ if(t==="items") S.items.delete(o.id); if(t==="progress") S.progress.delete(o.id); later(); return; }
         if(n.user_id && n.user_id!==S.user.id) return;
-        if(t==="items") S.items.set(n.id, Object.assign({}, n.data, {id:n.id}));
+        if(t==="items"){ if(ohneLoesung(n.data)) S.items.delete(n.id); else S.items.set(n.id, Object.assign({}, n.data, {id:n.id})); }
         else if(t==="progress") S.progress.set(n.id, n.data);
         else if(n.key==="settings") Object.assign(S.settings, n.data||{});
         else if(n.key==="session"){ if(!session) loadSavedSess(n.data); }
@@ -792,7 +798,7 @@ function schedule(prev, grade, tier, base){
   } else ivl = Math.min(daysLeft, ivl);
   let due = addDays(base, ivl);
   if(due <= today() && grade>=2) due = addDays(today(), 1);
-  if(prev && prev.follow && grade>=2 && prev.follow > today() && due > prev.follow && !p.gesichert) due = prev.follow;
+  if(prev && prev.follow && grade>=2 && grade<=3 && prev.follow > today() && due > prev.follow && !p.gesichert) due = prev.follow; // „Leicht“ überspringt den Übermorgen-Termin
   if(grade>=3 && !p.sure) p.sure = today();
   p.fs = {s: Math.round(fs.s*100)/100, d: Math.round(fs.d*100)/100};
   p.stage = grade; p.ivl = diffDays(today(), due); p.reps++; p.due = due; p.last = today(); p.lastGrade = grade;
@@ -858,7 +864,7 @@ function mergeAbg(remote){
 }
 function todayTarget(){ return S.settings.todayDate===today() && S.settings.todayN!=null ? S.settings.todayN : S.settings.base; }
 const doneToday = () => S.log.days[today()]||0;
-function fmtIvl(n){ return n===1 ? "morgen" : n===7 ? "in 1 Woche" : n===30 ? "in 1 Monat" : n<30 ? "in "+n+" Tagen" : n<365 ? "in "+Math.round(n/30)+" Mon." : "in 1 Jahr"; }
+function fmtIvl(n){ return n===1 ? "morgen" : n===7 ? "in 1 Woche" : n<=45 ? "in "+n+" Tagen" : n<365 ? "in "+n+" Tagen (~"+(Math.round(n/3.044)/10).toLocaleString("de-DE")+" Mon.)" : "in "+n+" Tagen"; }
 
 /* ---------- Hilfsfunktionen Einträge ---------- */
 const titleOf = it => it.type==="card" ? it.front : it.type==="def" ? it.term : it.title;
@@ -991,7 +997,7 @@ function fmtBack(t){
     if((m = s.match(RE_TIP))) { B.push({k:"box", cls:"tip", lbl:m[1], html:fmtInline(s.slice(m[0].length).trim())}); return; }
     if((m = s.match(RE_EX))) { B.push({k:"box", cls:"ex", lbl:m[1], html:fmtInline(s.slice(m[0].length).trim())}); return; }
     if(RE_RES.test(s)) { B.push({k:"box", cls:"res", html:fmtLine(s)}); return; }
-    if(RE_STN.test(s)) { B.push({k:"opn", cls:"stn", html:fmtLine(s)}); return; }
+    if(RE_STN.test(s)) { B.push({k:"opn", cls:"stl", html:fmtLine(s)}); return; }
     if(RE_OPN_HM.test(s)) { B.push({k:"opn", cls:"hm", html:fmtLine(s)}); return; }
     if(RE_OPN_AA.test(s)) { B.push({k:"opn", cls:"aa", html:fmtLine(s)}); return; }
     B.push({k:"p", s, html:fmtLine(s)});
@@ -1168,24 +1174,52 @@ const ILL = {
   idee: () => `<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a6 6 0 0 0-3.5 10.9V17h7v-3.1A6 6 0 0 0 12 3z" ${fl("acc-soft")} stroke="var(--acc-ink)" stroke-width="1.5" stroke-linejoin="round"/><path d="M9.5 20h5" stroke="var(--acc-ink)" stroke-width="1.5" stroke-linecap="round"/></svg>`,
 };
 
-/* ---------- Fallabfrage: Gruppen ---------- */
+/* ---------- Fallabfrage: Gruppen nach Reihen (KLK, UKK, Klausurenwerkstatt, Klausurenbesprechung) ---------- */
+// Ein Fall erscheint erst, wenn die Lösung da ist (fall.loesung === false → wird gar nicht geladen).
+// In „Aktuell“ je Reihe: die aktuelle Klausur + alle der letzten 4 Wochen (KLK: die letzten 4 Nummern davor, eine Klausur pro Woche).
+// Danach bleiben die Fälle in der App (Bibliothek-Reiter der Reihe, normales Pensum).
 const FALL_TAGE = 28;
+const REIHEN = ["KLK","UKK","Klausurenwerkstatt","Klausurenbesprechung"];
+const REIHE_TXT = {KLK:"KLK", UKK:"UKK", Klausurenwerkstatt:"Klausurenwerkstatt", Klausurenbesprechung:"Klausurenbesprechung Julius & Lukas"};
+const REIHE_INFO = {KLK:"Hemmer-Klausurenkurs, eine Klausur pro Woche", UKK:"Uni-Klausurenkurs", Klausurenwerkstatt:"Klausurenwerkstatt", Klausurenbesprechung:"Klausurenbesprechung mit Julius und Lukas"};
+function ohneLoesung(d){ return !!(d && d.fall && d.fall.loesung===false); }
+function normReihe(r){ r = String(r||""); return /klk|klausurenkurs/i.test(r) ? "KLK" : /ukk|uni-?klaus/i.test(r) ? "UKK" : /werkstatt/i.test(r) ? "Klausurenwerkstatt" : /besprechung|julius|lukas/i.test(r) ? "Klausurenbesprechung" : r; }
+function isoAus(name){ const m = String(name||"").match(/(\d{1,2})\.(\d{1,2})\.(\d{2,4})/); if(!m) return ""; let y = +m[3]; if(y<100) y += 2000; else if(y<1000) y = 2000 + y%100; return `${y}-${String(m[2]).padStart(2,"0")}-${String(m[1]).padStart(2,"0")}`; }
+function fallOf(it){
+  if(it.fall){ const r = normReihe(it.fall.reihe); return Object.assign({}, it.fall, {reihe:r, key:it.fall.key||it.fall.ordner||(r+"/"+it.fall.name)}); }
+  const m = /Klausurenkurs,\s*Klausur\s*(\d{4})/i.exec(it.source||"");
+  if(m && /hemmer/i.test(it.source||"")) return {reihe:"KLK", key:"KLK/K"+m[1], name:"K"+m[1], nr:+m[1]};
+  return null;
+}
 function fallGroups(){
   const m = new Map();
   for(const it of S.items.values()){
-    if(!it.fall || !it.fallabfrage) continue;
-    const k = it.fall.key || it.fall.ordner || it.fall.name;
-    if(!m.has(k)) m.set(k, {key:k, fall:it.fall, datum:it.fallabfrage, items:[]});
-    const g = m.get(k); g.items.push(it); if(it.fallabfrage > g.datum) g.datum = it.fallabfrage;
+    const f = fallOf(it); if(!f || !REIHEN.includes(f.reihe)) continue;
+    if(!m.has(f.key)) m.set(f.key, {key:f.key, reihe:f.reihe, fall:f, datum:"", items:[]});
+    const g = m.get(f.key); g.items.push(it);
+    if(!g.fall.titel && f.titel) g.fall = Object.assign({}, g.fall, {titel:f.titel});
+    const d = f.datum || isoAus(f.name) || it.fallabfrage || "";
+    if(d > g.datum) g.datum = d;
   }
   for(const g of m.values()){
+    g.nr = g.fall.nr || +((String(g.fall.name||"").match(/\d{4}/)||[])[0]||0);
     g.summary = g.items.find(i=>i.fallsumme) || g.items.find(i=>i.type==="case");
-    g.items.sort((a,b)=>(b.fallsumme?1:0)-(a.fallsumme?1:0) || String(a.id).localeCompare(String(b.id)));
+    g.items.sort((a,b)=>(b.fallsumme?1:0)-(a.fallsumme?1:0) || (b.type==="case"?1:0)-(a.type==="case"?1:0) || String(a.id).localeCompare(String(b.id),"de",{numeric:true}));
   }
-  return [...m.values()].sort((a,b)=>b.datum.localeCompare(a.datum) || (b.fall.nr||0)-(a.fall.nr||0));
+  return [...m.values()].sort((a,b)=> a.reihe==="KLK"&&b.reihe==="KLK" ? b.nr-a.nr : (b.datum||"").localeCompare(a.datum||"") || b.nr-a.nr);
 }
-const fallAge = g => diffDays(g.datum, today());
+function reiheGroups(r){ return fallGroups().filter(g=>g.reihe===r); }
+// aktuell = neueste Klausur der Reihe; dazu die der letzten 4 Wochen
+function fallAktuell(r){
+  const gs = reiheGroups(r); if(!gs.length) return [];
+  if(r==="KLK"){ const top = gs[0].nr; return gs.filter(g=>g.nr >= top-4); }
+  const grenze = addDays(today(), -FALL_TAGE);
+  return gs.filter((g,i)=> i===0 || (g.datum && g.datum >= grenze));
+}
+const fallAge = g => g.datum ? diffDays(g.datum, today()) : 0;
+const fallLabel = g => g.reihe==="KLK" ? "K"+g.nr : g.datum ? toDate(g.datum).toLocaleDateString("de-DE",{day:"numeric",month:"short",year:"numeric"}) : (g.fall.name||"");
 const fallTitle = g => (g.summary && g.summary.title) || g.fall.titel || g.fall.name;
+let fallTab = (()=>{ try{ return localStorage.getItem("ek-falltab")||"KLK"; }catch(e){ return "KLK"; } })();
 function startFall(key){
   const g = fallGroups().find(x=>x.key===key); if(!g) return;
   const k = "fall:"+key, open = g.items.filter(isOpenIn(k));
@@ -1211,18 +1245,19 @@ function vAktuell(){
 
   // 1) Tägliches Pensum
   const pensum = `<section class="zone z-pensum">
-    <header>${ILL.pensum()}<div><h2>Tägliches Pensum</h2><p>Ausgewählt nach Fälligkeit, Tier (1 bis 4) und deinem Lernstand.</p></div></header>
+    <header>${ILL.pensum()}<div><h2>Tägliches Pensum</h2></div></header>
     ${poolTabs(pool, "pool", k=>all.filter(i=>inPool(k,i) && cats.includes(i.type) && pOpen(i)).length+" fällig")}
     <h3>Was möchtest du abfragen?</h3>
     <div class="cats">${TKEYS.map(t=>`<button class="chip t-${t}" data-act="cat" data-t="${t}" aria-pressed="${cats.includes(t)}"><i class="dot"></i>${TYPES_PL[t]} <span class="n">${dueBy(t)}</span></button>`).join("")}</div>
     <h3>Wie viele heute?</h3>
     <div class="slider"><input id="daily" type="range" min="0" max="200" step="5" value="${target}" aria-label="Karten heute"><output id="dailyOut">${target}</output></div>
-    <p class="small muted" style="margin:0 0 16px">Grundpensum ${S.settings.base} pro Tag, der Regler gilt nur für heute. Erledigt: ${done}. Höchstens ${S.settings.newMax!=null?S.settings.newMax:20} neue Karten am Tag.${(()=>{ const g=[...S.progress.values()].filter(isGesichert).length; return g ? ` ${g} ${g===1?"Karte ist":"Karten sind"} gesichert und kommen ab ${toDate(endspurtStart()).toLocaleDateString("de-DE")} zur Endwiederholung.` : ""; })()}</p>
-    <div class="row">${n ? `<button class="btn big st-open" data-act="start">${n} Karten abfragen</button><span class="stpill open">offen</span>`
-      : done>=target && done>0 ? `<button class="btn big st-done" data-act="${avail?"more":"noop"}" title="${avail?"Noch 10 weitere abfragen":"Alles erledigt"}">✓ Tagespensum geschafft</button>`
+    <p class="small muted" style="margin:0 0 16px">Erledigt: ${done} · max. ${S.settings.newMax!=null?S.settings.newMax:20} neue am Tag.${(()=>{ const g=[...S.progress.values()].filter(isGesichert).length; return g ? ` ${g} ${g===1?"Karte ist":"Karten sind"} gesichert und (Endspurt ab ${toDate(endspurtStart()).toLocaleDateString("de-DE")}).` : ""; })()}</p>
+    ${(()=>{ const d = pendSess(), ps = d && d.kind==="pensum" && sessPool(d)===pool ? d : null, extra = ps && ps.label==="Zusätzliche Runde";
+      if(ps && !extra) return `<div class="row">${resBtn(ps, true)}<span class="stpill part">${esc(ps.label)} nicht fertig</span></div>`;
+      return `<div class="row">${n ? `<button class="btn big st-open" data-act="start">${n} Karten abfragen</button><span class="stpill open">offen</span>`
+      : done>=target && done>0 ? (extra ? `<button class="btn big st-done" disabled>✓ Tagespensum geschafft</button>` : `<button class="btn big st-done" data-act="${avail?"more":"noop"}" title="${avail?"Noch 10 weitere abfragen":"Alles erledigt"}">✓ Tagespensum geschafft</button>`)
       : `<button class="btn big st-done" disabled>✓ Nichts fällig</button>`}
-    ${!n && avail ? `<button class="btn" data-act="more">10 weitere</button>`:""}</div>
-    <p class="small muted" style="margin:14px 0 0"><kbd>Leertaste</kbd> Antwort zeigen, <kbd>1</kbd>–<kbd>5</kbd> bewerten, <kbd>?</kbd> alle Tastenkürzel</p>
+    ${extra ? `${resBtn(ps)}<span class="stpill part">Zusätzliche Runde nicht fertig</span>` : !n && avail ? `<button class="btn" data-act="more">10 weitere</button>`:""}</div>`; })()}
   </section>`;
 
   // 2) Tagesabfrage
@@ -1231,29 +1266,33 @@ function vAktuell(){
   const taNew = d => all.filter(i=>i.tagesabfrage===d && isNew(i)).length;
   const taOpen = d => all.filter(i=>i.tagesabfrage===d && taPending(i)).length;
   const taRow = d => { const o = taOpen(d), c = taCount(d);
-    return `<div class="zrow"><div><div class="t">${d===today()?"Heute":d===addDays(today(),-1)?"Gestern":toDate(d).toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long"})}</div><div class="s">${c} ${c===1?"Karte":"Karten"}${taNew(d)?", "+taNew(d)+" noch nie gelernt":""}</div></div><span class="spacer"></span>${o ? `<button class="btn st-open" data-act="tagesabfrage" data-d="${esc(d)}" title="${o} von ${c} noch nicht abgefragt">Abfragen <span class="stn">${o}</span></button>` : `<button class="btn st-done" data-act="tagesabfrage" data-d="${esc(d)}" title="Alle Karten dieser Tagesabfrage sind abgefragt">✓ Erledigt</button>`}</div>`; };
+    return `<div class="zrow"><div><div class="t">${d===today()?"Heute":d===addDays(today(),-1)?"Gestern":toDate(d).toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long"})}</div><div class="s">${c} ${c===1?"Karte":"Karten"}${taNew(d)?", "+taNew(d)+" noch nie gelernt":""}</div></div><span class="spacer"></span>${(()=>{ const ps = pendSess(); return ps && ps.kind==="tages" && ps.key===d; })() ? resBtn(pendSess()) : o ? `<button class="btn st-open" data-act="tagesabfrage" data-d="${esc(d)}" title="${o} von ${c} noch nicht abgefragt">Abfragen <span class="stn">${o}</span></button>` : `<button class="btn st-done" data-act="tagesabfrage" data-d="${esc(d)}" title="Alle Karten dieser Tagesabfrage sind abgefragt">✓ Erledigt</button>`}</div>`; };
   const taShown = taHist ? taDates : taDates.slice(0,3);
   const tages = `<section class="zone z-tages">
-    <header>${ILL.tages()}<div><h2>Tagesabfrage</h2><p>Claude schaut dreimal täglich (16, 19 und 22 Uhr) in deinen Lernordner und fragt dich nur das ab, was neu oder geändert ist.</p></div></header>
-    <div class="zlist">${taDates.length ? taShown.map(taRow).join("") : `<div class="zempty">Noch nichts da. Sobald Claude deine Änderungen ausgewertet hat, erscheint die Abfrage hier.</div>`}
+    <header>${ILL.tages()}<div><h2>Tagesabfrage</h2></div></header>
+    <div class="zlist">${taDates.length ? taShown.map(taRow).join("") : `<div class="zempty">Noch nichts da.</div>`}
     ${taDates.length>3 ? `<div style="border-top:1px dashed var(--line);padding-top:10px"><button class="linkbtn" data-act="tahist">${taHist?"Verlauf ausblenden":"Verlauf anzeigen ("+(taDates.length-3)+" ältere)"}</button></div>`:""}</div>
   </section>`;
 
-  // 3) Fallabfrage
-  const groups = fallGroups().filter(g=>fallAge(g) < FALL_TAGE);
+  // 3) Fallabfrage – je Reihe ein Reiter
+  const fOpen = g => g.items.filter(isOpenIn("fall:"+g.key)).length;
   const fallRow = (g,i) => {
     const sp = g.summary && S.progress.get(g.summary.id);
-    const left = FALL_TAGE - fallAge(g);
     const status = !sp ? "Kernproblem noch nicht skizziert" : "Zuletzt: "+GRADE_TXT[sp.lastGrade];
-    return `<div class="zrow"><div style="min-width:0"><div class="row" style="gap:8px"><span class="tag-reihe">${esc(g.fall.reihe||"Fall")} ${esc(g.fall.name||"")}</span></div>
+    const ps = pendSess(), o = fOpen(g);
+    return `<div class="zrow"><div style="min-width:0"><div class="row" style="gap:8px"><span class="tag-reihe">${esc(fallLabel(g))}</span>${i===0?`<span class="stpill part">aktuell</span>`:""}</div>
       <div class="t" style="margin-top:6px">${esc(fallTitle(g))}</div>
-      <div class="s">${g.items.length} ${g.items.length===1?"Eintrag":"Einträge"} · ${esc(status)} · noch ${left} ${left===1?"Tag":"Tage"} hier</div></div>
-      <span class="spacer"></span>${g.items.some(isOpenIn("fall:"+g.key)) ? `<button class="btn st-open" data-act="fall" data-k="${esc(g.key)}">Abfragen <span class="stn">${g.items.filter(isOpenIn("fall:"+g.key)).length}</span></button>` : `<button class="btn st-done" data-act="fall" data-k="${esc(g.key)}" title="Für heute erledigt">✓ Erledigt</button>`}</div>`;
+      <div class="s">${g.items.length} ${g.items.length===1?"Eintrag":"Einträge"} · ${esc(status)}</div></div>
+      <span class="spacer"></span>${ps && ps.kind==="fall" && ps.key===g.key ? resBtn(ps) : o ? `<button class="btn st-open" data-act="fall" data-k="${esc(g.key)}">Abfragen <span class="stn">${o}</span></button>` : `<button class="btn st-done" data-act="fall" data-k="${esc(g.key)}" title="Für heute erledigt">✓ Erledigt</button>`}</div>`;
   };
+  const SEG_TXT = {KLK:"KLK", UKK:"UKK", Klausurenwerkstatt:"Werkstatt", Klausurenbesprechung:"J & L"};
+  if(!REIHEN.includes(fallTab)) fallTab = "KLK";
+  const fShown = fallAktuell(fallTab);
   const fall = `<section class="zone z-fall">
-    <header>${ILL.fall()}<div><h2>Fallabfrage</h2><p>Neue Klausuren aus UKK, KLK und der Klausurenbesprechung. Du skizzierst das Kernproblem, Claude prüft es gegen die Lösung.</p></div></header>
-    <div class="zlist">${groups.length ? groups.map(fallRow).join("") : `<div class="zempty">Gerade kein Fall aus den letzten vier Wochen. Liegt ein neuer Klausur-Ordner bereit, erstellt Claude einmal am Tag Fallzusammenfassung und Karten.</div>`}</div>
-    <p class="small muted" style="margin:12px 0 0">Nach vier Wochen verschwinden die Fälle von hier und laufen im normalen Pensum weiter.</p>
+    <header>${ILL.fall()}<div><h2>Fallabfrage</h2></div></header>
+    <div class="segtabs" role="tablist">${REIHEN.map(r=>{ const sh = fallAktuell(r), n = sh.reduce((x,g)=>x+(fOpen(g)?1:0),0), ps = pendSess(), part = ps && ps.kind==="fall" && sh.some(g=>g.key===ps.key);
+      return `<button role="tab" class="seg ${fallTab===r?"on":""}" aria-selected="${fallTab===r}" data-act="falltab" data-t="${r}" title="${esc(REIHE_TXT[r]||r)}">${esc(SEG_TXT[r]||r)}${part?`<i class="segdot" title="nicht fertig"></i>`:n?`<span class="stn">${n}</span>`:""}</button>`; }).join("")}</div>
+    <div class="zlist">${fShown.length ? fShown.map(fallRow).join("") : `<div class="zempty">Noch kein Fall mit Lösung in dieser Reihe.</div>`}</div>
   </section>`;
 
   return `<div class="hero"><div>
@@ -1266,11 +1305,11 @@ function vAktuell(){
         <div class="pebble"><b>${all.filter(isNew).length}</b><span>noch nie gelernt</span></div>
       </div>
     </div>${ILL.hero()}</div>
-    ${(()=>{ const d = session && session.idx<session.ids.length ? {label:session.label, idx:session.idx, ids:session.ids, live:true} : S.savedSess; if(!d) return "";
+    ${(()=>{ const d = session && session.idx<session.ids.length ? {label:session.label, idx:session.idx, ids:session.ids, kind:session.kind, live:true} : S.savedSess; if(!d || ["pensum","tages","fall"].includes(d.kind)) return "";
       return `<div class="hint resume">${ILL.idee()}<span><b>Angefangene Abfrage:</b> ${esc(d.label)}, ${d.idx} von ${d.ids.length} erledigt. Dein Stand ist gespeichert.</span><span class="spacer"></span><button class="btn st-part" data-act="${d.live?"tosession":"resume"}">Fortsetzen</button>${d.live?"":`<button class="btn ghost small" data-act="dropsess">Verwerfen</button>`}</div>`; })()}
     ${example?`<div class="hint">${ILL.idee()}<span>Die Kartei enthält noch Beispielinhalte zum Ausprobieren. Du kannst sie unter „Daten“ löschen.</span></div>`:""}
-    ${leech?`<div class="hint">${ILL.idee()}<span><b>${leech} Problemkarte${leech>1?"n":""}:</b> Karten, die du immer wieder vergisst. <a href="#problemkarten" class="linkbtn">Ansehen</a></span></div>`:""}
-    ${fixes?`<div class="hint">${ILL.idee()}<span><b>${fixes} Korrekturvorschl${fixes>1?"äge":"ag"}</b> von Claude warten. Sie erscheinen, wenn du die Karte lernst. <a class="linkbtn" href="#bibliothek" data-act="fixfilter">Alle zeigen</a></span></div>`:""}
+    ${leech?`<div class="hint">${ILL.idee()}<span><b>${leech} Problemkarte${leech>1?"n":""}:</b> <a href="#problemkarten" class="linkbtn">Ansehen</a></span></div>`:""}
+    ${fixes?`<div class="hint">${ILL.idee()}<span><b>${fixes} Korrekturvorschl${fixes>1?"äge":"ag"}</b> offen. <a class="linkbtn" href="#bibliothek" data-act="fixfilter">Alle zeigen</a></span></div>`:""}
     <div class="zones">${pensum}${tages}${fall}</div>`;
 }
 
@@ -1387,9 +1426,9 @@ function sheet(it, revealed, study){
   const ck = it.type==="case" ? checks.get(it.id) : null;
   const rec = v && v.result ? ({"Nochmal":1,"Schwer":2,"Gut":3,"Leicht":4,"Sehr leicht":5}[v.result.empfehlung]||0) : ck && ck.rec ? ck.rec : 0;
   const gradeBtns = [1,2,3,4,5].map(g=>{
-    return `<button data-act="grade" data-g="${g}" class="${rec===g?"rec":""}">${session.exam ? "" : `<i class="ginfo" data-act="gradeinfo" data-g="${g}" title="Was bewirkt „${GRADE_TXT[g]}“?" role="button" aria-label="Info zu ${GRADE_TXT[g]}">i</i>`}<b>${GRADE_TXT[g]}<kbd>${g}</kbd></b><span>${session.exam ? "" : GRADE_HINT(p, g)}</span></button>`;
+    return `<button data-act="grade" data-g="${g}" class="${rec===g?"rec":""}"><b>${GRADE_TXT[g]}<kbd>${g}</kbd></b><span>${session.exam ? "" : GRADE_HINT(p, g)}</span></button>`;
   }).join("") ;
-  const gInfo = gradeInfo && !session.exam ? `<div class="ginfo-box"><p><b>${g2txt(gradeInfo)}</b> ${GRADE_INFO[gradeInfo]}</p>${gradeInfo<=3?`<p class="muted">Neue Karten: Bei Nochmal, Schwer oder Gut kommen sie zuerst morgen und übermorgen, danach rechnet FSRS.</p>`:""}</div>` : "";
+  const gInfo = "";
   const sketch = it.type==="case" ? sketchBox(it, revealed) : "";
   return `<article class="sheet t-${it.type}">${meta}${q}${!revealed?norms:""}${write}${verdictHtml}${sketch}
     ${revealed ? `<div class="answer">${it.type==="case"?'<h3 style="margin-top:0">Lösung</h3>':""}${a}</div>${mnemoBox(it)}${norms}<div class="grades">${gradeBtns}</div>${gInfo}${linkedLine(it)}`
@@ -1452,7 +1491,6 @@ function sketchBox(it, revealed){
   }
   if(revealed) return "";
   return `<div class="sketch"><h3>${ILL.idee()} Skizziere das Kernproblem</h3>
-    <p class="small muted" style="margin:0">Ein paar Sätze reichen: Worum geht es, welche Anspruchsgrundlagen oder Delikte, welche Hauptprobleme und wie löst du sie? Claude prüft das gegen die Lösung.</p>
     <textarea id="sktext" placeholder="Kernproblem: …">${esc(c&&c.input||"")}</textarea>
     <div class="row" style="margin-top:10px"><button class="btn clay" data-act="check" data-id="${esc(it.id)}" ${S.ai?"":"disabled"}>Von Claude prüfen lassen</button>
     <button class="btn ghost" data-act="reveal">Lösung ohne Prüfung zeigen</button>
@@ -1613,14 +1651,14 @@ async function sendChat(id, text){
 /* ---------- Ansicht: Suche ---------- */
 let searchQ = "";
 function vSuche(){
-  return `<h1>Suche</h1><p class="sub">Durchsucht Begriffe, Inhalte, Schlagwörter und Normen aller Definitionen, Karteikarten, Schemata und Fälle.</p>
+  return `<h1>Suche</h1>
     <input id="bigq" class="bigsearch" type="search" placeholder="z. B. Außenbereich, Art. 3 GG, Störer" aria-label="Suchbegriff">
     <div id="results"></div>`;
 }
 function runSearch(){
   const box = $("#results"); if(!box) return;
   const toks = fold(searchQ).split(/\s+/).filter(Boolean);
-  if(!toks.length){ box.innerHTML = `<p class="muted">Tipp ein Wort ein. Mehrere Wörter müssen alle vorkommen.</p>${tagCloud()}`; return; }
+  if(!toks.length){ box.innerHTML = `${tagCloud()}`; return; }
   const hits = [...S.items.values()].filter(it=>{ const h = hay(it); return toks.every(t=>h.includes(t)); })
     .sort((a,b)=>{ const ta=fold(titleOf(a)), tb=fold(titleOf(b)); const sa=toks.some(t=>ta.includes(t))?1:0, sb=toks.some(t=>tb.includes(t))?1:0; return sb-sa || tierOf(a)-tierOf(b); });
   if(!hits.length){ box.innerHTML = `<div class="panel empty">Kein Treffer für „${esc(searchQ)}“. Prüf die Schreibweise oder such nach einer Norm.</div>`; return; }
@@ -1639,8 +1677,19 @@ const isHemmer = i => /hemmer/i.test(i.source||"") || (i.tags||[]).some(t=>/^hem
 const isZusatz = i => (i.tags||[]).some(t=>/^(wiederholungsfrage|zusatzfrage|sonderheft)$/i.test(t)) || /wiederholungs|zusatzfrage|sonderheft/i.test(i.source||"");
 const POOLS = {"":["Alle", ()=>true], "zusatz":["Hemmer-Zusatzfragen", i=>isZusatz(i)]};
 const inPool = (pool, i) => (POOLS[pool||""]||POOLS[""])[1](i);
-function poolTabs(cur, act, countFn){ return `<div class="subtabs" role="tablist">${Object.entries(POOLS).map(([k,[l]])=>`<button role="tab" class="tab ${(cur||"")===k?"on":""}" aria-selected="${(cur||"")===k}" data-act="${act}" data-t="${k}">${l}${countFn?` <span class="muted">${countFn(k)}</span>`:""}</button>`).join("")}</div>`; }
-const CATS = {"hemmer-zusatz":["Hemmer-Zusatzfragen", i=>i.type==="card"&&isZusatz(i)], "hemmer-faelle":["Hemmer-Fälle", i=>i.type==="case"&&isHemmer(i)], "hemmer-karten":["Hemmer-Karteikarten", i=>i.type==="card"&&isHemmer(i)], "hemmer-alle":["Alles von Hemmer", isHemmer]};
+/* angefangene Abfrage (laufend oder pausiert) → am passenden Knopf statt als Banner */
+function pendSess(){ return session && !session.exam && session.idx<session.ids.length ? {label:session.label, idx:session.idx, ids:session.ids, kind:session.kind, key:session.key, live:true} : S.savedSess && !S.savedSess.exam ? S.savedSess : null; }
+const sessPool = d => /Zusatzfragen/.test(d.label||"") ? "zusatz" : "";
+function resBtn(d, big){ return `<button class="btn ${big?"big ":""}st-part" data-act="${d.live?"tosession":"resume"}" title="${esc(d.label)}: ${d.idx} von ${d.ids.length} erledigt – noch nicht fertig">⏸ Weiter: noch ${d.ids.length-d.idx} von ${d.ids.length}</button>${d.live?"":`<button class="btn ghost small" data-act="dropsess" title="Angefangene Abfrage verwerfen">Verwerfen</button>`}`; }
+function poolTabs(cur, act, countFn){ return `<div class="subtabs" role="tablist">${Object.entries(POOLS).map(([k,[l]])=>`<button role="tab" class="tab ${(cur||"")===k?"on":""}" aria-selected="${(cur||"")===k}" data-act="${act}" data-t="${k}">${l}${countFn?` <span class="muted">${countFn(k)}</span>`:""}${act==="pool" && (()=>{ const d = pendSess(); return d && d.kind==="pensum" && sessPool(d)===k; })() ? ` <span class="stpill part">nicht fertig</span>`:""}</button>`).join("")}</div>`; }
+const CATS = {"reihe:KLK":["KLK", i=>(fallOf(i)||{}).reihe==="KLK"], "reihe:UKK":["UKK", i=>(fallOf(i)||{}).reihe==="UKK"], "reihe:Klausurenwerkstatt":["Klausurenwerkstatt", i=>(fallOf(i)||{}).reihe==="Klausurenwerkstatt"], "reihe:Klausurenbesprechung":["Klausurenbesprechung J & L", i=>(fallOf(i)||{}).reihe==="Klausurenbesprechung"], "hemmer-zusatz":["Hemmer-Zusatzfragen", i=>i.type==="card"&&isZusatz(i)], "hemmer-faelle":["Hemmer-Fälle", i=>i.type==="case"&&isHemmer(i)], "hemmer-karten":["Hemmer-Karteikarten", i=>i.type==="card"&&isHemmer(i)], "hemmer-alle":["Alles von Hemmer", isHemmer]};
+function bibReihe(r, ids, toks){
+  const gs = reiheGroups(r).map(g=>Object.assign({}, g, {shown:g.items.filter(i=>ids.has(i.id))})).filter(g=>g.shown.length);
+  if(!gs.length) return `<div class="panel empty">Keine Einträge für diese Auswahl.</div>`;
+  const akt = new Set(fallAktuell(r).map(g=>g.key));
+  return gs.map(g=>`<section class="fgroup"><div class="row" style="gap:8px;align-items:baseline;margin:22px 0 6px"><span class="tag-reihe">${esc(fallLabel(g))}</span>${akt.has(g.key)?`<span class="stpill part">in der Fallabfrage</span>`:""}<h3 style="margin:0;font-size:17px">${esc(fallTitle(g))}</h3><span class="spacer"></span><button class="btn small" data-act="fall" data-k="${esc(g.key)}">Abfragen</button></div>
+    <div class="list">${g.shown.map(i=>itemRow(i,toks)).join("")}</div></section>`).join("");
+}
 function vBib(){
   const ar = areas();
   let list = [...S.items.values()].filter(i=>(!bib.type||i.type===bib.type)&&(!bib.cat||CATS[bib.cat][1](i))&&(!bib.area||i.area===bib.area)&&(!bib.fix||(i.suggestion&&i.suggestion.status==="offen"))&&(!bib.star||i.star));
@@ -1649,7 +1698,7 @@ function vBib(){
   list.sort(bib.sort==="rel" ? (a,b)=>tierOf(a)-tierOf(b)||titleOf(a).localeCompare(titleOf(b),"de") : bib.sort==="due" ? (a,b)=>((S.progress.get(a.id)||{}).due||"0").localeCompare((S.progress.get(b.id)||{}).due||"0") : (a,b)=>titleOf(a).localeCompare(titleOf(b),"de"));
   return `<div class="row"><h1>Bibliothek</h1><span class="spacer"></span>${list.some(i=>i.star)?`<button class="btn" data-act="learnstar">★ ${list.filter(i=>i.star).length} Sternkarten abfragen</button>`:""}<a class="btn primary" href="#neu">Eintrag anlegen</a></div>
   <p class="sub">${S.items.size} Einträge: ${TKEYS.map(t=>[...S.items.values()].filter(i=>i.type===t).length+" "+TYPES_PL[t]).join(", ")}.</p>
-  <div class="subtabs" role="tablist">${[["", "Alle Einträge", S.items.size], ["hemmer-zusatz", "Hemmer-Zusatzfragen", [...S.items.values()].filter(CATS["hemmer-zusatz"][1]).length]].map(([k,l,n])=>`<button role="tab" class="tab ${bib.cat===k?"on":""}" aria-selected="${bib.cat===k}" data-act="bibtab" data-t="${k}">${l} <span class="muted">${n}</span></button>`).join("")}</div>
+  <div class="subtabs" role="tablist">${[["", "Alle Einträge", S.items.size], ["hemmer-zusatz", "Hemmer-Zusatzfragen", [...S.items.values()].filter(CATS["hemmer-zusatz"][1]).length], ...REIHEN.map(r=>["reihe:"+r, CATS["reihe:"+r][0], reiheGroups(r).length+" Klausuren"])].map(([k,l,n])=>`<button role="tab" class="tab ${bib.cat===k?"on":""}" aria-selected="${bib.cat===k}" data-act="bibtab" data-t="${k}">${l} <span class="muted">${n}</span></button>`).join("")}</div>
   <div class="filters">
     <select data-bib="type" aria-label="Art"><option value="">Alle Arten</option>${TKEYS.map(t=>`<option value="${t}" ${bib.type===t?"selected":""}>${TYPES_PL[t]}</option>`).join("")}</select>
     <select data-bib="cat" aria-label="Kategorie"><option value="">Alle Kategorien</option>${Object.entries(CATS).map(([k,v])=>`<option value="${k}" ${bib.cat===k?"selected":""}>${v[0]} (${[...S.items.values()].filter(v[1]).length})</option>`).join("")}</select>
@@ -1659,7 +1708,7 @@ function vBib(){
     <label class="switch"><input type="checkbox" data-bib="star" ${bib.star?"checked":""}> nur ★ Sterne (${[...S.items.values()].filter(i=>i.star).length})</label>
     <label class="switch"><input type="checkbox" data-bib="fix" ${bib.fix?"checked":""}> nur mit Korrekturvorschlag</label>
   </div>
-  ${list.length ? `<div class="list">${list.slice(0,400).map(i=>itemRow(i,toks)).join("")}</div>${list.length>400?`<p class="small muted">Die ersten 400 von ${list.length} angezeigt. Grenze die Auswahl mit den Filtern ein.</p>`:""}` : `<div class="panel empty">Keine Einträge für diese Auswahl.</div>`}`;
+  ${bib.cat.startsWith("reihe:") ? bibReihe(bib.cat.slice(6), new Set(list.map(i=>i.id)), toks) : list.length ? `<div class="list">${list.slice(0,400).map(i=>itemRow(i,toks)).join("")}</div>${list.length>400?`<p class="small muted">Die ersten 400 von ${list.length} angezeigt. Grenze die Auswahl mit den Filtern ein.</p>`:""}` : `<div class="panel empty">Keine Einträge für diese Auswahl.</div>`}`;
 }
 
 /* ---------- Ansicht: Detail ---------- */
@@ -1765,7 +1814,7 @@ function vNormen(){
   const groups = new Map();
   for(const [n,list] of idx){ const law = (n.match(/([A-ZÄÖÜ][A-Za-zÄÖÜäöü]*)\s*$/)||[,"Sonstige"])[1]; if(!groups.has(law)) groups.set(law,[]); groups.get(law).push([n,list]); }
   const num = n => parseFloat((n.match(/\d+[a-z]?/)||["0"])[0]) || 0;
-  return `<h1>Normen</h1><p class="sub">Jede Norm bündelt alle Definitionen, Karteikarten, Schemata und Fälle, in denen sie vorkommt.</p>
+  return `<h1>Normen</h1>
   ${idx.size ? [...groups.entries()].sort((a,b)=>a[0].localeCompare(b[0],"de")).map(([law,arr])=>`<h2>${esc(law)}</h2><div class="row" style="gap:8px">${arr.sort((a,b)=>num(a[0])-num(b[0])).map(([n,l])=>`<a class="norm" style="font-size:14px;padding:7px 10px" href="#${normSlug(n)}">${esc(n)} <span style="opacity:.6">${l.length}</span></a>`).join("")}</div>`).join("") : `<div class="panel empty">Noch keine Normen hinterlegt.</div>`}`;
 }
 function vNorm(slug){
@@ -1785,7 +1834,7 @@ function vProblem(){
   const list = [...S.items.values()].filter(i=>isLeech(i) && inPool(leechPool,i)).sort((a,b)=>(S.progress.get(b.id).lapses)-(S.progress.get(a.id).lapses));
   return `<div class="row"><h1>Problemkarten</h1><span class="spacer"></span>${list.length?`<button class="btn primary" data-act="learnleech">Alle ${list.length} abfragen</button>`:""}</div>
   ${poolTabs(leechPool, "lpool", k=>[...S.items.values()].filter(i=>isLeech(i) && inPool(k,i)).length)}
-  <p class="sub">Karten, die du dreimal oder öfter mit „Nochmal“ bewertet hast. Sie werden automatisch gesammelt. Oft hilft es, sie umzuformulieren oder Claude nach einer Eselsbrücke zu fragen.</p>
+  <p class="sub">Dreimal oder öfter mit „Nochmal“ bewertet.</p>
   ${list.length?`<div class="list">${list.map(i=>itemRow(i)).join("")}</div>`:`<div class="panel empty">Keine Problemkarten. Gut so.</div>`}`;
 }
 
@@ -1793,7 +1842,7 @@ function vProblem(){
 const exam = {cats:[...TKEYS], area:"", n:30, maxTier:3, pool:""};
 function vPruefung(){
   const pool = examPool();
-  return `<h1>Prüfungsmodus</h1><p class="sub">Gemischte Abfrage unabhängig von der Fälligkeit, wie in einer Prüfungssituation. Dein Wiederholungsplan bleibt dabei unverändert; am Ende siehst du deine Quote.</p>
+  return `<h1>Prüfungsmodus</h1><p class="sub">Gemischt, ohne Einfluss auf den Wiederholungsplan.</p>
   ${poolTabs(exam.pool, "expool", k=>[...S.items.values()].filter(i=>inPool(k,i)).length)}
   <section class="panel" style="max-width:720px">
     <h3 style="margin-top:0">Kategorien</h3>
@@ -1885,8 +1934,7 @@ function vStats(){
   <h2>Aktivität</h2>
   <div class="grid2">
     <section class="panel"><h3 style="margin-top:0">Fällig in den nächsten 14 Tagen</h3>
-      <div class="forecast">${fc.map((n,d)=>`<div><em>${n}</em><i style="height:${(n/max*100).toFixed(0)}%"></i><span>${d===0?"heute":toDate(addDays(t,d)).toLocaleDateString("de-DE",{weekday:"short"}).replace(".","")}</span></div>`).join("")}</div>
-      <p class="small muted" style="margin:10px 0 0">Die Spalte „heute“ enthält alle noch nie gelernten Einträge.</p></section>
+      <div class="forecast">${fc.map((n,d)=>`<div><em>${n}</em><i style="height:${(n/max*100).toFixed(0)}%"></i><span>${d===0?"heute":toDate(addDays(t,d)).toLocaleDateString("de-DE",{weekday:"short"}).replace(".","")}</span></div>`).join("")}</div></section>
     <section class="panel"><h3 style="margin-top:0">Gelernt in den letzten 30 Tagen</h3>
       <div class="forecast" style="gap:2px">${last30.map((n,i)=>`<div title="${n}"><i style="height:${(n/max30*100).toFixed(0)}%;max-width:14px;background:var(--acc-ink)"></i></div>`).join("")}</div></section>
   </div>
@@ -1903,21 +1951,20 @@ function vStats(){
 /* ---------- Ansicht: Daten ---------- */
 function vDaten(){
   const ex = [...S.items.values()].filter(i=>i.example).length;
-  return `<h1>Daten</h1><p class="sub">${S.mode==="konto" ? "Deine Kartei liegt in deiner Supabase-Datenbank und ist auf allen deinen Geräten gleich. Sichere sie trotzdem ab und zu als Datei." : "Noch nicht mit Supabase verbunden: Die Kartei liegt nur in diesem Browser. Trag deine Zugangsdaten in config.js ein (Anleitung, Schritt 5)."}${S.stale?" Die Verbindung zur Datenbank hakt gerade; Angezeigtes ist eventuell nicht aktuell.":""}</p>
+  return `<h1>Daten</h1><p class="sub">${S.mode==="konto" ? "" : "Noch nicht mit Supabase verbunden: Die Kartei liegt nur in diesem Browser. Trag deine Zugangsdaten in config.js ein (Anleitung, Schritt 5)."}${S.stale?" Die Verbindung zur Datenbank hakt gerade; Angezeigtes ist eventuell nicht aktuell.":""}</p>
   <div class="grid2">
     ${S.user?`<section class="panel"><h3 style="margin-top:0">Konto</h3><p class="small muted">Angemeldet als ${esc(S.user.email||"")}.</p>
       <div class="row"><button class="btn" data-act="reload">Neu laden</button><button class="btn ghost" data-act="logout">Abmelden</button></div></section>`:""}
-    <section class="panel"><h3 style="margin-top:0">Sichern</h3><p class="small muted">Lädt Karten, Lernstand und Einstellungen als JSON-Datei herunter.</p>
+    <section class="panel"><h3 style="margin-top:0">Sichern</h3>
       <button class="btn" data-act="export">Als Datei sichern</button><div id="exportbox"></div></section>
-    <section class="panel"><h3 style="margin-top:0">Sicherung laden</h3><p class="small muted">Gleiche Einträge werden überschrieben, alle anderen bleiben erhalten.</p>
+    <section class="panel"><h3 style="margin-top:0">Sicherung laden</h3>
       <input type="file" id="importfile" accept=".json,application/json"></section>
-    <section class="panel"><h3 style="margin-top:0">Darstellung der Antworten</h3><p class="small muted">Gliedert Rückseiten automatisch (a), b), 1., Spiegelstriche), hebt Ergebnis, Merke, h.M./a.A. und (+)/(–) hervor. Nur Anzeige – der gespeicherte Text bleibt unverändert. Eigene Markierungen: **fett** und ==markiert==.</p>
+    <section class="panel"><h3 style="margin-top:0">Darstellung der Antworten</h3>
       <label class="row" style="gap:8px;cursor:pointer"><input type="checkbox" data-act="fmt" ${fmtOn?"checked":""}> Automatisch formatieren</label></section>
-    <section class="panel"><h3 style="margin-top:0">Grundpensum</h3><p class="small muted">So viele Karten schlägt „Aktuell“ jeden Tag vor.</p>
+    <section class="panel"><h3 style="margin-top:0">Grundpensum</h3>
       <div class="slider"><input type="range" min="10" max="200" step="5" value="${S.settings.base}" data-act="base" aria-label="Grundpensum"><output id="baseOut">${S.settings.base}</output></div>
       <div class="row" style="margin-top:10px;gap:18px;flex-wrap:wrap"><label class="small muted">Neue Karten pro Tag (Pensum) <input type="number" id="newmax" min="0" max="200" value="${S.settings.newMax!=null?S.settings.newMax:20}" style="width:70px;padding:6px 8px;border:1px solid var(--line);border-radius:10px;background:var(--soft);color:var(--ink)"></label>
-      <label class="small muted">Endspurt: Tage vor dem Examen <input type="number" id="endspurt" min="7" max="60" value="${S.settings.endspurt||21}" style="width:70px;padding:6px 8px;border:1px solid var(--line);border-radius:10px;background:var(--soft);color:var(--ink)"></label></div>
-      <p class="small muted" style="margin:8px 0 0">Karten, deren Merkdauer bis zum Examen reicht oder die du mit „Sehr leicht“ bewertest, sind gesichert: Sie fallen aus allen Abfragen heraus und kommen im Endspurt einmal zur Endwiederholung.</p></section>
+      <label class="small muted">Endspurt: Tage vor dem Examen <input type="number" id="endspurt" min="7" max="60" value="${S.settings.endspurt||21}" style="width:70px;padding:6px 8px;border:1px solid var(--line);border-radius:10px;background:var(--soft);color:var(--ink)"></label></div></section>
     ${ex?`<section class="panel"><h3 style="margin-top:0">Beispielinhalte</h3><p class="small muted">${ex} Einträge sind nur zum Ausprobieren da. Lösch sie, bevor du deine eigenen Karten importierst.</p><button class="btn" data-act="delexamples">Beispielinhalte löschen</button></section>`:""}
   </div>
   <h2>Quizlet-Text einfügen</h2>
@@ -1928,7 +1975,7 @@ function vDaten(){
       <div class="field"><label for="qz-type">Anlegen als</label><select id="qz-type"><option value="card">Karteikarten</option><option value="def">Definitionen</option></select></div>
       <div class="field"><label for="qz-area">Rechtsgebiet</label><input id="qz-area" list="arealist2"><datalist id="arealist2">${areas().map(a=>`<option value="${esc(a)}">`).join("")}</datalist></div>
     </div>
-    <div class="row" style="margin-top:12px"><button class="btn primary" data-act="quizlet">Importieren</button><span class="small muted">Tier, Normen und Verknüpfungen ergänzt Claude später beim Import im Chat.</span></div>
+    <div class="row" style="margin-top:12px"><button class="btn primary" data-act="quizlet">Importieren</button></div>
   </section>`;
 }
 async function doExport(){
@@ -1994,6 +2041,7 @@ document.addEventListener("click", async e=>{
   else if(a==="lpool"){ leechPool = b.dataset.t; render(); }
   else if(a==="tahist"){ taHist = !taHist; render(); }
   else if(a==="fall"){ startFall(b.dataset.k); }
+  else if(a==="falltab"){ fallTab = b.dataset.t; try{ localStorage.setItem("ek-falltab", fallTab); }catch(e){} render(); }
   else if(a==="check"){ checkCase(id); }
   else if(a==="stopcheck"){ const c = checks.get(id); if(c&&c.ctl) c.ctl.abort(); }
   else if(a==="recheck"){ const c = checks.get(id); checks.set(id, {input:c?c.input:""}); if(session) session.revealed = false; render(); const t=$("#sktext"); if(t) t.focus(); }
