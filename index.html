@@ -149,6 +149,14 @@ kbd{font:600 10px/1 var(--sans);letter-spacing:.02em;border:0;border-radius:4px;
 .zone{border-top:3px solid var(--zc,var(--acc))}
 .zone > *{position:relative;z-index:1}
 .zone.z-todo{--zc:var(--muted)}
+.zone.z-notiz{--zc:var(--moss)}
+.zone.z-notiz header{align-items:center}
+.note{display:block}
+.notehead{display:flex;width:100%;gap:12px;align-items:baseline;justify-content:space-between;text-align:left;border:0;background:none;padding:0;color:inherit;cursor:pointer;font:inherit}
+.notehead .t{font:500 16px/1.4 var(--serif)}
+.notehead .s{font-size:12.5px;color:var(--muted);white-space:nowrap}
+.note .notebody{margin-top:10px;max-width:820px}
+.noteform{max-width:none;margin-top:4px}
 .todo .tchk{width:22px;height:22px;flex:none;display:grid;place-items:center;padding:0;border:1.5px solid var(--line);border-radius:6px;background:var(--soft);color:var(--moss);font-weight:700;cursor:pointer}
 .todo.done .t{text-decoration:line-through;color:var(--muted)}
 .zone.z-pensum{--zc:var(--acc)} .zone.z-tages{--zc:var(--moss)} .zone.z-fall{--zc:var(--clay)}
@@ -635,6 +643,7 @@ async function loadAll(){
     if(r.key==="settings") Object.assign(S.settings, r.data||{});
     if(r.key==="session") sessMeta = r.data;
     if(r.key==="abgefragt") mergeAbg(r.data);
+    if(r.key==="notizen") mergeNotes(r.data);
     if(r.key==="log"){ const days = Object.assign({}, (r.data||{}).days||{}); for(const [k,v] of Object.entries(S.log.days)) days[k] = Math.max(days[k]||0, v); S.log = {days}; }
   });
   if(!session) loadSavedSess(sessMeta);
@@ -655,6 +664,7 @@ function subscribe(){
         else if(n.key==="settings") Object.assign(S.settings, n.data||{});
         else if(n.key==="session"){ if(!session) loadSavedSess(n.data); }
         else if(n.key==="abgefragt") mergeAbg(n.data);
+        else if(n.key==="notizen") mergeNotes(n.data);
         else if(n.key==="log"){ const days = Object.assign({}, (n.data||{}).days||{}); for(const [k,v] of Object.entries(S.log.days)) days[k] = Math.max(days[k]||0, v); S.log = {days}; }
         later();
       });
@@ -1104,7 +1114,7 @@ function refresh(){
   const a = document.activeElement;
   if(a && /INPUT|TEXTAREA|SELECT/.test(a.tagName) && $("#main").contains(a)) return;
   const r = route();
-  if(r==="lernen" || r==="neu" || (r.startsWith("e-") && editing)) return;
+  if(r==="lernen" || r==="neu" || (r.startsWith("e-") && editing) || (r==="aktuell" && noteEdit)) return;
   render();
 }
 function afterRender(){
@@ -1327,7 +1337,8 @@ function vAktuell(){
     ${leech?`<div class="hint">${ILL.idee()}<span><b>${leech} Problemkarte${leech>1?"n":""}:</b> <a href="#problemkarten" class="linkbtn">Ansehen</a></span></div>`:""}
     ${fixes?`<div class="hint">${ILL.idee()}<span><b>${fixes} Korrekturvorschl${fixes>1?"äge":"ag"}</b> offen. <a class="linkbtn" href="#bibliothek" data-act="fixfilter">Alle zeigen</a></span></div>`:""}
     <div class="zones">${pensum}${tages}${fall}</div>
-    ${todoZone()}`;
+    ${todoZone()}
+    ${notesZone()}`;
 }
 /* To-do-Themen: freie Liste in „Aktuell“, gespeichert in den Einstellungen (Konto) */
 function todoZone(){
@@ -1772,6 +1783,66 @@ function vDetail(id){
   </div>`;
 }
 
+/* ---------- Notizbuch ----------
+   Freie Notizen (Titel, Text, Rechtsgebiet, Verknüpfungen), gespeichert in meta „notizen“.
+   Zusammenführen je Notiz nach Zeitstempel; Gelöschtes bleibt als Grabstein, damit es auf anderen Geräten nicht zurückkommt. */
+const NOTES_KEY = "juragarage-notizen";
+try{ S.notes = (JSON.parse(localStorage.getItem(NOTES_KEY)||"{}")||{}).list || []; }catch(e){ S.notes = []; }
+let noteEdit = null, noteOpen = null, noteQ = "", noteArea = "", noteTimer = null;
+function mergeNotes(remote){
+  const r = remote && Array.isArray(remote.list) ? remote.list : []; const m = new Map(S.notes.map(n=>[n.id,n]));
+  for(const n of r){ const l = m.get(n.id); if(!l || (n.updated||"") > (l.updated||"")) m.set(n.id, n); }
+  S.notes = [...m.values()];
+  try{ localStorage.setItem(NOTES_KEY, JSON.stringify({list:S.notes})); }catch(e){}
+}
+function saveNotes(){
+  try{ localStorage.setItem(NOTES_KEY, JSON.stringify({list:S.notes})); }catch(e){}
+  clearTimeout(noteTimer); noteTimer = setTimeout(()=>{ putMeta("notizen", {list:S.notes}).catch(()=>{}); }, 400);
+}
+const liveNotes = () => S.notes.filter(n=>!n.del).sort((a,b)=>(b.updated||"").localeCompare(a.updated||""));
+const noteById = id => S.notes.find(n=>n.id===id && !n.del);
+const noteDate = n => n.updated ? new Date(n.updated).toLocaleDateString("de-DE",{day:"numeric",month:"short",year:"numeric"}) : "";
+const noteAreas = () => [...new Set([...areas(), ...liveNotes().map(n=>n.area).filter(Boolean)])].sort((a,b)=>a.localeCompare(b,"de"));
+/* Notizen-Feld in „Aktuell“: Liste zum Aufklappen, Anlegen und Bearbeiten direkt im Feld */
+function noteForm(n){
+  if(!draftLinksInit){ draftLinks = n ? [...(n.links||[])] : []; draftLinksInit = true; }
+  return `<div class="form noteform" id="editform" data-id="">
+    <div class="two"><div class="field"><label for="n-title">Titel</label><input id="n-title" value="${esc(n&&n.title||"")}" placeholder="z. B. Prüfungsreihenfolge bei der Drittanfechtung"></div>
+    <div class="field"><label for="n-area">Rechtsgebiet</label><input id="n-area" list="narealist" value="${esc(n&&n.area||"")}"><datalist id="narealist">${noteAreas().map(a=>`<option value="${esc(a)}">`).join("")}</datalist></div></div>
+    <div class="field"><label for="n-text">Notiz</label><div class="mdbar"><button type="button" data-act="md" data-for="n-text" data-m="**" title="Auswahl fett">B</button><button type="button" class="mk" data-act="md" data-for="n-text" data-m="==" title="Auswahl markieren">Markieren</button><small>**fett** · ==markiert== · Gliederung A., I., 1.</small></div><textarea id="n-text" style="min-height:200px">${esc(n&&n.text||"")}</textarea></div>
+    <div class="field picker"><label for="f-link">Verknüpfen mit</label><input id="f-link" placeholder="Karte, Schema oder Fall suchen und hinzufügen" autocomplete="off"><div class="drop" id="linkdrop" hidden></div>
+      <div class="chips" id="linkchips">${linkChips()}</div></div>
+    <div class="row"><button class="btn primary" data-act="notesave" data-id="${n?esc(n.id):""}">${n?"Speichern":"Notiz anlegen"}</button><button class="btn" data-act="notecancel">Abbrechen</button></div>
+  </div>`;
+}
+function notesZone(){
+  const all = liveNotes(), toks = fold(noteQ).split(/\s+/).filter(Boolean);
+  const list = all.filter(n=>(!noteArea || n.area===noteArea) && (!toks.length || toks.every(t=>fold([n.title,n.text,n.area].join(" ")).includes(t))));
+  const ar = [...new Set(all.map(n=>n.area).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"de"));
+  const row = n => {
+    if(noteEdit===n.id) return `<div class="zrow note">${noteForm(n)}</div>`;
+    const open = noteOpen===n.id, linked = (n.links||[]).map(x=>S.items.get(x)).filter(Boolean);
+    return `<div class="zrow note ${open?"open":""}"><button class="notehead" data-act="noteopen" data-id="${esc(n.id)}" aria-expanded="${open}"><span class="t">${hl(n.title||"(ohne Titel)", toks)}</span><span class="s">${esc([n.area, noteDate(n)].filter(Boolean).join(" · "))}</span></button>
+      ${open ? `<div class="notebody">${fmtBack(n.text||"") || '<p class="muted">Kein Text.</p>'}</div>
+      ${linked.length ? `<div class="links-line"><span class="small muted">Verknüpft:</span>${linked.map(o=>`<a class="lchip t-${esc(o.type)}" href="#e-${esc(o.id)}" title="${esc(TYPES[o.type])}: ${esc(titleOf(o))}"><i class="dot"></i><span class="lt">${esc(titleOf(o))}</span></a>`).join("")}</div>` : ""}
+      <div class="row" style="margin-top:10px"><button class="btn small" data-act="noteedit" data-id="${esc(n.id)}">Bearbeiten</button><button class="btn ghost small" data-act="notedel" data-id="${esc(n.id)}">Löschen</button></div>` : ""}</div>`;
+  };
+  return `<section class="zone z-notiz" style="margin-top:20px">
+    <header><div><h2>Notizen</h2><p>Freie Notizen, auf Wunsch mit Karten verknüpft.</p></div><span class="spacer"></span>${noteEdit ? "" : `<button class="btn" data-act="noteneu">Neue Notiz</button>`}</header>
+    ${all.length > 3 ? `<div class="filters" style="margin-top:10px"><input type="search" data-note="q" value="${esc(noteQ)}" placeholder="Notizen durchsuchen" aria-label="Notizen durchsuchen"><select data-note="area" aria-label="Rechtsgebiet"><option value="">Alle Rechtsgebiete</option>${ar.map(a=>`<option ${noteArea===a?"selected":""}>${esc(a)}</option>`).join("")}</select></div>` : ""}
+    ${noteEdit==="neu" ? `<div class="zrow note">${noteForm(null)}</div>` : ""}
+    <div class="zlist">${list.length ? list.map(row).join("") : `<div class="zempty">${all.length ? "Keine Notiz passt zur Suche." : "Noch keine Notizen."}</div>`}</div>
+  </section>`;
+}
+function noteSave(id){
+  const title = ($("#n-title").value||"").trim(), text = ($("#n-text").value||"").replace(/\s+$/,""), area = ($("#n-area").value||"").trim();
+  if(!title && !text.trim()){ toast("Die Notiz ist leer."); return; }
+  const t = new Date().toISOString(), old = id ? noteById(id) : null;
+  const n = Object.assign({}, old||{id:"n"+Date.now().toString(36)+Math.random().toString(36).slice(2,5), created:t}, {title, text, area, links:[...new Set(draftLinks)], updated:t});
+  S.notes = [...S.notes.filter(x=>x.id!==n.id), n]; saveNotes();
+  noteEdit = null; noteOpen = n.id; draftLinksInit = false; toast(old?"Notiz gespeichert":"Notiz angelegt"); render();
+}
+
 /* ---------- Ansicht: Bearbeiten / Anlegen ---------- */
 let draftLinks = [];
 function vEdit(it){
@@ -2071,6 +2142,12 @@ document.addEventListener("click", async e=>{
   else if(a==="todo-t"){ const t = (S.settings.todo||[]).find(x=>x.id===id); if(t){ t.done = !t.done; saveSettings(); render(); } }
   else if(a==="todo-x"){ S.settings.todo = (S.settings.todo||[]).filter(x=>x.id!==id); saveSettings(); render(); }
   else if(a==="todo-clr"){ S.settings.todo = (S.settings.todo||[]).filter(x=>!x.done); saveSettings(); render(); }
+  else if(a==="noteneu"){ noteEdit = "neu"; draftLinksInit = false; render(); setTimeout(()=>{ const i = $("#n-title"); i && i.focus(); }, 0); }
+  else if(a==="noteopen"){ noteOpen = noteOpen===id ? null : id; render(); }
+  else if(a==="noteedit"){ noteEdit = id; draftLinksInit = false; render(); }
+  else if(a==="notesave"){ noteSave(id); }
+  else if(a==="notecancel"){ noteEdit = null; draftLinksInit = false; render(); }
+  else if(a==="notedel"){ const n = noteById(id); if(n && confirm("Notiz „"+(n.title||"ohne Titel")+"“ löschen?")){ S.notes = S.notes.map(x=>x.id===id ? {id, del:true, updated:new Date().toISOString()} : x); saveNotes(); if(noteOpen===id) noteOpen = null; toast("Notiz gelöscht"); render(); } }
   else if(a==="tahist"){ taHist = !taHist; render(); }
   else if(a==="fall"){ startFall(b.dataset.k); }
   else if(a==="falltab"){ fallTab = b.dataset.t; try{ localStorage.setItem("ek-falltab", fallTab); }catch(e){} render(); }
@@ -2138,6 +2215,7 @@ document.addEventListener("input", e=>{
   else if(t.id==="bigq"){ searchQ = t.value; runSearch(); }
   else if(t.id==="quick"){ searchQ = t.value; if(route()!=="suche") go("suche"); else { const i=$("#bigq"); if(i) i.value=searchQ; runSearch(); } }
   else if(t.dataset.bib==="q"){ bib.q = t.value; clearTimeout(t._tm); t._tm=setTimeout(()=>{ render(); const i=document.querySelector('[data-bib="q"]'); if(i){ i.focus(); i.setSelectionRange(i.value.length,i.value.length);} },250); }
+  else if(t.dataset.note==="q"){ noteQ = t.value; clearTimeout(t._tm); t._tm=setTimeout(()=>{ render(); const i=document.querySelector('[data-note="q"]'); if(i){ i.focus(); i.setSelectionRange(i.value.length,i.value.length);} },250); }
   else if(t.dataset.ex==="n"){ exam.n = Number(t.value); $("#exOut").textContent = t.value; }
   else if(t.id==="f-link"){ const toks = fold(t.value).split(/\s+/).filter(Boolean); const d = $("#linkdrop");
     if(!toks.length){ d.hidden = true; return; }
@@ -2146,6 +2224,7 @@ document.addEventListener("input", e=>{
   else if(t.id==="chatin"){ t.style.height="auto"; t.style.height=Math.min(140,t.scrollHeight)+"px"; }
 });
 document.addEventListener("change", async e=>{
+  if(e.target.dataset && e.target.dataset.note==="area"){ noteArea = e.target.value; render(); return; }
   if(e.target.id==="newmax" || e.target.id==="endspurt"){ const v = Math.round(Number(e.target.value)); if(isFinite(v) && v>=0){ S.settings[e.target.id==="newmax"?"newMax":"endspurt"] = v; await saveSettings(); } return; }
   if(e.target.id==="examdate"){ if(e.target.value){ S.settings.examDate = e.target.value; await saveSettings(); render(); } return; }
   const t = e.target;
