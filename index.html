@@ -149,14 +149,23 @@ kbd{font:600 10px/1 var(--sans);letter-spacing:.02em;border:0;border-radius:4px;
 .zone{border-top:3px solid var(--zc,var(--acc))}
 .zone > *{position:relative;z-index:1}
 .zone.z-todo{--zc:var(--muted)}
-.zone.z-notiz{--zc:var(--moss)}
-.zone.z-notiz header{align-items:center}
+.zone.z-notiz{--zc:var(--acc);background:color-mix(in srgb,var(--acc-soft) 55%,var(--paper));padding:14px 18px 14px;max-width:760px}
+.zone.z-notiz header{align-items:center;margin:0}
+.zone.z-notiz header h2{font-size:18px;margin:0}
+.zone.z-notiz .zlist{margin-top:6px}
+.zone.z-notiz .zrow{padding:8px 0;border-top-color:color-mix(in srgb,var(--acc) 35%,var(--line))}
+.zone.z-notiz .filters{margin:8px 0 0;gap:8px}
+.zone.z-notiz .linkbtn{margin-top:6px}
 .note{display:block}
 .notehead{display:flex;width:100%;gap:12px;align-items:baseline;justify-content:space-between;text-align:left;border:0;background:none;padding:0;color:inherit;cursor:pointer;font:inherit}
-.notehead .t{font:500 16px/1.4 var(--serif)}
-.notehead .s{font-size:12.5px;color:var(--muted);white-space:nowrap}
-.note .notebody{margin-top:10px;max-width:820px}
-.noteform{max-width:none;margin-top:4px}
+.notehead .t{font:500 15px/1.35 var(--serif);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.notehead .s{font-size:12px;color:var(--muted);white-space:nowrap;flex:none}
+.note.open .notehead .t{white-space:normal}
+.note .notebody{margin-top:6px;font-size:14.5px}
+.note .notebody p{margin:.3em 0}
+.noteform{max-width:none;margin-top:6px;gap:8px}
+.noteform .field label{font-size:12.5px;margin-bottom:3px}
+.noteform .field input,.noteform .field textarea{background:var(--paper);padding:7px 10px}
 .todo .tchk{width:22px;height:22px;flex:none;display:grid;place-items:center;padding:0;border:1.5px solid var(--line);border-radius:6px;background:var(--soft);color:var(--moss);font-weight:700;cursor:pointer}
 .todo.done .t{text-decoration:line-through;color:var(--muted)}
 .zone.z-pensum{--zc:var(--acc)} .zone.z-tages{--zc:var(--moss)} .zone.z-fall{--zc:var(--clay)}
@@ -608,12 +617,13 @@ async function deleteItem(id){
   }
   if(S.sb){ await sbRun("i/"+id, ()=>S.sb.from("items").delete().eq("id",id)); await sbRun("p/"+id, ()=>S.sb.from("progress").delete().eq("id",id)); } else lsSave();
 }
+const progWritten = new Map(); // id → Zeitpunkt des letzten eigenen Schreibens
 async function putProgress(id,p){
-  S.progress.set(id,p);
-  if(S.sb) await sbRun("p/"+id, ()=>S.sb.from("progress").upsert(rowOf(id,p), {onConflict:"user_id,id"})); else lsSave();
+  S.progress.set(id,p); const row = rowOf(id,p); progWritten.set(id, row.updated_at);
+  if(S.sb) await sbRun("p/"+id, ()=>S.sb.from("progress").upsert(row, {onConflict:"user_id,id"})); else lsSave();
 }
 async function deleteProgress(id){
-  S.progress.delete(id);
+  S.progress.delete(id); progWritten.set(id, now());
   if(S.sb) await sbRun("p/"+id, ()=>S.sb.from("progress").delete().eq("id",id)); else lsSave();
 }
 async function putMeta(key, data){
@@ -660,7 +670,7 @@ function subscribe(){
         if(p.eventType==="DELETE"){ if(t==="items") S.items.delete(o.id); if(t==="progress") S.progress.delete(o.id); later(); return; }
         if(n.user_id && n.user_id!==S.user.id) return;
         if(t==="items"){ if(ohneLoesung(n.data)) S.items.delete(n.id); else S.items.set(n.id, Object.assign({}, n.data, {id:n.id})); }
-        else if(t==="progress") S.progress.set(n.id, n.data);
+        else if(t==="progress"){ const w = progWritten.get(n.id); if(w && n.updated_at && Date.parse(n.updated_at) < Date.parse(w)) return; S.progress.set(n.id, n.data); }
         else if(n.key==="settings") Object.assign(S.settings, n.data||{});
         else if(n.key==="session"){ if(!session) loadSavedSess(n.data); }
         else if(n.key==="abgefragt") mergeAbg(n.data);
@@ -1337,7 +1347,6 @@ function vAktuell(){
     ${leech?`<div class="hint">${ILL.idee()}<span><b>${leech} Problemkarte${leech>1?"n":""}:</b> <a href="#problemkarten" class="linkbtn">Ansehen</a></span></div>`:""}
     ${fixes?`<div class="hint">${ILL.idee()}<span><b>${fixes} Korrekturvorschl${fixes>1?"äge":"ag"}</b> offen. <a class="linkbtn" href="#bibliothek" data-act="fixfilter">Alle zeigen</a></span></div>`:""}
     <div class="zones">${pensum}${tages}${fall}</div>
-    ${todoZone()}
     ${notesZone()}`;
 }
 /* To-do-Themen: freie Liste in „Aktuell“, gespeichert in den Einstellungen (Konto) */
@@ -1582,8 +1591,15 @@ async function backCard(){
   session.idx = Math.max(0, session.idx-1);
   session.revealed = true;
   verdicts.delete(h.id); checks.delete(h.id); own.delete(h.id); mnemoEdit = null;
+  let save = null;
+  if(!session.exam){
+    // alten Lernstand sofort wiederherstellen, damit Anzeige und neue Bewertung vom Stand vor der Bewertung ausgehen
+    if(!session.ids.slice(session.idx+1).includes(h.id)) unmarkAbg(abgKeyOf(session), h.id);
+    if(!session.history.some(x=>x.id===h.id)){ session.counted.delete(h.id); const t = today(); if(S.log.days[t]) { S.log.days[t]--; putMeta("log", S.log).catch(()=>{}); } }
+    save = h.prev ? putProgress(h.id, h.prev) : deleteProgress(h.id);
+  }
   saveSess(); render();
-  if(!session.exam){ if(!session.ids.slice(session.idx+1).includes(h.id)) unmarkAbg(abgKeyOf(session), h.id); if(h.prev) await putProgress(h.id, h.prev); else await deleteProgress(h.id); }
+  if(save) await save;
 }
 
 /* ---------- KI: Auswertung & Chat ---------- */
@@ -1788,7 +1804,7 @@ function vDetail(id){
    Zusammenführen je Notiz nach Zeitstempel; Gelöschtes bleibt als Grabstein, damit es auf anderen Geräten nicht zurückkommt. */
 const NOTES_KEY = "juragarage-notizen";
 try{ S.notes = (JSON.parse(localStorage.getItem(NOTES_KEY)||"{}")||{}).list || []; }catch(e){ S.notes = []; }
-let noteEdit = null, noteOpen = null, noteQ = "", noteArea = "", noteTimer = null;
+let noteEdit = null, noteOpen = null, noteAll = false, noteQ = "", noteArea = "", noteTimer = null;
 function mergeNotes(remote){
   const r = remote && Array.isArray(remote.list) ? remote.list : []; const m = new Map(S.notes.map(n=>[n.id,n]));
   for(const n of r){ const l = m.get(n.id); if(!l || (n.updated||"") > (l.updated||"")) m.set(n.id, n); }
@@ -1807,10 +1823,10 @@ const noteAreas = () => [...new Set([...areas(), ...liveNotes().map(n=>n.area).f
 function noteForm(n){
   if(!draftLinksInit){ draftLinks = n ? [...(n.links||[])] : []; draftLinksInit = true; }
   return `<div class="form noteform" id="editform" data-id="">
-    <div class="two"><div class="field"><label for="n-title">Titel</label><input id="n-title" value="${esc(n&&n.title||"")}" placeholder="z. B. Prüfungsreihenfolge bei der Drittanfechtung"></div>
+    <div class="two"><div class="field"><label for="n-title">Titel</label><input id="n-title" value="${esc(n&&n.title||"")}" placeholder="Titel"></div>
     <div class="field"><label for="n-area">Rechtsgebiet</label><input id="n-area" list="narealist" value="${esc(n&&n.area||"")}"><datalist id="narealist">${noteAreas().map(a=>`<option value="${esc(a)}">`).join("")}</datalist></div></div>
-    <div class="field"><label for="n-text">Notiz</label><div class="mdbar"><button type="button" data-act="md" data-for="n-text" data-m="**" title="Auswahl fett">B</button><button type="button" class="mk" data-act="md" data-for="n-text" data-m="==" title="Auswahl markieren">Markieren</button><small>**fett** · ==markiert== · Gliederung A., I., 1.</small></div><textarea id="n-text" style="min-height:200px">${esc(n&&n.text||"")}</textarea></div>
-    <div class="field picker"><label for="f-link">Verknüpfen mit</label><input id="f-link" placeholder="Karte, Schema oder Fall suchen und hinzufügen" autocomplete="off"><div class="drop" id="linkdrop" hidden></div>
+    <div class="field"><label for="n-text">Notiz</label><div class="mdbar"><button type="button" data-act="md" data-for="n-text" data-m="**" title="Auswahl fett">B</button><button type="button" class="mk" data-act="md" data-for="n-text" data-m="==" title="Auswahl markieren">Markieren</button><small>**fett** · ==markiert== · Gliederung A., I., 1.</small></div><textarea id="n-text" style="min-height:120px">${esc(n&&n.text||"")}</textarea></div>
+    <div class="field picker"><label for="f-link">Verknüpfen mit (optional)</label><input id="f-link" placeholder="Karte, Schema oder Fall suchen" autocomplete="off"><div class="drop" id="linkdrop" hidden></div>
       <div class="chips" id="linkchips">${linkChips()}</div></div>
     <div class="row"><button class="btn primary" data-act="notesave" data-id="${n?esc(n.id):""}">${n?"Speichern":"Notiz anlegen"}</button><button class="btn" data-act="notecancel">Abbrechen</button></div>
   </div>`;
@@ -1828,10 +1844,11 @@ function notesZone(){
       <div class="row" style="margin-top:10px"><button class="btn small" data-act="noteedit" data-id="${esc(n.id)}">Bearbeiten</button><button class="btn ghost small" data-act="notedel" data-id="${esc(n.id)}">Löschen</button></div>` : ""}</div>`;
   };
   return `<section class="zone z-notiz" style="margin-top:20px">
-    <header><div><h2>Notizen</h2><p>Freie Notizen, auf Wunsch mit Karten verknüpft.</p></div><span class="spacer"></span>${noteEdit ? "" : `<button class="btn" data-act="noteneu">Neue Notiz</button>`}</header>
-    ${all.length > 3 ? `<div class="filters" style="margin-top:10px"><input type="search" data-note="q" value="${esc(noteQ)}" placeholder="Notizen durchsuchen" aria-label="Notizen durchsuchen"><select data-note="area" aria-label="Rechtsgebiet"><option value="">Alle Rechtsgebiete</option>${ar.map(a=>`<option ${noteArea===a?"selected":""}>${esc(a)}</option>`).join("")}</select></div>` : ""}
+    <header><h2>Notizen${all.length?` <span class="muted" style="font:500 14px var(--sans)">${all.length}</span>`:""}</h2><span class="spacer"></span>${noteEdit ? "" : `<button class="btn small" data-act="noteneu" title="Neue Notiz">+ Neu</button>`}</header>
+    ${all.length > 5 ? `<div class="filters"><input type="search" data-note="q" value="${esc(noteQ)}" placeholder="Notizen durchsuchen" aria-label="Notizen durchsuchen"><select data-note="area" aria-label="Rechtsgebiet"><option value="">Alle Rechtsgebiete</option>${ar.map(a=>`<option ${noteArea===a?"selected":""}>${esc(a)}</option>`).join("")}</select></div>` : ""}
     ${noteEdit==="neu" ? `<div class="zrow note">${noteForm(null)}</div>` : ""}
-    <div class="zlist">${list.length ? list.map(row).join("") : `<div class="zempty">${all.length ? "Keine Notiz passt zur Suche." : "Noch keine Notizen."}</div>`}</div>
+    <div class="zlist">${list.length ? (noteAll || toks.length || noteArea ? list : list.slice(0,6)).map(row).join("") : `<div class="zempty">${all.length ? "Keine Notiz passt zur Suche." : "Noch keine Notizen."}</div>`}
+    ${list.length>6 && !toks.length && !noteArea ? `<button class="linkbtn small" data-act="noteall">${noteAll?"Weniger anzeigen":"Alle "+list.length+" anzeigen"}</button>` : ""}</div>
   </section>`;
 }
 function noteSave(id){
@@ -2143,6 +2160,7 @@ document.addEventListener("click", async e=>{
   else if(a==="todo-x"){ S.settings.todo = (S.settings.todo||[]).filter(x=>x.id!==id); saveSettings(); render(); }
   else if(a==="todo-clr"){ S.settings.todo = (S.settings.todo||[]).filter(x=>!x.done); saveSettings(); render(); }
   else if(a==="noteneu"){ noteEdit = "neu"; draftLinksInit = false; render(); setTimeout(()=>{ const i = $("#n-title"); i && i.focus(); }, 0); }
+  else if(a==="noteall"){ noteAll = !noteAll; render(); }
   else if(a==="noteopen"){ noteOpen = noteOpen===id ? null : id; render(); }
   else if(a==="noteedit"){ noteEdit = id; draftLinksInit = false; render(); }
   else if(a==="notesave"){ noteSave(id); }
