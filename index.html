@@ -149,23 +149,29 @@ kbd{font:600 10px/1 var(--sans);letter-spacing:.02em;border:0;border-radius:4px;
 .zone{border-top:3px solid var(--zc,var(--acc))}
 .zone > *{position:relative;z-index:1}
 .zone.z-todo{--zc:var(--muted)}
-.zone.z-notiz{--zc:var(--acc);background:color-mix(in srgb,var(--acc-soft) 55%,var(--paper));padding:14px 18px 14px;max-width:760px}
-.zone.z-notiz header{align-items:center;margin:0}
-.zone.z-notiz header h2{font-size:18px;margin:0}
-.zone.z-notiz .zlist{margin-top:6px}
-.zone.z-notiz .zrow{padding:8px 0;border-top-color:color-mix(in srgb,var(--acc) 35%,var(--line))}
-.zone.z-notiz .filters{margin:8px 0 0;gap:8px}
-.zone.z-notiz .linkbtn{margin-top:6px}
-.note{display:block}
-.notehead{display:flex;width:100%;gap:12px;align-items:baseline;justify-content:space-between;text-align:left;border:0;background:none;padding:0;color:inherit;cursor:pointer;font:inherit}
-.notehead .t{font:500 15px/1.35 var(--serif);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.notehead .s{font-size:12px;color:var(--muted);white-space:nowrap;flex:none}
-.note.open .notehead .t{white-space:normal}
-.note .notebody{margin-top:6px;font-size:14.5px}
-.note .notebody p{margin:.3em 0}
-.noteform{max-width:none;margin-top:6px;gap:8px}
-.noteform .field label{font-size:12.5px;margin-bottom:3px}
-.noteform .field input,.noteform .field textarea{background:var(--paper);padding:7px 10px}
+.hero.hero-notes{grid-template-columns:minmax(0,1fr) 320px;align-items:start}
+@media (max-width:760px){.hero.hero-notes{grid-template-columns:1fr}}
+.notes{background:color-mix(in srgb,var(--acc-soft) 45%,transparent);border-left:3px solid var(--acc);border-radius:0 10px 10px 0;padding:8px 12px 6px;font-size:14px}
+.notes .nhead{font:600 11px/1.2 var(--sans);letter-spacing:.07em;text-transform:uppercase;color:var(--acc-ink);margin-bottom:2px}
+.notes .nadd{width:100%;border:0;border-bottom:1px solid transparent;background:transparent;color:var(--ink);padding:4px 0;font:inherit;font-size:13.5px;outline:none}
+.notes .nadd:focus{border-bottom-color:var(--acc)}
+.notes .nadd::placeholder{color:var(--muted)}
+.noteform input,.noteform textarea{width:100%;border:0;border-bottom:1px solid color-mix(in srgb,var(--acc) 40%,transparent);background:transparent;color:var(--ink);padding:4px 0;font:inherit;font-size:13.5px;outline:none}
+.noteform{display:grid;gap:4px;margin:2px 0 4px}
+.noteform textarea{min-height:60px;resize:vertical}
+.noteform .btn.small{padding:3px 10px;font-size:12.5px}
+.nlist{list-style:none;margin:0;padding:0;max-height:240px;overflow:auto}
+.note{padding:1px 0}
+.nline{display:flex;gap:7px;align-items:center}
+.notes .tchk{width:14px;height:14px;flex:none;display:grid;place-items:center;padding:0;border:1.5px solid color-mix(in srgb,var(--acc) 70%,var(--line));border-radius:3px;background:transparent;color:var(--acc-ink);font-size:10px;font-weight:700;cursor:pointer}
+.notehead{display:flex;flex:1;min-width:0;gap:4px;align-items:baseline;text-align:left;border:0;background:none;padding:2px 0;color:inherit;cursor:pointer;font:inherit;font-size:13.5px}
+.notehead .t{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.notehead .more{color:var(--muted);flex:none}
+.note.open .notehead .t{white-space:normal;font-weight:600}
+.note.done .notehead .t{text-decoration:line-through;color:var(--muted)}
+.nbody{margin:0 0 4px 21px;font-size:13px}
+.nbody p{margin:.2em 0}
+.notes .linkbtn.small{font-size:12px}
 .todo .tchk{width:22px;height:22px;flex:none;display:grid;place-items:center;padding:0;border:1.5px solid var(--line);border-radius:6px;background:var(--soft);color:var(--moss);font-weight:700;cursor:pointer}
 .todo.done .t{text-decoration:line-through;color:var(--muted)}
 .zone.z-pensum{--zc:var(--acc)} .zone.z-tages{--zc:var(--moss)} .zone.z-fall{--zc:var(--clay)}
@@ -619,8 +625,8 @@ async function deleteItem(id){
 }
 const progWritten = new Map(); // id → Zeitpunkt des letzten eigenen Schreibens
 async function putProgress(id,p){
-  S.progress.set(id,p); const row = rowOf(id,p); progWritten.set(id, row.updated_at);
-  if(S.sb) await sbRun("p/"+id, ()=>S.sb.from("progress").upsert(row, {onConflict:"user_id,id"})); else lsSave();
+  S.progress.set(id,p);
+  if(S.sb){ const row = rowOf(id,p); progWritten.set(id, row.updated_at); await sbRun("p/"+id, ()=>S.sb.from("progress").upsert(row, {onConflict:"user_id,id"})); } else lsSave();
 }
 async function deleteProgress(id){
   S.progress.delete(id); progWritten.set(id, now());
@@ -1331,7 +1337,7 @@ function vAktuell(){
     <div class="zlist">${fShown.length ? fShown.map(fallRow).join("") : `<div class="zempty">Noch kein Fall mit Lösung in dieser Reihe.</div>`}</div>
   </section>`;
 
-  return `<div class="hero"><div>
+  return `<div class="hero hero-notes"><div>
       <h1>Aktuell</h1>
       <p class="sub" style="margin-bottom:6px">${datum}${S.mode==="lokal"?". Noch nicht mit Supabase verbunden: Deine Einträge liegen nur in diesem Browser.":""}</p>
       <div class="pebbles">
@@ -1340,14 +1346,13 @@ function vAktuell(){
         <div class="pebble"><b>${wdh.length}</b><span>${wdh.length===1?"Wiederholung":"Wiederholungen"} fällig</span></div>
         <div class="pebble"><b>${all.filter(isNew).length}</b><span>noch nie gelernt</span></div>
       </div>
-    </div>${ILL.hero()}</div>
+    </div>${notesZone()}</div>
     ${(()=>{ const d = session && session.idx<session.ids.length ? {label:session.label, idx:session.idx, ids:session.ids, kind:session.kind, live:true} : S.savedSess; if(!d || ["pensum","tages","fall"].includes(d.kind)) return "";
       return `<div class="hint resume">${ILL.idee()}<span><b>Angefangene Abfrage:</b> ${esc(d.label)}, ${d.idx} von ${d.ids.length} erledigt. Dein Stand ist gespeichert.</span><span class="spacer"></span><button class="btn st-part" data-act="${d.live?"tosession":"resume"}">Fortsetzen</button>${d.live?"":`<button class="btn ghost small" data-act="dropsess">Verwerfen</button>`}</div>`; })()}
     ${example?`<div class="hint">${ILL.idee()}<span>Die Kartei enthält noch Beispielinhalte zum Ausprobieren. Du kannst sie unter „Daten“ löschen.</span></div>`:""}
     ${leech?`<div class="hint">${ILL.idee()}<span><b>${leech} Problemkarte${leech>1?"n":""}:</b> <a href="#problemkarten" class="linkbtn">Ansehen</a></span></div>`:""}
     ${fixes?`<div class="hint">${ILL.idee()}<span><b>${fixes} Korrekturvorschl${fixes>1?"äge":"ag"}</b> offen. <a class="linkbtn" href="#bibliothek" data-act="fixfilter">Alle zeigen</a></span></div>`:""}
-    <div class="zones">${pensum}${tages}${fall}</div>
-    ${notesZone()}`;
+    <div class="zones">${pensum}${tages}${fall}</div>`;
 }
 /* To-do-Themen: freie Liste in „Aktuell“, gespeichert in den Einstellungen (Konto) */
 function todoZone(){
@@ -1419,7 +1424,7 @@ function vLernen(){
   if(!it){ session.idx++; return vLernen(); }
   const pos = session.idx+1, tot = session.ids.length;
   return `<div class="row"><b>${esc(session.label)}</b><span class="muted">${pos} von ${tot}</span><span class="spacer"></span>
-    ${session.history&&session.history.length?`<button class="btn ghost" data-act="backcard" title="Zur vorherigen Karte (Taste B oder ←)">← Zurück</button>`:""}<button class="btn ghost" data-act="endsession">Beenden</button></div>
+    ${session.history&&session.history.length?`<button class="btn ghost" data-act="backcard" title="Zur vorherigen Karte (Taste B oder ←)">← Zurück</button>`:""}<button class="btn ghost" data-act="skipcard" title="Ohne Bewertung überspringen (Taste S oder →). Die Karte bleibt fällig.">Überspringen →</button><button class="btn ghost" data-act="endsession">Beenden</button></div>
   <div class="bar"><i style="width:${(session.idx/tot*100).toFixed(1)}%"></i></div>
   <div class="study">
     <div>${fixNotice(it)}${sheet(it, session.revealed, true)}</div>
@@ -1583,9 +1588,22 @@ async function grade(g){
   render();
 }
 
+/* Überspringen: Karte ohne Bewertung aus diesem Durchgang nehmen; sie bleibt fällig und kommt beim nächsten Start wieder */
+function skipCard(){
+  if(!session || session.idx >= session.ids.length) return;
+  const id = session.ids[session.idx];
+  session.ids.splice(session.idx, 1);
+  if(!session.history) session.history = [];
+  session.history.push({id, skip:true, at:session.idx});
+  session.revealed = false; verdicts.delete(id); checks.delete(id); own.delete(id); mnemoEdit = null; gradeInfo = 0;
+  saveSess();
+  if(session.idx >= session.ids.length){ finishAbg(abgKeyOf(session)); toast("✓ "+session.label+" abgeschlossen"); }
+  render();
+}
 async function backCard(){
   if(!session || !session.history || !session.history.length) return;
   const h = session.history.pop();
+  if(h.skip){ session.ids.splice(Math.min(h.at, session.ids.length), 0, h.id); session.idx = Math.min(h.at, session.ids.length-1); session.revealed = false; saveSess(); render(); return; }
   if(h.inserted!=null && session.ids[h.inserted]===h.id) session.ids.splice(h.inserted,1);
   session.results[h.g] = Math.max(0, session.results[h.g]-1);
   session.idx = Math.max(0, session.idx-1);
@@ -1804,7 +1822,7 @@ function vDetail(id){
    Zusammenführen je Notiz nach Zeitstempel; Gelöschtes bleibt als Grabstein, damit es auf anderen Geräten nicht zurückkommt. */
 const NOTES_KEY = "juragarage-notizen";
 try{ S.notes = (JSON.parse(localStorage.getItem(NOTES_KEY)||"{}")||{}).list || []; }catch(e){ S.notes = []; }
-let noteEdit = null, noteOpen = null, noteAll = false, noteQ = "", noteArea = "", noteTimer = null;
+let noteEdit = null, noteOpen = null, noteDone = false, noteAll = false, noteQ = "", noteArea = "", noteTimer = null;
 function mergeNotes(remote){
   const r = remote && Array.isArray(remote.list) ? remote.list : []; const m = new Map(S.notes.map(n=>[n.id,n]));
   for(const n of r){ const l = m.get(n.id); if(!l || (n.updated||"") > (l.updated||"")) m.set(n.id, n); }
@@ -1821,41 +1839,42 @@ const noteDate = n => n.updated ? new Date(n.updated).toLocaleDateString("de-DE"
 const noteAreas = () => [...new Set([...areas(), ...liveNotes().map(n=>n.area).filter(Boolean)])].sort((a,b)=>a.localeCompare(b,"de"));
 /* Notizen-Feld in „Aktuell“: Liste zum Aufklappen, Anlegen und Bearbeiten direkt im Feld */
 function noteForm(n){
-  if(!draftLinksInit){ draftLinks = n ? [...(n.links||[])] : []; draftLinksInit = true; }
-  return `<div class="form noteform" id="editform" data-id="">
-    <div class="two"><div class="field"><label for="n-title">Titel</label><input id="n-title" value="${esc(n&&n.title||"")}" placeholder="Titel"></div>
-    <div class="field"><label for="n-area">Rechtsgebiet</label><input id="n-area" list="narealist" value="${esc(n&&n.area||"")}"><datalist id="narealist">${noteAreas().map(a=>`<option value="${esc(a)}">`).join("")}</datalist></div></div>
-    <div class="field"><label for="n-text">Notiz</label><div class="mdbar"><button type="button" data-act="md" data-for="n-text" data-m="**" title="Auswahl fett">B</button><button type="button" class="mk" data-act="md" data-for="n-text" data-m="==" title="Auswahl markieren">Markieren</button><small>**fett** · ==markiert== · Gliederung A., I., 1.</small></div><textarea id="n-text" style="min-height:120px">${esc(n&&n.text||"")}</textarea></div>
-    <div class="field picker"><label for="f-link">Verknüpfen mit (optional)</label><input id="f-link" placeholder="Karte, Schema oder Fall suchen" autocomplete="off"><div class="drop" id="linkdrop" hidden></div>
-      <div class="chips" id="linkchips">${linkChips()}</div></div>
-    <div class="row"><button class="btn primary" data-act="notesave" data-id="${n?esc(n.id):""}">${n?"Speichern":"Notiz anlegen"}</button><button class="btn" data-act="notecancel">Abbrechen</button></div>
+  return `<div class="noteform" id="noteform">
+    <input id="n-title" value="${esc(n&&n.title||"")}" placeholder="Titel">
+    <textarea id="n-text" placeholder="Text (optional) – **fett**, ==markiert==">${esc(n&&n.text||"")}</textarea>
+    <input id="n-area" list="narealist" value="${esc(n&&n.area||"")}" placeholder="Rechtsgebiet (optional)"><datalist id="narealist">${noteAreas().map(a=>`<option value="${esc(a)}">`).join("")}</datalist>
+    <div class="row" style="gap:6px"><button class="btn small primary" data-act="notesave" data-id="${n?esc(n.id):""}">Speichern</button><button class="btn small ghost" data-act="notecancel">Abbrechen</button></div>
   </div>`;
 }
 function notesZone(){
-  const all = liveNotes(), toks = fold(noteQ).split(/\s+/).filter(Boolean);
-  const list = all.filter(n=>(!noteArea || n.area===noteArea) && (!toks.length || toks.every(t=>fold([n.title,n.text,n.area].join(" ")).includes(t))));
-  const ar = [...new Set(all.map(n=>n.area).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"de"));
+  const all = liveNotes(), offen = all.filter(n=>!n.done), erl = all.filter(n=>n.done);
   const row = n => {
-    if(noteEdit===n.id) return `<div class="zrow note">${noteForm(n)}</div>`;
+    if(noteEdit===n.id) return `<li class="note">${noteForm(n)}</li>`;
     const open = noteOpen===n.id, linked = (n.links||[]).map(x=>S.items.get(x)).filter(Boolean);
-    return `<div class="zrow note ${open?"open":""}"><button class="notehead" data-act="noteopen" data-id="${esc(n.id)}" aria-expanded="${open}"><span class="t">${hl(n.title||"(ohne Titel)", toks)}</span><span class="s">${esc([n.area, noteDate(n)].filter(Boolean).join(" · "))}</span></button>
-      ${open ? `<div class="notebody">${fmtBack(n.text||"") || '<p class="muted">Kein Text.</p>'}</div>
-      ${linked.length ? `<div class="links-line"><span class="small muted">Verknüpft:</span>${linked.map(o=>`<a class="lchip t-${esc(o.type)}" href="#e-${esc(o.id)}" title="${esc(TYPES[o.type])}: ${esc(titleOf(o))}"><i class="dot"></i><span class="lt">${esc(titleOf(o))}</span></a>`).join("")}</div>` : ""}
-      <div class="row" style="margin-top:10px"><button class="btn small" data-act="noteedit" data-id="${esc(n.id)}">Bearbeiten</button><button class="btn ghost small" data-act="notedel" data-id="${esc(n.id)}">Löschen</button></div>` : ""}</div>`;
+    return `<li class="note ${n.done?"done":""} ${open?"open":""}"><div class="nline"><button class="tchk" data-act="notedone" data-id="${esc(n.id)}" aria-pressed="${!!n.done}" title="${n.done?"Wieder öffnen":"Abhaken"}">${n.done?"✓":""}</button><button class="notehead" data-act="noteopen" data-id="${esc(n.id)}" aria-expanded="${open}" title="${esc(n.title||"")}"><span class="t">${esc(n.title||"(ohne Titel)")}</span>${n.text&&!open?`<span class="more">…</span>`:""}</button></div>
+      ${open ? `<div class="nbody">${n.text ? fmtBack(n.text) : ""}${n.area?`<div class="small muted">${esc(n.area)}</div>`:""}
+      ${linked.length ? `<div class="links-line" style="margin-top:6px">${linked.map(o=>`<a class="lchip t-${esc(o.type)}" href="#e-${esc(o.id)}"><i class="dot"></i><span class="lt">${esc(titleOf(o))}</span></a>`).join("")}</div>` : ""}
+      <div class="row" style="gap:4px;margin-top:6px"><button class="linkbtn small" data-act="noteedit" data-id="${esc(n.id)}">Bearbeiten</button><button class="linkbtn small" data-act="notedel" data-id="${esc(n.id)}">Löschen</button></div></div>` : ""}</li>`;
   };
-  return `<section class="zone z-notiz" style="margin-top:20px">
-    <header><h2>Notizen${all.length?` <span class="muted" style="font:500 14px var(--sans)">${all.length}</span>`:""}</h2><span class="spacer"></span>${noteEdit ? "" : `<button class="btn small" data-act="noteneu" title="Neue Notiz">+ Neu</button>`}</header>
-    ${all.length > 5 ? `<div class="filters"><input type="search" data-note="q" value="${esc(noteQ)}" placeholder="Notizen durchsuchen" aria-label="Notizen durchsuchen"><select data-note="area" aria-label="Rechtsgebiet"><option value="">Alle Rechtsgebiete</option>${ar.map(a=>`<option ${noteArea===a?"selected":""}>${esc(a)}</option>`).join("")}</select></div>` : ""}
-    ${noteEdit==="neu" ? `<div class="zrow note">${noteForm(null)}</div>` : ""}
-    <div class="zlist">${list.length ? (noteAll || toks.length || noteArea ? list : list.slice(0,6)).map(row).join("") : `<div class="zempty">${all.length ? "Keine Notiz passt zur Suche." : "Noch keine Notizen."}</div>`}
-    ${list.length>6 && !toks.length && !noteArea ? `<button class="linkbtn small" data-act="noteall">${noteAll?"Weniger anzeigen":"Alle "+list.length+" anzeigen"}</button>` : ""}</div>
-  </section>`;
+  return `<aside class="notes nomic">
+    <div class="nhead">Notizen${offen.length?` · ${offen.length}`:""}</div>
+    ${noteEdit==="neu" ? noteForm(null) : `<input id="noteq" class="nadd" placeholder="+ Notiz" autocomplete="off">`}
+    <ul class="nlist">${offen.map(row).join("")}${noteDone ? erl.map(row).join("") : ""}</ul>
+    ${!all.length ? `<div class="small muted" style="padding:4px 2px">Noch keine Notizen.</div>` : ""}
+    ${erl.length ? `<div class="row" style="gap:10px;margin-top:4px"><button class="linkbtn small" data-act="notedonelist">${noteDone?"Erledigte ausblenden":"✓ "+erl.length+" erledigt"}</button>${noteDone?`<button class="linkbtn small" data-act="notedoneclr">Erledigte löschen</button>`:""}</div>` : ""}
+  </aside>`;
+}
+function noteQuick(){
+  const i = $("#noteq"), v = (i && i.value || "").trim(); if(!v) return;
+  const t = new Date().toISOString();
+  S.notes = [...S.notes, {id:"n"+Date.now().toString(36)+Math.random().toString(36).slice(2,5), created:t, updated:t, title:v, text:"", area:"", links:[]}];
+  saveNotes(); render(); setTimeout(()=>{ const j = $("#noteq"); j && j.focus(); }, 0);
 }
 function noteSave(id){
   const title = ($("#n-title").value||"").trim(), text = ($("#n-text").value||"").replace(/\s+$/,""), area = ($("#n-area").value||"").trim();
   if(!title && !text.trim()){ toast("Die Notiz ist leer."); return; }
   const t = new Date().toISOString(), old = id ? noteById(id) : null;
-  const n = Object.assign({}, old||{id:"n"+Date.now().toString(36)+Math.random().toString(36).slice(2,5), created:t}, {title, text, area, links:[...new Set(draftLinks)], updated:t});
+  const n = Object.assign({}, old||{id:"n"+Date.now().toString(36)+Math.random().toString(36).slice(2,5), created:t}, {title, text, area, links:(old&&old.links)||[], updated:t});
   S.notes = [...S.notes.filter(x=>x.id!==n.id), n]; saveNotes();
   noteEdit = null; noteOpen = n.id; draftLinksInit = false; toast(old?"Notiz gespeichert":"Notiz angelegt"); render();
 }
@@ -2159,12 +2178,13 @@ document.addEventListener("click", async e=>{
   else if(a==="todo-t"){ const t = (S.settings.todo||[]).find(x=>x.id===id); if(t){ t.done = !t.done; saveSettings(); render(); } }
   else if(a==="todo-x"){ S.settings.todo = (S.settings.todo||[]).filter(x=>x.id!==id); saveSettings(); render(); }
   else if(a==="todo-clr"){ S.settings.todo = (S.settings.todo||[]).filter(x=>!x.done); saveSettings(); render(); }
-  else if(a==="noteneu"){ noteEdit = "neu"; draftLinksInit = false; render(); setTimeout(()=>{ const i = $("#n-title"); i && i.focus(); }, 0); }
-  else if(a==="noteall"){ noteAll = !noteAll; render(); }
   else if(a==="noteopen"){ noteOpen = noteOpen===id ? null : id; render(); }
-  else if(a==="noteedit"){ noteEdit = id; draftLinksInit = false; render(); }
+  else if(a==="notedone"){ const n = noteById(id); if(n){ S.notes = S.notes.map(x=>x.id===id ? Object.assign({}, x, {done:!x.done, updated:new Date().toISOString()}) : x); saveNotes(); render(); } }
+  else if(a==="notedonelist"){ noteDone = !noteDone; render(); }
+  else if(a==="notedoneclr"){ if(confirm("Alle erledigten Notizen löschen?")){ const t = new Date().toISOString(); S.notes = S.notes.map(x=>x.done && !x.del ? {id:x.id, del:true, updated:t} : x); saveNotes(); noteDone = false; render(); } }
+  else if(a==="noteedit"){ noteEdit = id; render(); setTimeout(()=>{ const i = $("#n-text"); i && i.focus(); }, 0); }
   else if(a==="notesave"){ noteSave(id); }
-  else if(a==="notecancel"){ noteEdit = null; draftLinksInit = false; render(); }
+  else if(a==="notecancel"){ noteEdit = null; render(); }
   else if(a==="notedel"){ const n = noteById(id); if(n && confirm("Notiz „"+(n.title||"ohne Titel")+"“ löschen?")){ S.notes = S.notes.map(x=>x.id===id ? {id, del:true, updated:new Date().toISOString()} : x); saveNotes(); if(noteOpen===id) noteOpen = null; toast("Notiz gelöscht"); render(); } }
   else if(a==="tahist"){ taHist = !taHist; render(); }
   else if(a==="fall"){ startFall(b.dataset.k); }
@@ -2178,6 +2198,7 @@ document.addEventListener("click", async e=>{
   else if(a==="grade"){ grade(Number(b.dataset.g)); }
   else if(a==="bibtab"){ bib.cat = b.dataset.t; render(); }
   else if(a==="backcard"){ await backCard(); }
+  else if(a==="skipcard"){ skipCard(); }
   else if(a==="endsession"){ if(session && session.idx < session.ids.length){ saveSess(); toast("Abfrage pausiert – unter „Aktuell“ kannst du weitermachen"); } else saveSess(); session = null; if(b.tagName!=="A") go("aktuell"); }
   else if(a==="resume"){ resumeSess(); }
   else if(a==="dropsess"){ if(confirm("Angefangene Abfrage verwerfen? Bereits bewertete Karten bleiben gespeichert.")){ session = null; S.savedSess = null; saveSess(); render(); } }
@@ -2255,7 +2276,8 @@ document.addEventListener("keydown", e=>{
   const ae = document.activeElement; const typing = ae && /INPUT|TEXTAREA|SELECT/.test(ae.tagName);
   if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==="f"){ e.preventDefault(); if(route()!=="suche") go("suche"); else { const i=$("#bigq"); i&&i.focus(); i&&i.select(); } return; }
   if(ae && ae.id==="sktext" && e.key==="Enter" && (e.ctrlKey||e.metaKey)){ e.preventDefault(); const cur = session && S.items.get(session.ids[session.idx]); if(cur) checkCase(cur.id); return; }
-  if(ae && ae.id==="todoin" && e.key==="Enter"){ e.preventDefault(); addTodo(); return; }
+  if(ae && ae.id==="noteq" && e.key==="Enter"){ e.preventDefault(); noteQuick(); return; }
+  if(ae && ae.id==="n-title" && e.key==="Enter"){ e.preventDefault(); const b = document.querySelector('[data-act="notesave"]'); b && b.click(); return; }
   if(ae && ae.id==="chatin" && e.key==="Enter" && !e.shiftKey){ e.preventDefault(); const box = ae.closest(".chat"); sendChat(box.dataset.chat, ae.value); return; }
   if(e.key==="Escape"){ if($("#layer").innerHTML){ $("#layer").innerHTML=""; return; } if(typing){ ae.blur(); return; } }
   if(typing || e.ctrlKey || e.metaKey || e.altKey) return;
@@ -2264,6 +2286,7 @@ document.addEventListener("keydown", e=>{
     if((e.key===" "||e.key==="Enter") && !session.revealed){ e.preventDefault(); const cur = S.items.get(session.ids[session.idx]); const sk = $("#sktext"); if(cur && cur.type==="case" && sk){ sk.focus(); return; } session.revealed=true; render(); return; }
     if(session.revealed && /^[1-5]$/.test(e.key)){ e.preventDefault(); grade(Number(e.key)); return; }
     if((e.key==="b"||e.key==="ArrowLeft") && session.history && session.history.length){ e.preventDefault(); backCard(); return; }
+    if(e.key==="s"||e.key==="ArrowRight"){ e.preventDefault(); skipCard(); return; }
     if(e.key==="w" && !session.revealed){ const ta=$("#wtext"); if(ta){ e.preventDefault(); ta.focus(); } return; }
   }
   if(e.key==="k"){ const c=$("#chatin"); if(c && !c.disabled){ e.preventDefault(); c.focus(); } return; }
